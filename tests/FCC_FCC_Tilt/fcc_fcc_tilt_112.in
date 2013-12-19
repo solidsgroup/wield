@@ -1,0 +1,32 @@
+DISTRIBUTION=???
+
+#IO SETTINGS
+
+$outfile tests/FCC_FCC_Tilt/fcc_fcc_tilt_112_DISTRIBUTION.dat
+
+#CRYSTAL PARAMETERS
+
+$C_1 tests/FCC_FCC_Tilt/fcc.in
+$C_2 tests/FCC_FCC_Tilt/fcc.in
+$C 0 0 0 0 0 0 
+$f_constants tests/FCC_FCC_Tilt/fcc_fcc_DISTRIBUTION.in
+
+#CONFIGURATION PARAMETERS
+
+$X1 1 1 2
+$Z1 1 -1 0
+$X2 1 1 2
+$Z2 1 -1 0
+$ThetaRotX1 0.5
+$ThetaRotX2 0.5
+$theta_min 0
+$theta_max 105
+$dtheta 1
+
+$xtype degrees
+
+#NUMERICAL SETTINGS
+
+$tolerance 0.003
+$distribution DISTRIBUTION
+

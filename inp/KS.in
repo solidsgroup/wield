@@ -1,0 +1,61 @@
+MACROS
+
+ANGLE=???
+true=1
+false=0
+
+IO SETTINGS
+
+$outfile dat/KS_ANGLE.dat
+#$outfile dat/KS_ANGLE_2d.dat
+
+CRYSTAL PARAMETERS
+
+$C_1 inp/fcc.in
+$C_2 inp/bcc.in
+$C 0 0 0 0 0 0 
+$A 2.89
+$B 35.7
+$stdev 0.1
+
+CONFIGURATION PARAMETERS
+
+#$X1 1 1 1
+#$Z1 -1 1 0
+#$X2 1 1 0
+#$Z2 1 -1 -1
+
+#$Y1 1 1 1
+#$Z1 1 1 -2
+#$Y2 1 1 0
+#$Z2 1 -1 2
+
+$X1 -1 1 0
+$X2 1 -1 -1 
+
+$Z1 1  1 -2
+$Z2 1 -1 2
+
+
+$RotX1_offset ANGLE
+$ThetaRotX1 1
+$ThetaRotX2 1
+$ThetaRotZ2 0
+$theta_min -25
+$theta_max 25
+$dtheta 0.1
+
+#$PhiRotX1 1
+#$PhiRotX2 1
+#$phi_min 0
+#$phi_max 80
+#$dphi 5
+
+NUMERICAL PARAMETERS
+
+$tolerance 0.003
+
+PROGRAM OPTIONS
+
+$relaxation false
+

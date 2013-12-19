@@ -1,0 +1,11 @@
+OFFSET=0.0351
+MULT=1.4/.0123
+
+$A OFFSET*MULT
+$B 1*MULT
+$stdev 0.4
+#$A 4.2
+#$B 114.74
+
+#$A 3.6067
+#$B 38.25

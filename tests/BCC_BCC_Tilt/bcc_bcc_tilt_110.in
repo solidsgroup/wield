@@ -1,0 +1,31 @@
+DISTRIBUTION=???
+
+#IO SETTINGS
+
+$outfile tests/BCC_BCC_Tilt/bcc_bcc_tilt_110_DISTRIBUTION.dat
+
+#CRYSTAL PARAMETERS
+
+$C_1 tests/BCC_BCC_Tilt/bcc.in
+$C_2 tests/BCC_BCC_Tilt/bcc.in
+$C 0 0 0 0 0 0 
+$f_constants tests/BCC_BCC_Tilt/bcc_bcc_DISTRIBUTION.in
+
+#CONFIGURATION PARAMETERS
+
+$X1 1 1 0
+$Z1 0 0 1
+$X2 1 1 0
+$Z2 0 0 1
+$ThetaRotX1 0.5
+$ThetaRotX2 0.5
+$theta_min 0
+$theta_max 180
+$dtheta 1
+
+#NUMERICAL PARAMETERS
+
+$tolerance 0.003
+$distribution DISTRIBUTION
+
+
