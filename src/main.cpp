@@ -1,3 +1,5 @@
+// WIELD: general interface energy computation
+
 #include <iostream>
 #include <fstream>
 #include <vector>
