@@ -1,4 +1,13 @@
-// WIELD: general interface energy computation
+///
+/// \file main.cpp
+/// \brief This is the short description for main.cpp
+///
+/// This is the long description for main.cpp
+/// \f[\int_{\Omega}\nabla\cdot\mathbb{V}dV = \int_{\partial\Omega}\mathbb{V}\cdot\mathbb{n}dA\f]
+///
+
+/// WIELD: general interface energy computation
+/// (W)eak approximation of (I)nterface (E)nergy for bicrysta(L) boun(D)aries
 
 #include <iostream>
 #include <fstream>
@@ -8,7 +17,7 @@
 #include "Eigen/Geometry"
 #include "SurfaceIntegrate.h"
 #include "Trig6Int.h"
-#include "DTrig6Int.h"
+//#include "DTrig6Int.h"
 #include "ElasticEnergy.h"
 #include "Energy.h"
 #include "Rotations.h"
@@ -20,7 +29,12 @@
 
 using namespace std;
 using namespace Eigen;
-
+///
+/// \fn int main(int argc, char* argv[])
+/// \param argc The number of command line arguments passed
+/// \param argv An array of command line arguments
+/// This is the main function for the program
+///
 int main(int argc, char* argv[])
 {
   string filename;

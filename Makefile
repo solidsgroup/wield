@@ -44,6 +44,12 @@ obj/%.o: src/%.cpp #$(HDR)
 
 
 #
+# Doxygen generation
+#
+doc:
+	mkdir -p doc
+
+#
 # Utility Targets
 #
 
