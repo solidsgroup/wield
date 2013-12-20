@@ -1,5 +1,3 @@
-// Comment B
-// I want to have a comment here!
 // WIELD: general interface energy computation
 
 #include <iostream>
@@ -168,3 +166,5 @@ int main(int argc, char* argv[])
 	}
     }
 }
+
+
