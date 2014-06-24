@@ -1,3 +1,6 @@
+///
+/// \file FTT.cpp
+///
 #include "FTT.h"
 #include "Dirac.h"
 #include "colors.h"

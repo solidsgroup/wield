@@ -1,53 +1,68 @@
+# Generic Makefile
+# Brandon Runnels
+# Last Edited: November 5, 2013
 
-#include ~/.make.eureka
+include ~/.make.reader
 include ~/.make.eigen
+ifndef EMACS
 include ~/.make.color
-include ~/.make.matio
+include ~/.make.vtk
+endif
 
-CC              = g++
-CPP_COMPILER_OPTIONS = -std=c++11
-CPP_LINKER_OPTIONS = -lm -lmuparser -lreadline
+CC                    = g++
+CPP_COMPILER_OPTIONS += -c -m64 -g3 -Wno-deprecated -ggdb -fbuiltin -no-canonical-prefixes -include ~/Include/colors.h 
+CPP_LINKER_OPTIONS   += -m64 -g3 -ggdb
 
-EXE 		= ./bin/Main
-SRC		= $(shell find ./src/ -name '*.cpp')
-HDR		= $(shell find ./inc/ -name '*.h')
-OBJ 		= $(subst ./src/,./obj/, $(SRC:.cpp=.o))
-INC 		= -I./src \
-		  -I./inc \
-		  $(INC_EXT)
-LIB		= $(LIB_EXT)
+ifdef EMACS
+PREFIX                = $(shell pwd)/
+endif
+EXCLUDE               = $(PREFIX)/src/MainOld.cpp
+SRC_MAIN              = $(filter-out $(EXCLUDE), $(shell find ./src/ -name '*.cc'))
+EXE 		      = $(subst ./src/,./bin/, $(SRC_MAIN:.cc=))
+SRC		      = $(filter-out $(EXCLUDE), $(shell find ./src/ -name '*.cpp'))
+HDR		      = $(filter-out $(EXCLUDE), $(shell find ./inc/ -name '*.h'))
+OBJ 		      = $(subst ./src/,./obj/, $(SRC:.cpp=.o)) 
+OBJ_MAIN              = $(subst ./src/,./obj/, $(SRC_MAIN:.cc=.o))
+INC 		      = -I./src \
+		        -I./inc \
+		        $(INC_EXT)
+LIB		      = $(LIB_EXT)
 
+.SECONDARY: $(OBJ) $(OBJ_MAIN)
 
 all: make_directories $(EXE)
-
-make_directories:
-	@mkdir -p $(dir $(OBJ))
-
-$(EXE): $(OBJ)
-	@echo -e $(B_ON)$(FG_BLUE)"###"
-	@echo "### LINKING" 
-	@echo -e "###"$(RESET)
-	$(CC) ${CPP_LINKER_OPTIONS} -o $(EXE) $(OBJ) $(LIB)
 	@echo -e $(B_ON)$(FG_GREEN)"###"
 	@echo "### DONE" 
 	@echo -e "###"$(RESET)	
 
-obj/%.o: src/%.cpp #$(HDR)
+$(PREFIX)bin/%: ./obj/%.o $(OBJ) 
+	@echo -e $(B_ON)$(FG_BLUE)"###"
+	@echo "### LINKING $@" 
+	@echo -e "###"$(RESET)
+	@mkdir -p $(dir $@)
+	$(CC) ${CPP_LINKER_OPTIONS} -o $@ $^ $(LIB)
+
+./obj/%.o: ./src/%.cpp 
 	@echo -e $(B_ON)$(FG_YELLOW)"###"
 	@echo "### COMPILING $<" 
 	@echo -e "###"$(RESET)
-	$(CC) -c $(CPP_COMPILER_OPTIONS) $(INC) -o $@ $<
+	$(CC) $(CPP_COMPILER_OPTIONS) $(INC) -o $@ $(PREFIX)$<
+
+./obj/%.o: ./src/%.cc 
+	@echo -e $(B_ON)$(FG_YELLOW)"###"
+	@echo "### COMPILING $<" 
+	@echo -e "###"$(RESET)
+	$(CC) $(CPP_COMPILER_OPTIONS) $(INC) -o $@ $(PREFIX)$<
+
+make_directories: $(SRC)
+	mkdir -p $(dir $(OBJ)) $(dir $(OBJ_MAIN)) bin
 
 %.cpp:
 
+%.cc:
+
 %.h :
 
-
-#
-# Doxygen generation
-#
-doc:
-	mkdir -p doc
 
 #
 # Utility Targets
@@ -57,6 +72,6 @@ clean:
 	@echo -e $(B_ON)$(FG_RED)"###"
 	@echo "### Cleaning out ./obj, ./bin, *~, *#" 
 	@echo -e "###"$(RESET)	
-	rm -rf ${OBJ}  ${EXE} *~ *\#
+	rm -rf ${OBJ} ${EXE} ./bin/* *~ *\#
 tidy:
 	rm -rf *~ *\# src/*~ src/*\# dat/*~ dat/*\# inc/*~ inc/*\# 

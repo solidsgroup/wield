@@ -1,3 +1,6 @@
+///
+/// \file DTrig6Int.cpp
+///
 #include "DTrig6Int.h"
 
 Vector6d DTrig6Int(int *_T, double *_a, double epsilon)

@@ -1,3 +1,8 @@
+///
+/// \file Trig6Int2_RS
+/// \brief This is the short description for Trig2Int2_RS
+///
+
 #include "Trig6Int2_RS.h"
 
 double RS::Trig6Int_2(int *_T1, int *_T2, double *_a, double *_b, double epsilon)

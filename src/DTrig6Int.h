@@ -5,5 +5,4 @@
 #include "Eigen/Geometry"
 #define PI 3.14159265369
 using namespace Eigen;
-typedef Matrix<double,6,1> Vector6d;
 Vector6d DTrig6Int(int *_T, double *_a, double epsilon);

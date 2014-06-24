@@ -1,3 +1,8 @@
+/// 
+/// \mainpage WIELD: (W)eak approximation of (I)nterface (E)nergy for bicrysta(L) boun(D)aries 
+/// This is a small research program to compute the energy of a bicrystal interface using the Site Potential method.
+/// 
+
 ///
 /// \file main.cpp
 /// \brief This is the short description for main.cpp
@@ -6,8 +11,6 @@
 /// \f[\int_{\Omega}\nabla\cdot\mathbb{V}dV = \int_{\partial\Omega}\mathbb{V}\cdot\mathbb{n}dA\f]
 ///
 
-/// WIELD: general interface energy computation
-/// (W)eak approximation of (I)nterface (E)nergy for bicrysta(L) boun(D)aries
 
 #include <iostream>
 #include <fstream>
@@ -33,6 +36,7 @@ using namespace Eigen;
 /// \fn int main(int argc, char* argv[])
 /// \param argc The number of command line arguments passed
 /// \param argv An array of command line arguments
+/// 
 /// This is the main function for the program
 ///
 int main(int argc, char* argv[])
@@ -63,6 +67,7 @@ int main(int argc, char* argv[])
   Vector3d ex(1,0,0), ey(0,1,0), ez(0,0,1);
 
   double tol = 0.1;
+  // Iterate through the OR parameterized by Theta
   for (double theta = theta_min; theta <= theta_max; theta += dtheta)
     {
       Matrix3d R1 =  RotX((ThetaRotX1*theta)*PI/180) * RotY((ThetaRotY1*theta)*PI/180) * RotZ((ThetaRotZ1*theta)*PI/180);
@@ -72,8 +77,10 @@ int main(int argc, char* argv[])
 	goto testbed;
 
 
+      // If there is no interface rotation, do this
       if (fabs(phi_min - phi_max) < 1E-10)
 	{
+	  //W.SetR(Omega_1*R1,Omega_2*R2);
 	  W.SetR(Omega_1*R1,Omega_2*R2);
 
 	  if (xtype=="degrees")
@@ -83,6 +90,7 @@ int main(int argc, char* argv[])
 	  out << (A + B*W.W(alpha));
 	  out << endl;
 	}
+      // Do this if rotating the interface for a fixed OR
       else
 	for (double phi = phi_min; phi <= phi_max; phi += dphi)
 	  {

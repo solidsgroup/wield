@@ -1,3 +1,6 @@
+///
+/// \file Trig6Int.cpp
+///
 #include "Trig6Int.h"
 #define COS 0
 #define SIN 1

@@ -1,3 +1,6 @@
+///
+/// \file Crystal.cpp
+///
 #include "Crystal.h"
 
 // int Generate(int order,

@@ -1,3 +1,6 @@
+///
+/// \file ElasticEnergy.cpp
+///
 #include "ElasticEnergy.h"
 
 double ElasticEnergy(Vector6d C, Vector6d alpha)

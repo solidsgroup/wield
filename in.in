@@ -1,15 +1,15 @@
-DISTRIBUTION=???
+$DISTRIBUTION cauchy
 
 #IO SETTINGS
 
-$outfile tests/BCC_BCC_Tilt/bcc_bcc_tilt_110_DISTRIBUTION.dat
+$outfile tests/BCC_BCC_Tilt/bcc_bcc_tilt_110_$DISTRIBUTION.dat
 
 #CRYSTAL PARAMETERS
 
 $C_1 tests/BCC_BCC_Tilt/bcc.in
 $C_2 tests/BCC_BCC_Tilt/bcc.in
 $C 0 0 0 0 0 0 
-$f_constants tests/BCC_BCC_Tilt/bcc_bcc_DISTRIBUTION.in
+$f_constants tests/BCC_BCC_Tilt/bcc_bcc_$DISTRIBUTION.in
 
 #CONFIGURATION PARAMETERS
 

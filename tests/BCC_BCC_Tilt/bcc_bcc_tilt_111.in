@@ -18,7 +18,7 @@ $Z1 0 -1 1
 $X2 1 1 1
 $Z2 0 -1 1
 $ThetaRotX1 0.5
-$ThetaRotX2 0.5
+$ThetaRotX2 -0.5
 $theta_min 0
 $theta_max 60
 $dtheta 1

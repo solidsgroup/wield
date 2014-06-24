@@ -1,0 +1,32 @@
+$order 4
+$sigma 0.2
+
+$alpha1 1
+$alpha2 1
+$alpha3 1
+
+#Y (3)   (4)   #Y    (8)      #Y (12)    (13)
+#Y    (2)      #Y (6)   (7)   #Y     (11)
+#Y (0)   (1)   #Y    (5)      #Y (9)     (10)    
+# XXXXXXXXXX   # XXXXXXXXXX   # XXXXXXXXXXXXX
+
+$X 0 1 0.5 0 1 0.5 0 1 0.5 0 1 0.5 0 1
+$Y 0 0 0.5 1 1 0 0.5 0.5 1 0 0 0.5 1 1 
+$Z 0 0 0 0 0 0.5 0.5 0.5 0.5 1 1 1 1 1
+
+$outfile fcc.in
+
+
+$vtk
+
+$xmin 0
+$xmax 4
+$ymin 0
+$ymax 2
+$zmin -0.5
+$zmax 0
+
+$resolution 50
+
+$FactorTop .6
+

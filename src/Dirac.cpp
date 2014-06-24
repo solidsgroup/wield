@@ -1,3 +1,6 @@
+///
+/// \file Dirac.cpp
+///
 #include "Dirac.h"
 double Dirac(double x, double sigma)
 {

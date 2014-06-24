@@ -1,3 +1,6 @@
+///
+/// \file Trig6Int_RS.cpp
+///
 #include "Trig6Int_RS.h"
 
 double RS::Trig6Int(int *_T, double *_a, double epsilon)
