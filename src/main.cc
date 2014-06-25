@@ -1,192 +1,213 @@
-/// 
-/// \mainpage WIELD: (W)eak approximation of (I)nterface (E)nergy for bicrysta(L) boun(D)aries 
-/// This is a small research program to compute the energy of a bicrystal interface using the Site Potential method.
-/// 
-
-///
-/// \file main.cpp
-/// \brief This is the short description for main.cpp
-///
-/// This is the long description for main.cpp
-/// \f[\int_{\Omega}\nabla\cdot\mathbb{V}dV = \int_{\partial\Omega}\mathbb{V}\cdot\mathbb{n}dA\f]
-///
 
 
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <fstream>
+#include <stdexcept>
+#define eigen_assert(A) if (!(A)) throw new std::runtime_error("Eigen threw an exception");
 #include "Eigen/Core"
 #include "Eigen/Geometry"
-#include "SurfaceIntegrate.h"
-#include "Trig6Int.h"
-//#include "DTrig6Int.h"
-#include "ElasticEnergy.h"
-#include "Energy.h"
-#include "Rotations.h"
-#include "Crystal.h"
-#include "matio.h"
-#include "Reader.h"
-#include "Convexify.h"
-#include "readline/readline.h"
 
 using namespace std;
 using namespace Eigen;
-///
-/// \fn int main(int argc, char* argv[])
-/// \param argc The number of command line arguments passed
-/// \param argv An array of command line arguments
-/// 
-/// This is the main function for the program
-///
+
+#include "/home/brandon/Research/Reader/Reader.h"
+
+
+#include "Utils/wieldTypes.h"
+#include "Utils/wieldRotations.h"
+#include "Utils/wieldExceptions.h"
+#include "SurfaceIntegrate.h"
+#include "Utils/wieldVTK.h"
+#include "Utils/wieldProgress.h"
+
 int main(int argc, char* argv[])
 {
+  WIELD_TRY;
+
+  //
+  // OPEN INPUT FILE READER
+  // 
+
   string filename;
-  /**/ if (argc < 2) {filename=readline("Please specify filename: ");cout << filename << endl;} // Currently failing--do not use
+  if (argc < 2) 
+    {WIELD_NEW_EXCEPTION("You must specify a filename!");}
   else filename=argv[1];
-  Reader myreader(filename,argc,argv,true);
+  Reader reader(filename, "$", "#", "...");
 
-  string mode;       myreader.Read(mode, "$mode", (string)"");
-  if (mode == "convexify") 
-    {Convexify(myreader); exit(0);}
 
-  #include "io.h"
+  //
+  // SPECIFICATION OF THE ORIENTATION RELATIONSHIP
+  // 
 
-  int order;
-  if (order1==order2) order = order1;
-  else {cout << "Crystal order must match" << endl; exit(0);}
+  // Specify orientation of crystal 1
+  Matrix3d Omega_1;
+  if (reader.Find("X1") && reader.Find("Y1"))
+    Omega_1 = createMatrixFromXY(reader.Read<Vector3d>("X1"), reader.Read<Vector3d>("Y1"));
+  else if (reader.Find("Y1") && reader.Find("Z1"))
+    Omega_1 = createMatrixFromYZ(reader.Read<Vector3d>("Y1"), reader.Read<Vector3d>("Z1"));
+  else if (reader.Find("Z1") && reader.Find("X1"))
+    Omega_1 = createMatrixFromZX(reader.Read<Vector3d>("Z1"), reader.Read<Vector3d>("X1"));
+  else WIELD_NEW_EXCEPTION("Missing two vectors to specify Omega_1");
 
-  Vector6d alpha; alpha << alpha1_1,alpha1_2,alpha1_3,alpha2_1,alpha2_2,alpha2_3;
-  Vector6d alpha0 = alpha;
+  // Specify orientation of crystal 2
+  Matrix3d Omega_2; 
+  if (reader.Find("X2") && reader.Find("Y2"))
+    Omega_2 = createMatrixFromXY(reader.Read<Vector3d>("X2"), reader.Read<Vector3d>("Y2"));
+  else if (reader.Find("Y2") && reader.Find("Z2"))
+    Omega_2 = createMatrixFromYZ(reader.Read<Vector3d>("Y2"), reader.Read<Vector3d>("Z2"));
+  else if (reader.Find("Z2") && reader.Find("X2"))
+    Omega_2 = createMatrixFromZX(reader.Read<Vector3d>("Z2"), reader.Read<Vector3d>("X2"));
+  else WIELD_NEW_EXCEPTION("Missing two vectors to specify Omega_2");
 
-  
-  vector<pair<Vector3d, double> > w;
 
-  Energy W(4,C_1,C_2,C,alpha0,stdev,tolerance,distribution,selfenergyfactor);
+  //
+  // VARIATION OF THE ORIENTATION RELATIONSHIP
+  //
 
-  Vector3d ex(1,0,0), ey(0,1,0), ez(0,0,1);
+  // Specify the range of the FREE VARIABLES:
+  double theta_min = reader.Read<double>("theta_min");
+  double dtheta    = reader.Read<double>("dtheta");
+  double theta_max = reader.Read<double>("theta_max");
+  double phi_min   = reader.Read<double>("phi_min",0.);
+  double dphi      = reader.Read<double>("dphi",0.);
+  double phi_max   = reader.Read<double>("phi_max",0.);
 
-  double tol = 0.1;
-  // Iterate through the OR parameterized by Theta
+  // Specify the rotation of the CRYSTAL 
+  double ThetaRotX1 = reader.Read<double>("ThetaRotX1",0.);
+  double ThetaRotY1 = reader.Read<double>("ThetaRotY1",0.);
+  double ThetaRotZ1 = reader.Read<double>("ThetaRotZ1",0.);
+  double ThetaRotX2 = reader.Read<double>("ThetaRotX2",0.);
+  double ThetaRotY2 = reader.Read<double>("ThetaRotY2",0.);
+  double ThetaRotZ2 = reader.Read<double>("ThetaRotZ2",0.);
+
+  // Specify the rotation of the INTERFACE
+  double PhiRotX1 = reader.Read<double>("PhiRotX1",0.);
+  double PhiRotY1 = reader.Read<double>("PhiRotY1",0.);
+  double PhiRotZ1 = reader.Read<double>("PhiRotZ1",0.);
+  double PhiRotX2 = reader.Read<double>("PhiRotX2",0.);
+  double PhiRotY2 = reader.Read<double>("PhiRotY2",0.);
+  double PhiRotZ2 = reader.Read<double>("PhiRotZ2",0.);
+
+
+  //
+  // ADJUSTABLE PARAMETERS
+  //
+
+  double A,B,stdev;
+  if (reader.Find("f_constants"))
+    {
+      string f_constants = reader.Read<string>("f_constants");
+      Reader constantsReader(f_constants, "$", "#", "...");
+      A = constantsReader.Read<double>("A");
+      B = constantsReader.Read<double>("B");
+      stdev = constantsReader.Read<double>("stdev");
+    }
+  else // Otherwise, look in the current file
+    {
+      A = reader.Read<double>("A");
+      B = reader.Read<double>("B");
+      stdev = reader.Read<double>("stdev");
+    }
+
+
+  //
+  // LATTICE FOURIER COEFFICIENTS FROM FILE
+  //
+
+  // Top crystal
+  string f1 = reader.Read<string>("C_1");
+  Reader crystal1Reader(f1, "$", "#", "...");
+  int order1 = crystal1Reader.Read<int>("order");
+  CosSeries C1(order1); crystal1Reader.Read<CosSeries>("C", &C1);
+  C1.order = order1;
+  C1.alpha1 = crystal1Reader.Read<double>("a1");
+  C1.alpha2 = crystal1Reader.Read<double>("a2");
+  C1.alpha3 = crystal1Reader.Read<double>("a3");
+
+  // Bottom crystal
+  string f2 = reader.Read<string>("C_2");
+  Reader crystal2Reader(f2, "$", "#", "...");
+  int order2 = crystal2Reader.Read<int>("order");
+  CosSeries C2(order2); crystal2Reader.Read<CosSeries>("C", &C2);
+  C2.order = order2;
+  C2.alpha1 = crystal2Reader.Read<double>("a1");
+  C2.alpha2 = crystal2Reader.Read<double>("a2");
+  C2.alpha3 = crystal2Reader.Read<double>("a3");
+
+
+  //
+  // MISC
+  //
+
+  double tolerance = reader.Read<double>("tolerance",0.);
+
+
+  //
+  // OUTPUT FILE STREAM
+  //
+
+  string outfile = reader.Read<string>("outfile"); // file to store computation data
+  ofstream out(outfile.c_str());        // output stream
+
+
+
+  //
+  // VTK VISUALIZATION
+  //
+
+  if (reader.Find("vtk"))
+    {
+      vector<Actor> actors;
+      actors.push_back(drawCrystal(C1, 
+				   Omega_1
+				   *createMatrixFromXAngle(reader.Read<double>("vtk_rot_x1",0.)) 
+				   *createMatrixFromYAngle(reader.Read<double>("vtk_rot_y1",0.))
+				   *createMatrixFromZAngle(reader.Read<double>("vtk_rot_z1",0.)),
+				   0*C1.alpha1, -2*C1.alpha2, 0*C1.alpha3,
+				   2*C1.alpha1,  2*C1.alpha2, 2*C1.alpha3,
+				   (int)((double)reader.Read<double>("resolution",50)/C1.alpha1), 
+				   0.6,0.));
+      actors.push_back(drawCrystal(C2, 
+				   Omega_2
+				   *createMatrixFromXAngle(reader.Read<double>("vtk_rot_x2",0.)) 
+				   *createMatrixFromYAngle(reader.Read<double>("vtk_rot_y2",0.))
+				   *createMatrixFromZAngle(reader.Read<double>("vtk_rot_z2",0.)),
+				   0*C2.alpha1, -2*C2.alpha2, -2*C2.alpha3,
+				   2*C2.alpha1,  2*C2.alpha2, 0*C2.alpha3,
+				   (int)((double)reader.Read<double>("resolution",50)/C1.alpha1), 
+				   0.6,0.));
+      renderCrystals(actors);
+      return 0;
+    }	
+
+
+  //
+  // ROTATE ORIENTATION RELATIONSHIP AND COMPUTE GRAIN BOUNDARY ENERGY
+  //
+
   for (double theta = theta_min; theta <= theta_max; theta += dtheta)
     {
-      Matrix3d R1 =  RotX((ThetaRotX1*theta)*PI/180) * RotY((ThetaRotY1*theta)*PI/180) * RotZ((ThetaRotZ1*theta)*PI/180);
-      Matrix3d R2 =  RotX((ThetaRotX2*theta)*PI/180) * RotY((ThetaRotY2*theta)*PI/180) * RotZ((ThetaRotZ2*theta)*PI/180);
-
-      if (testbed) 
-	goto testbed;
-
-
-      // If there is no interface rotation, do this
-      if (fabs(phi_min - phi_max) < 1E-10)
-	{
-	  //W.SetR(Omega_1*R1,Omega_2*R2);
-	  W.SetR(Omega_1*R1,Omega_2*R2);
-
-	  if (xtype=="degrees")
-	    out << theta << " ";
-	  else if (xtype == "normal")
-	    out << ey.dot(R1*ez) << " ";
-	  out << (A + B*W.W(alpha));
-	  out << endl;
-	}
-      // Do this if rotating the interface for a fixed OR
-      else
-	for (double phi = phi_min; phi <= phi_max; phi += dphi)
-	  {
-	    Matrix3d RR1 =  
-	      R1 * RotX((PhiRotX1*phi)*PI/180) * RotY((PhiRotY1*phi)*PI/180) * RotZ((PhiRotZ1*phi)*PI/180);
-	    Matrix3d RR2 =  
-	      R2 * RotX((PhiRotX2*phi)*PI/180) * RotY((PhiRotY2*phi)*PI/180) * RotZ((PhiRotZ2*phi)*PI/180);
-
-	    W.SetR(Omega_1*RR1,Omega_2*RR2);
-	    
-	    double _w_ = (A + B*W.W(alpha));
-	    Vector3d _n_ = RR1*ez; 
-
-	    out  << ex.transpose()*_n_ << " " << ey.transpose()*_n_ << " " << _w_ << endl;
-	    cout << ex.transpose()*_n_ << " " << ey.transpose()*_n_ << " " << _w_ << endl;
-
-	    if (relaxation)
-	      w.push_back(make_pair(_n_,_w_));
-	    cout << endl;
-	  }
-      continue;
-
-    testbed:
-
-      /*
-      {
-      	R1 =  RotX((4*theta)*PI/180);
-      	R2 =  RotX((4*theta)*PI/180);
-      	W.SetR(Omega_1*R1,Omega_2*R2);
+      Matrix3d Rot1 = 
+	Omega_1 *
+	createMatrixFromXAngle(theta*ThetaRotX1) *
+	createMatrixFromYAngle(theta*ThetaRotY1) *
+	createMatrixFromZAngle(theta*ThetaRotZ1);
+      Matrix3d Rot2 = 
+	Omega_2 *
+	createMatrixFromXAngle(theta*ThetaRotX2) *
+	createMatrixFromYAngle(theta*ThetaRotY2) *
+	createMatrixFromZAngle(theta*ThetaRotZ2);
       
-      	double small = 1E-5;
-      	double eps = 0.5;
-      	double DW, DW_numeric;
-      
-      	W.SetEpsilon(eps+small);
-      	DW_numeric = W.W(alpha);
-      	W.SetEpsilon(eps);
-      	DW_numeric -= W.W(alpha);
-      	DW_numeric /= small;
-      
-      	DW = W.W_epsilon(alpha);
-      
-      	cout << "computed=" << DW << "\t numeric=" << DW_numeric << endl;
-      }
-      exit(0);
-      */
+      out << theta << " " << 
+	A - B*SurfaceIntegrate(C1, Rot1,C2, Rot2,stdev,tolerance) << endl;
 
-      double eps1=0.5, eps2=1, eps3;
-      int k;
-      double f1, f2;
-      for (k=0;k<15;k++)
-	{
-	  W.SetR(Omega_1*R1,Omega_2*R2);
-
-	  // W.SetEpsilon((double)k / 10.);
-	  // cout << (double)k / 10. << " " << W.W(alpha) + E/((double) k/10.) << endl;
-	  // continue;
-
-	  W.SetEpsilon(eps1);
-	  f1 = B*W.W_epsilon(alpha) - E;
-	  W.SetEpsilon(eps2);
-	  f2 = B*W.W_epsilon(alpha) - E;
-	  eps3 = eps2 - f2*(eps2-eps1)/(f2-f1);
-	  eps1 = eps2;
-	  eps2 = eps3;
-	  cout << "k=" << k << " " << fabs(eps2-eps1) << "   eps=" << eps3 << " f1=" << f1 << " f2=" << f2 << endl;
-	  if (fabs(eps2-eps1)<1E-8) break;
-	};
-      cout << endl << endl;
-      //if (k==15) {cout << "Convergence error" << endl; exit(0);}
-
-      out << theta << " ";
-      out << A + B*W.W(alpha) + E*eps2;
-      out << endl;
+      WIELD_PROGRESS("Computing energy curve", theta-theta_min, theta_max-theta_min)
     }
-
-  if (relaxation)
-    {
-      vector<pair<Vector3d,double> >::iterator p,q,r;
-      for (p=w.begin();p!=w.end();p++)
-	{
-	  for (q=p+1;q!=w.end();q++)
-	    {
-	      for (r=q+1;r!=w.end();r++)
-		{
-		  Matrix3d M; 
-		  M.col(0) = p->first;
-		  M.col(1) = q->first;
-		  M.col(2) = r->first;
-
-		  cout << (M.inverse()*ez).transpose() << endl;;
-
-		}
-	    }
-	}
-    }
+  cout << endl;
+  
+  WIELD_CATCH_FINAL;
 }
 
 

@@ -1,0 +1,9 @@
+#$intercept 0.213649
+#$multiplier 1.5/0.00302271
+$intercept 0.
+$multiplier 1.
+
+$A $multiplier*$intercept
+$B $multiplier
+$stdev 6.
+

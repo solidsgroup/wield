@@ -47,6 +47,7 @@ $(PREFIX)bin/%: ./obj/%.o $(OBJ)
 	@echo -e $(B_ON)$(FG_YELLOW)"###"
 	@echo "### COMPILING $<" 
 	@echo -e "###"$(RESET)
+	@mkdir -p $(dir $@)
 	$(CC) $(CPP_COMPILER_OPTIONS) $(INC) -o $@ $(PREFIX)$<
 
 ./obj/%.o: ./src/%.cc 
@@ -73,6 +74,6 @@ clean:
 	@echo -e $(B_ON)$(FG_RED)"###"
 	@echo "### Cleaning out ./obj, ./bin, *~, *#" 
 	@echo -e "###"$(RESET)	
-	rm -rf ${OBJ} ${EXE} ./bin/* *~ *\#
+	rm -rf ${OBJ} ${OBJ_MAIN} ${EXE} ./bin/* *~ *\#
 tidy:
 	rm -rf *~ *\# src/*~ src/*\# dat/*~ dat/*\# inc/*~ inc/*\# 

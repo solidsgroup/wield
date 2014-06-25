@@ -15,12 +15,9 @@
 #include <math.h>
 #include "Eigen/Core"
 #include "Eigen/Geometry"
-#include "Trig6Int.h"
-#include "Trig6Int_RS.h"
-#include "Trig6Int2_RS.h"
-#include "DTrig6Int.h"
 
-#include "TypeDefinitions.h"
+#include "Utils/wieldTypes.h"
+#include "Integrator/wieldTrig6.h"
 
 using namespace Eigen;
 using namespace std;
@@ -76,12 +73,6 @@ double SurfaceIntegrate(CosSeries C1,
 				double Lb1_1 = (double)l*pi*nb1[0]/C2.alpha1; double Lb2_1 = (double)l*pi*nb2[0]/C2.alpha1;
 				double Mb1_2 = (double)m*pi*nb1[1]/C2.alpha2; double Mb2_2 = (double)m*pi*nb2[1]/C2.alpha2;
 				double Nb1_3 = (double)n*pi*nb1[2]/C2.alpha3; double Nb2_3 = (double)n*pi*nb2[2]/C2.alpha3;
-				// double Ia1_1 = 2*(double)i*pi*na1[0]/C1.alpha1; double Ia2_1 = 2*(double)i*pi*na2[0]/C1.alpha1;
-				// double Ja1_2 = 2*(double)j*pi*na1[1]/C1.alpha2; double Ja2_2 = 2*(double)j*pi*na2[1]/C1.alpha2;
-				// double Ka1_3 = 2*(double)k*pi*na1[2]/C1.alpha3; double Ka2_3 = 2*(double)k*pi*na2[2]/C1.alpha3;
-				// double Lb1_1 = 2*(double)l*pi*nb1[0]/C2.alpha1; double Lb2_1 = 2*(double)l*pi*nb2[0]/C2.alpha1;
-				// double Mb1_2 = 2*(double)m*pi*nb1[1]/C2.alpha2; double Mb2_2 = 2*(double)m*pi*nb2[1]/C2.alpha2;
-				// double Nb1_3 = 2*(double)n*pi*nb1[2]/C2.alpha3; double Nb2_3 = 2*(double)n*pi*nb2[2]/C2.alpha3;
 
 				int F[6] = {p, q, r, s, t, u};
 				double a1[6] = {Ia1_1, Ja1_2, Ka1_3, Lb1_1, Mb1_2, Nb1_3};
@@ -92,21 +83,21 @@ double SurfaceIntegrate(CosSeries C1,
 				if (type==0) // Gaussian
 				  S += 
 				    C1(i,j,k)*C2(l,m,n)
-				    * Trig6Int(F, a1, epsilon)
-				    * Trig6Int(F, a2, epsilon);
+				    * Trig6_Gaussian(F, a1, epsilon)
+				    * Trig6_Gaussian(F, a2, epsilon);
 				else if (type==1) // Cauchy
 				  S += 
 				    C1(i,j,k)*C2(l,m,n)
-				    * RS::Trig6Int_2(F,F,a1,a2,epsilon);
+				    * Trig6_Cauchy(F,F,a1,a2,epsilon);
 				else // Fake Cauchy
 				  S += 
 				    C1(i,j,k)*C2(l,m,n)
-				    * RS::Trig6Int(F, a1, epsilon)
-				    * RS::Trig6Int(F, a2, epsilon);
+				    * Trig6_FakeCauchy(F, a1, epsilon)
+				    * Trig6_FakeCauchy(F, a2, epsilon);
 				if (S != S)
 				  WIELD_NEW_EXCEPTION("Nan detected! S="<<S<<", ijklmnpqrstu="<<i<<j<<k<<l<<m<<n<<p<<q<<r<<s<<t<<u);
 			      }
-  return S;
+  return S * (epsilon * sqrt(pi)) * (epsilon * sqrt(pi));
   WIELD_CATCH;
 }
 

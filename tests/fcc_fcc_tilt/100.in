@@ -1,0 +1,35 @@
+$DISTRIBUTION cauchy
+
+#IO SETTINGS
+
+$outfile 100.dat
+
+#CRYSTAL PARAMETERS
+
+$C_1 fcc.in
+$C_2 fcc.in
+$f_constants constants.in
+
+#CONFIGURATION PARAMETERS
+
+$X1 1 0 0
+$Z1 0 0 1
+$X2 1 0 0
+$Z2 0 0 1
+$ThetaRotX1 0.5
+$ThetaRotX2 -0.5
+$theta_min 0
+$theta_max 90
+$dtheta 5
+
+#NUMERICAL PARAMETERS
+
+$tolerance 1E-2
+$distribution DISTRIBUTION
+
+$test sin(3.1415926535)
+
+#$vtk
+$vtk_rot_x1 55
+$vtk_rot_x2 -55
+$resolution 50

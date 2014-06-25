@@ -13,11 +13,11 @@
 using namespace std;
 using namespace Eigen;
 
-#include "/home/brandon/Research/Reader/Reader.h"
-#include "TypeDefinitions.h"
-#include "MatrixUtilities.h"
-#include "Exception.h"
-#include "wieldVTK.h"
+#include "Reader.h"
+#include "Utils/wieldTypes.h"
+#include "Utils/wieldRotations.h"
+#include "Utils/wieldExceptions.h"
+#include "Utils/wieldVTK.h"
 
 double computeGaussCosIntegral(int n, double x0, double sigma, double alpha)
 {
@@ -39,6 +39,7 @@ double computeGaussCosIntegral(int n, double x0, double sigma, double alpha)
      +Faddeeva::erf(fourthErfArg)*exp(fourthExpArg));
   if (fabs(ret.imag()/ret.real()) > 1E-10)
     WIELD_NEW_EXCEPTION("Fourier series integral returned imaginary part: ret="<<ret<<", n="<<n<<", x0="<<x0<<", alpha="<<alpha);
+  //cout << "val=" << ret.real()<< " n=" << n << " x0=" << x0 << " sigma=" << sigma << " alpha=" << alpha << endl;
   if (n==0)
     return ret.real() / (alpha);
   else
@@ -49,7 +50,12 @@ int main(int argc, char* argv[])
 {
   WIELD_TRY;
 
-  Reader reader("fs.in");
+  string filename;
+  if (argc < 2) 
+    {WIELD_NEW_EXCEPTION("You must specify a filename!");}
+  else filename=argv[1];
+  Reader reader(filename, "$", "#", "...");
+
   unsigned int order = reader.Read<int>("order");
   double sigma       = reader.Read<double>("sigma");
   double alpha1      = reader.Read<double>("alpha1");
@@ -63,7 +69,6 @@ int main(int argc, char* argv[])
     WIELD_NEW_EXCEPTION("Error: X, Y, Z vectors must be the same size");
   int size = X.size();
 
-
   CosSeries C(order);
   C.alpha1 = alpha1; C.alpha2 = alpha2; C.alpha3=alpha3;
   for (unsigned int l=0; l<order; l++)
@@ -73,10 +78,13 @@ int main(int argc, char* argv[])
 	  {
 	    C(l,m,n) = 0;
 	    for (unsigned int i=0; i<size; i++)
-	      C(l,m,n) += 
-		computeGaussCosIntegral(l, X[i], sigma, alpha1)	*
-		computeGaussCosIntegral(m, Y[i], sigma, alpha2)	*
-		computeGaussCosIntegral(n, Z[i], sigma, alpha3);
+	      {
+		C(l,m,n) += 
+		  computeGaussCosIntegral(l, X[i], sigma, alpha1)	*
+		  computeGaussCosIntegral(m, Y[i], sigma, alpha2)	*
+		  computeGaussCosIntegral(n, Z[i], sigma, alpha3);
+
+	      }
 	    if (l==0 && m==0 & n==0)
 	      C(l,m,n)=0;
 	  }
@@ -137,6 +145,7 @@ int main(int argc, char* argv[])
 	R = createMatrixFromZX(reader.Read<Vector3d>("NZ"), reader.Read<Vector3d>("NX"));
       else R = Matrix3d::Identity();
 
+  cout << "Hello" << endl;
       renderCrystal(drawCrystal(C, R,
 				reader.Read<double>("xmin"),
 				reader.Read<double>("ymin"),
