@@ -6,6 +6,14 @@
 
 typedef Matrix<double,6,1> Vector6d;
 
+
+double Energy(CosSeries C1, CosSeries C2, double epsilon, string tolerance = 0, string distribution = "cauchy")
+{
+  
+
+}
+
+
 class Energy
 {
  public:
@@ -32,11 +40,11 @@ class Energy
 
   double W(Vector6d alpha)
   {
-    return
-      - SurfaceIntegrate(4, C2, C2,
-			 R1.col(2), R1.col(0), R2.col(2), R2.col(0),
-			 alpha,
-			 epsilon, tolerance, distribution);// * (epsilon * sqrt(PI)) * (epsilon * sqrt(PI));
+    // return
+    //   - SurfaceIntegrate(4, C2, C2,
+    // 			 R1.col(2), R1.col(0), R2.col(2), R2.col(0),
+    // 			 alpha,
+    // 			 epsilon, tolerance, distribution);// * (epsilon * sqrt(PI)) * (epsilon * sqrt(PI));
   };
 
 private:

@@ -1,5 +1,5 @@
 $order 4
-$sigma 0.2
+$sigma 0.05
 
 $alpha1 1
 $alpha2 1
@@ -10,23 +10,23 @@ $alpha3 1
 #Y (0)   (1)   #Y    (5)      #Y (9)     (10)    
 # XXXXXXXXXX   # XXXXXXXXXX   # XXXXXXXXXXXXX
 
-$X 0 1 0.5 0 1 0.5 0 1 0.5 0 1 0.5 0 1
-$Y 0 0 0.5 1 1 0 0.5 0.5 1 0 0 0.5 1 1 
-$Z 0 0 0 0 0 0.5 0.5 0.5 0.5 1 1 1 1 1
+$X 0.0 1.0 0.5 0.0 1.0 0.5 0.0 1.0 0.5 0.0 1.0 0.5 0.0 1.0
+$Y 0.0 0.0 0.5 1.0 1.0 0.0 0.5 0.5 1.0 0.0 0.0 0.5 1.0 1.0 
+$Z 0.0 0.0 0.0 0.0 0.0 0.5 0.5 0.5 0.5 1.0 1.0 1.0 1.0 1.0
 
 $outfile fcc.in
 
 
-$vtk
+#$vtk
 
 $xmin 0
 $xmax 4
 $ymin 0
 $ymax 2
-$zmin -0.5
+$zmin -1
 $zmax 0
-
 $resolution 50
-
 $FactorTop .6
+$NX -1 1 0
+$NY 1 1 0
 

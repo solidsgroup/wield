@@ -2,14 +2,17 @@ $DISTRIBUTION cauchy
 
 #IO SETTINGS
 
-$outfile tests/BCC_BCC_Tilt/bcc_bcc_tilt_110_$DISTRIBUTION.dat
+$outfile out.dat
 
 #CRYSTAL PARAMETERS
 
-$C_1 tests/BCC_BCC_Tilt/bcc.in
-$C_2 tests/BCC_BCC_Tilt/bcc.in
-$C 0 0 0 0 0 0 
-$f_constants tests/BCC_BCC_Tilt/bcc_bcc_$DISTRIBUTION.in
+#$C_1 tests/FCC_FCC_Tilt/fcc.in
+#$C_2 tests/FCC_FCC_Tilt/fcc.in
+$C_1 fcc.in
+$C_2 fcc.in
+$A 0
+$B 8
+$stdev 10.
 
 #CONFIGURATION PARAMETERS
 
@@ -17,15 +20,20 @@ $X1 1 1 0
 $Z1 0 0 1
 $X2 1 1 0
 $Z2 0 0 1
-$ThetaRotX1 0.5
-$ThetaRotX2 0.5
+$ThetaRotY1 0.5
+$ThetaRotY2 0.5
 $theta_min 0
 $theta_max 180
 $dtheta 5
 
 #NUMERICAL PARAMETERS
 
-$tolerance 0.003
+$tolerance 1E-6
 $distribution DISTRIBUTION
 
+$test sin(3.1415926535)
 
+$vtk
+$vtk_rot_x1 90
+$vtk_rot_x2 -90
+$resolution 15

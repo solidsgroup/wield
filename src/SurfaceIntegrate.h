@@ -1,3 +1,14 @@
+///
+/// \file SurfaceIntegrate.h
+/// \brief Compute the surface integral of two multiplied Fourier series
+///
+/// The purpose of the SurfaceIntegrate function is to compute the integral of two functions \f$\phi_1,\phi_2\f$ with a measure function \f$g_\varepsilon\f$
+/// \f[\int_{-\infty}^\infty\int_{-\infty}^\infty \phi_1(\Omega_1\mathbf{x})\phi_2(\Omega_2\mathbf{x})g_\varepsilon(\mathbf{x})dxdy\bigg|_{z=0}\f]
+/// where the functions \f$\Omega_1,\Omega_2\f$ are given by Fourier Cosine series specified in variables C1 and C2. The rotation matrices \f$\Omega_1,\Omega_2\f$ specify the orientation of the crystals. Specifically,
+/// \f[\Omega = \begin{bmatrix}\mathbb{n}_1,\mathbb{n}_1,\mathbb{n}_1\end{bmatrix}\f]
+/// where \f$\mathbb{n}_3\f$ represents the crystallographic direction which is <i>normal</i> to the interface. The vectors \f$\mathbb{n}_1,\mathbb{n}_2\f$ represent the in-plane crystallographic directions. Orthogonality of these vectors is enforced by ensuring that \f$\Omega_1,\Omega_2\in SO(3)\f$
+///
+
 #ifndef SURFACEINTEGRATE_D
 #define SURFACEINTEGRATE_D
 #include <iostream>
@@ -9,35 +20,47 @@
 #include "Trig6Int2_RS.h"
 #include "DTrig6Int.h"
 
-#define PI 3.14159265369
+#include "TypeDefinitions.h"
+
 using namespace Eigen;
 using namespace std;
 
-double SurfaceIntegrate(int order, 
-			double Ca[4][4][4], double Cb[4][4][4], 
-			Vector3d na3, Vector3d na1, Vector3d nb3, Vector3d nb1, 
-			Vector6d alpha,
-			double epsilon, double tol,
-			string distribution)
+
+
+
+double SurfaceIntegrate(CosSeries C1, 
+			Matrix3d R1,
+			CosSeries C2, 
+			Matrix3d R2,
+			double epsilon, 
+			double tolerance = 0, 
+			string distribution = "cauchy")
 {
+  WIELD_TRY;
   int type; 
   if (distribution=="gaussian") type = 0;
   else if (distribution=="cauchy") type = 1;
   else if (distribution=="fakecauchy") type = 2;
   else {cout << "Error: Distribution type not specified" << endl; throw(0);}
-  double S;
-  if (abs(na3.dot(na1)) > 1E-8) {cout << "NA3, NA1 must be orthogonal" << endl;throw(0);}
-  if (abs(nb3.dot(nb1)) > 1E-8) {cout << "NB3, NB1 must be orthogonal" << endl;throw(0);}
-  na3 = na3/na3.norm(); nb3 = nb3/nb3.norm();
-  na1 = na1/na1.norm(); nb1 = nb1/nb1.norm();
+
+  if ((R1.transpose()*R1 - Matrix3d::Identity()).norm() > 1E-10)
+    WIELD_NEW_EXCEPTION("R1 is not a rotation matrix");
+  if ((R2.transpose()*R2 - Matrix3d::Identity()).norm() > 1E-10)
+    WIELD_NEW_EXCEPTION("R2 is not a rotation matrix");
+
+  Vector3d na1 = R1.col(0);
+  Vector3d nb1 = R2.col(0);
+  Vector3d na3 = R1.col(2);
+  Vector3d nb3 = R2.col(2);
+
   Vector3d na2 = na3.cross(na1); Vector3d nb2 = nb3.cross(nb1);
-  S=0;
-  for (int i=0;i<order;i++)
-    for (int j=0;j<order;j++) 
-      for (int k=0;k<order;k++) 
-	for (int l=0;l<order;l++)
-	  for (int m=0;m<order;m++)
-	    for (int n=0;n<order;n++)
+  double S=0;
+  for (int i=0;i<C1.order;i++)
+    for (int j=0;j<C1.order;j++) 
+      for (int k=0;k<C1.order;k++) 
+	for (int l=0;l<C2.order;l++)
+	  for (int m=0;m<C2.order;m++)
+	    for (int n=0;n<C2.order;n++)
 	      for (int p=0;p<2;p++)
 		for (int q=0;q<2;q++)
 		  for (int r=0;r<2;r++)
@@ -45,14 +68,20 @@ double SurfaceIntegrate(int order,
 		      for (int t=0;t<2;t++)
 			for (int u=0;u<2;u++)
 			  if ( (p+q+r+s+t+u)%2 == 0 ) // only do if p+q+r+s+t+u is even
-			    if (abs(Ca[i][j][k]*Cb[l][m][n]) > tol) // skip terms with low coefficients
+			    if (abs(C1(i,j,k)*C2(l,m,n)) > tolerance) // skip terms with low coefficients
 			      {
-				double Ia1_1 = 2*(double)i*PI*na1[0]/alpha[0]; double Ia2_1 = 2*(double)i*PI*na2[0]/alpha[0]; 
-				double Ja1_2 = 2*(double)j*PI*na1[1]/alpha[1]; double Ja2_2 = 2*(double)j*PI*na2[1]/alpha[1];
-				double Ka1_3 = 2*(double)k*PI*na1[2]/alpha[2]; double Ka2_3 = 2*(double)k*PI*na2[2]/alpha[2];
-				double Lb1_1 = 2*(double)l*PI*nb1[0]/alpha[3]; double Lb2_1 = 2*(double)l*PI*nb2[0]/alpha[3];
-				double Mb1_2 = 2*(double)m*PI*nb1[1]/alpha[4]; double Mb2_2 = 2*(double)m*PI*nb2[1]/alpha[4];
-				double Nb1_3 = 2*(double)n*PI*nb1[2]/alpha[5]; double Nb2_3 = 2*(double)n*PI*nb2[2]/alpha[5];
+				double Ia1_1 = (double)i*pi*na1[0]/C1.alpha1; double Ia2_1 = (double)i*pi*na2[0]/C1.alpha1;
+				double Ja1_2 = (double)j*pi*na1[1]/C1.alpha2; double Ja2_2 = (double)j*pi*na2[1]/C1.alpha2;
+				double Ka1_3 = (double)k*pi*na1[2]/C1.alpha3; double Ka2_3 = (double)k*pi*na2[2]/C1.alpha3;
+				double Lb1_1 = (double)l*pi*nb1[0]/C2.alpha1; double Lb2_1 = (double)l*pi*nb2[0]/C2.alpha1;
+				double Mb1_2 = (double)m*pi*nb1[1]/C2.alpha2; double Mb2_2 = (double)m*pi*nb2[1]/C2.alpha2;
+				double Nb1_3 = (double)n*pi*nb1[2]/C2.alpha3; double Nb2_3 = (double)n*pi*nb2[2]/C2.alpha3;
+				// double Ia1_1 = 2*(double)i*pi*na1[0]/C1.alpha1; double Ia2_1 = 2*(double)i*pi*na2[0]/C1.alpha1;
+				// double Ja1_2 = 2*(double)j*pi*na1[1]/C1.alpha2; double Ja2_2 = 2*(double)j*pi*na2[1]/C1.alpha2;
+				// double Ka1_3 = 2*(double)k*pi*na1[2]/C1.alpha3; double Ka2_3 = 2*(double)k*pi*na2[2]/C1.alpha3;
+				// double Lb1_1 = 2*(double)l*pi*nb1[0]/C2.alpha1; double Lb2_1 = 2*(double)l*pi*nb2[0]/C2.alpha1;
+				// double Mb1_2 = 2*(double)m*pi*nb1[1]/C2.alpha2; double Mb2_2 = 2*(double)m*pi*nb2[1]/C2.alpha2;
+				// double Nb1_3 = 2*(double)n*pi*nb1[2]/C2.alpha3; double Nb2_3 = 2*(double)n*pi*nb2[2]/C2.alpha3;
 
 				int F[6] = {p, q, r, s, t, u};
 				double a1[6] = {Ia1_1, Ja1_2, Ka1_3, Lb1_1, Mb1_2, Nb1_3};
@@ -62,21 +91,23 @@ double SurfaceIntegrate(int order,
 				
 				if (type==0) // Gaussian
 				  S += 
-				    Ca[i][j][k]*Cb[l][m][n]
+				    C1(i,j,k)*C2(l,m,n)
 				    * Trig6Int(F, a1, epsilon)
 				    * Trig6Int(F, a2, epsilon);
 				else if (type==1) // Cauchy
 				  S += 
-				    Ca[i][j][k]*Cb[l][m][n]
+				    C1(i,j,k)*C2(l,m,n)
 				    * RS::Trig6Int_2(F,F,a1,a2,epsilon);
 				else // Fake Cauchy
 				  S += 
-				    Ca[i][j][k]*Cb[l][m][n]
+				    C1(i,j,k)*C2(l,m,n)
 				    * RS::Trig6Int(F, a1, epsilon)
 				    * RS::Trig6Int(F, a2, epsilon);
-
+				if (S != S)
+				  WIELD_NEW_EXCEPTION("Nan detected! S="<<S<<", ijklmnpqrstu="<<i<<j<<k<<l<<m<<n<<p<<q<<r<<s<<t<<u);
 			      }
   return S;
+  WIELD_CATCH;
 }
 
 #endif //SURFACEINTEGRATE_D

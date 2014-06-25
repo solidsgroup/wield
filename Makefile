@@ -4,6 +4,7 @@
 
 include ~/.make.reader
 include ~/.make.eigen
+include ~/.make.muparser
 ifndef EMACS
 include ~/.make.color
 include ~/.make.vtk

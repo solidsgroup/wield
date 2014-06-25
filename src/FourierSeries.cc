@@ -58,27 +58,17 @@ int main(int argc, char* argv[])
   vector<double> X   = reader.Read<vector<double> >("X");
   vector<double> Y   = reader.Read<vector<double> >("Y");
   vector<double> Z   = reader.Read<vector<double> >("Z");
-  string outfile     = reader.Read<string>("outfile");
-  ofstream out(outfile.c_str());
 
   if ((X.size() != Y.size()) || (Y.size() != Z.size()) || (Z.size() != X.size()))
     WIELD_NEW_EXCEPTION("Error: X, Y, Z vectors must be the same size");
   int size = X.size();
 
 
-  out << "$order " << order << endl;
-  out << scientific;
-  out << "$a1 " << alpha1 << endl;
-  out << "$a2 " << alpha2 << endl;
-  out << "$a3 " << alpha3 << endl;
-
-  out << "$C ";
   CosSeries C(order);
   C.alpha1 = alpha1; C.alpha2 = alpha2; C.alpha3=alpha3;
   for (unsigned int l=0; l<order; l++)
     for (unsigned int m=0; m<order; m++)
       {
-	out << "..." << endl;
 	for (unsigned int n=0; n<order; n++)
 	  {
 	    C(l,m,n) = 0;
@@ -89,14 +79,37 @@ int main(int argc, char* argv[])
 		computeGaussCosIntegral(n, Z[i], sigma, alpha3);
 	    if (l==0 && m==0 & n==0)
 	      C(l,m,n)=0;
-	    out.width(16);
-	    out << C(l,m,n) << " ";
 	  }
       }
-  out << endl;
 
-  out.close();
 
+  //
+  // Print to file
+  //
+
+  if (reader.Find("outfile"))
+    {
+      string outfile     = reader.Read<string>("outfile");
+      ofstream out(outfile.c_str());
+      out << "$order " << order << endl;
+      out << scientific;
+      out << "$a1 " << alpha1 << endl;
+      out << "$a2 " << alpha2 << endl;
+      out << "$a3 " << alpha3 << endl;
+      out << "$C ";
+      for (unsigned int l=0; l<order; l++)
+	for (unsigned int m=0; m<order; m++)
+	  {
+	    out << "..." << endl;
+	    for (unsigned int n=0; n<order; n++)
+	      {
+		out.width(16);
+		out << C(l,m,n) << " ";
+	      }
+	  }
+      out << endl;
+      out.close();
+    }
 
   //
   // Visualization
@@ -115,8 +128,16 @@ int main(int argc, char* argv[])
       double FactorTop = reader.Read<double>("FactorTop", 0.);
       double FactorBottom= reader.Read<double>("FactorBottom",0.);
 
+      Matrix3d R; // Specify orientation of crystal 1
+      if (reader.Find("NX") && reader.Find("NY"))
+	R = createMatrixFromXY(reader.Read<Vector3d>("NX"), reader.Read<Vector3d>("NY"));
+      else if (reader.Find("NY") && reader.Find("NX"))
+	R = createMatrixFromYZ(reader.Read<Vector3d>("NY"), reader.Read<Vector3d>("NZ"));
+      else if (reader.Find("NZ") && reader.Find("NX"))
+	R = createMatrixFromZX(reader.Read<Vector3d>("NZ"), reader.Read<Vector3d>("NX"));
+      else R = Matrix3d::Identity();
 
-      renderCrystal(drawCrystal(C, Matrix3d::Identity(),
+      renderCrystal(drawCrystal(C, R,
 				reader.Read<double>("xmin"),
 				reader.Read<double>("ymin"),
 				reader.Read<double>("zmin"),
@@ -124,8 +145,8 @@ int main(int argc, char* argv[])
 				reader.Read<double>("ymax"),
 				reader.Read<double>("zmax"),
 				reader.Read<int>("resolution"),
-				reader.Read<double>("FactorTop"),
-				reader.Read<double>("FactorBottom")));
+				reader.Read<double>("FactorTop",0.),
+				reader.Read<double>("FactorBottom",0.)));
  
 
     }

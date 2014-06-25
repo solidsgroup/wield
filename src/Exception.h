@@ -33,7 +33,6 @@
     std::cout << WIELD_C_FG_BLUE << __LINE__ <<WIELD_C_FG_DEFAULT << endl; \
     std::cout << "\t" << WIELD_C_FG_YELLOW << __func__;		\
     std::cout << WIELD_C_RESET << endl;				\
-    throw;								\
   }
 #define WIELD_NEW_EXCEPTION(MESSAGE)					\
   {									\
@@ -48,7 +47,8 @@
   }
 
 #define WIELD_TRY try {
-#define WIELD_CATCH } catch (exception &e) {WIELD_EXCEPTION("");} catch (int i) {WIELD_EXCEPTION("");}
-#define WIELD_CATCH_MSG(MESSAGE) } catch (exception &e) {WIELD_EXCEPTION(MESSAGE);} catch (int i) {WIELD_EXCEPTION(MESSAGE);}
+#define WIELD_CATCH } catch (exception &e) {WIELD_EXCEPTION("");throw;} catch (int i) {WIELD_EXCEPTION("");throw;}
+#define WIELD_CATCH_FINAL } catch (exception &e) {WIELD_EXCEPTION("");} catch (int i) {WIELD_EXCEPTION("");}
+#define WIELD_CATCH_MSG(MESSAGE) } catch (exception &e) {WIELD_EXCEPTION(MESSAGE);throw;} catch (int i) {WIELD_EXCEPTION(MESSAGE);throw;}
 
 #endif // WIELD_EXCEPTION_H

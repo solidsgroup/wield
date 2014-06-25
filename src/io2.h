@@ -2,17 +2,8 @@
 // double vector
 // 
 
-
-
-Reader reader("in.in", "$", "#", "...");
 string outfile = reader.Read<string>("outfile"); // file to store computation data
 ofstream out(outfile.c_str());        // output stream
-
-reader.Read<Vector6d>("X1");
-
-Vector3d a(1,0,0), b(0,1,0);
-createMatrixFromXY(a,b);
-
 
 Matrix3d Omega_1; // Specify orientation of crystal 1
 if (reader.Find("X1") && reader.Find("Y1"))
@@ -91,22 +82,28 @@ if (reader.Find("f_constants"))
 string f1 = reader.Read<string>("C_1");
 Reader crystal1Reader(f1, "$", "#", "...");
 int order1 = crystal1Reader.Read<int>("order");
-double alpha1_1 = crystal1Reader.Read<double>("a1");
-double alpha1_2 = crystal1Reader.Read<double>("a2");
-double alpha1_3 = crystal1Reader.Read<double>("a3");
-CosSeries C_1(order1); crystal1Reader.Read<CosSeries>("C", &C_1);
+CosSeries C1(order1); crystal1Reader.Read<CosSeries>("C", &C1);
+C1.order = order1;
+C1.alpha1 = crystal1Reader.Read<double>("a1");
+C1.alpha2 = crystal1Reader.Read<double>("a2");
+C1.alpha3 = crystal1Reader.Read<double>("a3");
 
 string f2 = reader.Read<string>("C_2");
 Reader crystal2Reader(f2, "$", "#", "...");
-int order2 = crystal1Reader.Read<int>("order");
-double alpha2_1 = crystal1Reader.Read<double>("a1");
-double alpha2_2 = crystal1Reader.Read<double>("a2");
-double alpha2_3 = crystal1Reader.Read<double>("a3");
-CosSeries C_2(order1); crystal1Reader.Read<CosSeries>("C", &C_2);
+int order2 = crystal2Reader.Read<int>("order");
+CosSeries C2(order2); crystal2Reader.Read<CosSeries>("C", &C2);
+C2.order = order2;
+C2.alpha1 = crystal2Reader.Read<double>("a1");
+C2.alpha2 = crystal2Reader.Read<double>("a2");
+C2.alpha3 = crystal2Reader.Read<double>("a3");
 
 
 
+//
+// MISC
+//
 
+double tolerance = reader.Read<double>("tolerance",0.);
 
 
 //

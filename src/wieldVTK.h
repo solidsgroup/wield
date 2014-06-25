@@ -36,11 +36,14 @@ using namespace Eigen;
 #include <vtkPointData.h>
 #include <vtkPolyDataMapper2D.h>
 #include <vtkInteractorStyleTrackballCamera.h>
+#include <vtkOrientationMarkerWidget.h>
+#include <vtkAxesActor.h>
 
 typedef vtkSmartPointer<vtkActor> Actor;
 
 double computeDensityFunction(double x, double y, double z, CosSeries C)
 {
+  WIELD_TRY;
   int order = C.order;
   double alpha1 = C.alpha1;
   double alpha2 = C.alpha2;
@@ -55,6 +58,7 @@ double computeDensityFunction(double x, double y, double z, CosSeries C)
 	  cos(m*pi*y/alpha2) *
 	  cos(n*pi*z/alpha3);
   return phi;
+  WIELD_CATCH;
 }
 
 
@@ -65,6 +69,10 @@ Actor drawCrystal(CosSeries C, Matrix3d R,
 		    int resolution,
 		    double FactorTop=0, double FactorBottom=0)
 {
+  WIELD_TRY;
+  if (xmin > xmax) WIELD_NEW_EXCEPTION("xmin > xmax");
+  if (ymin > ymax) WIELD_NEW_EXCEPTION("ymin > ymax");
+  if (zmin > zmax) WIELD_NEW_EXCEPTION("zmin > zmax");
   double x0=xmin,y0=ymin,z0=zmin;
   double xl=xmax-xmin,yl=ymax-ymin,zl=zmax-zmin;
   int nx = (int)(resolution*xl), ny=(int)(resolution*yl), nz=(int)(resolution*zl);
@@ -86,18 +94,18 @@ Actor drawCrystal(CosSeries C, Matrix3d R,
       for(unsigned int i = 0; i < nx; i++)
 	{
 	  Vector3d X; X << x0 + i*dx, y0+j*dy, z0 + k*dz;
-	  X = R*X;
-	  double x=X[0], y=X[1], z=X[2];
+	  Vector3d x = R*X;
+	  
+	  //double x=X[0], y=X[1], z=X[2];
 
-	  points->InsertNextPoint(x,y,z);
+	  points->InsertNextPoint(X[0],X[1],X[2]);
 	  if ((i!=0) && (j!=0) && (k!=0) && (i<nx-1) && (j<ny-1) && (k<nz-1))
 	    phi->InsertNextValue(0);
 	  else 
-	    phi->InsertNextValue(computeDensityFunction(x,y,z,C));
+	    phi->InsertNextValue(computeDensityFunction(x[0],x[1],x[2],C));
 	}
 
   double range[2]; phi->GetRange(range);
-  cout << range[0] << "   " << range[1] << endl;
   vtkSmartPointer<vtkLookupTable> colorLookupTable = 
     vtkSmartPointer<vtkLookupTable>::New();
   colorLookupTable->SetTableRange(range[0] - (range[1]-range[0])*FactorBottom,range[1] + (range[1]-range[0])*FactorTop);
@@ -129,10 +137,12 @@ Actor drawCrystal(CosSeries C, Matrix3d R,
   actor->SetMapper(mapper);
   
   return actor;
+  WIELD_CATCH;
 }
 
 void renderCrystals(vector<Actor> actors)
 {
+  WIELD_TRY;
   // Visualize
   vtkSmartPointer<vtkRenderer> renderer = 
     vtkSmartPointer<vtkRenderer>::New();
@@ -147,11 +157,23 @@ void renderCrystals(vector<Actor> actors)
   renderWindowInteractor->SetInteractorStyle(style);
 
   for (int i=0; i<actors.size(); i++)
-    renderer->AddActor(actors[i]);
+    renderer->AddActor(actors[actors.size()-i-1]);
+  
+  vtkSmartPointer<vtkAxesActor> axes =
+    vtkSmartPointer<vtkAxesActor>::New();
+  vtkSmartPointer<vtkOrientationMarkerWidget> widget = 
+    vtkSmartPointer<vtkOrientationMarkerWidget>::New();
+  widget->SetOrientationMarker(axes);
+  widget->SetInteractor(renderWindowInteractor);
+  widget->SetOutlineColor(0,0,0);
+  widget->SetEnabled(1);
+  widget->InteractiveOn();
 
+  renderer->ResetCamera();
   renderer->SetBackground(1,1,1); // Background color white
   renderWindow->Render();
   renderWindowInteractor->Start();
+  WIELD_CATCH;
 }
 		  
 void renderCrystal(Actor actor)

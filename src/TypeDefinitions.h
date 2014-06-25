@@ -10,13 +10,15 @@ template<> struct Interpreter<Vector3d >
 {
   void operator() (const string varUnparsed, Vector3d *varParsed)
   {
+    WIELD_TRY;
     istringstream iss(varUnparsed); 
     string token;
     for (unsigned int i=0;i<3;i++)
       {
 	iss >> token;
-	(*varParsed)(i,0) = atof(token.c_str());
+	(*varParsed)(i,0) = EvaluateMath(token);
       }
+    WIELD_CATCH_MSG("Error parsing Vector3d: " << varUnparsed);
   }
 };
 
@@ -25,13 +27,15 @@ template<> struct Interpreter<Vector6d >
 {
   void operator() (const string varUnparsed, Vector6d *varParsed)
   {
+    WIELD_TRY;
     istringstream iss(varUnparsed); 
     string token;
     for (unsigned int i=0;i<6;i++)
       {
 	iss >> token;
-	(*varParsed)(i,0) = atof(token.c_str());
+	(*varParsed)(i,0) = EvaluateMath(token);
       }
+    WIELD_CATCH_MSG("Error parsing Vector6d: " << varUnparsed);
   }
 };
 
@@ -70,7 +74,7 @@ template<> struct Interpreter<CosSeries>
 	for (unsigned int k=0;k<order;k++)
 	  {
 	    iss >> token;
-	    (*varParsed)(i,j,k) = atof(token.c_str());
+	    (*varParsed)(i,j,k) = EvaluateMath(token);
 	  }
   }
 };

@@ -29,7 +29,7 @@ double RS::Trig6Int_2(int *_T1, int *_T2, double *_a, double *_b, double epsilon
     }      
 
   S1 = 6-ctr1; // the number of sines
-  S2 = 6-ctr2; // the number of sinse
+  S2 = 6-ctr2; // the number of sines
   if (S1%2 || S2%2) return 0; // return if there is an odd number of sines
 
   for (int i=0;i<6;i++)
@@ -68,7 +68,6 @@ double RS::Trig6Int_2(int *_T1, int *_T2, double *_a, double *_b, double epsilon
 			e1 = (a1 + MOD(i)*a2 + MOD(m)*a3 + MOD(j+m)*a4 + MOD(l+m)*a5 + MOD(l+k+m)*a6);
 			e2 = (b1 + MOD(p)*b2 + MOD(t)*b3 + MOD(q+t)*b4 + MOD(s+t)*b5 + MOD(s+r+t)*b6);
 			tI = exp(-sqrt(e1*e1 + e2*e2)/epsilon);
-			//tI = exp(-(e1*e1 + e2*e2)/eps2);
 			if (S1==6) // SSSSSS
 			  tI *= MOD(i+j+k+3);
 			else if (S1==4) // CCSSSS
@@ -84,73 +83,6 @@ double RS::Trig6Int_2(int *_T1, int *_T2, double *_a, double *_b, double epsilon
 			I += tI;
 		      }
   I /= 1024.;
-
-  // if (T[0] == COS && T[1] == COS && T[2] == COS && T[3] == COS && T[4] == COS && T[5] == SIN ) // cos cos cos cos cos sin
-  //   I = 0;
-  // else if (T[0] == COS && T[1] == COS && T[2] == COS && T[3] == SIN && T[4] == SIN && T[5] == SIN ) // cos cos cos sin sin sin
-  //   I = 0;
-  // else if (T[0] == COS && T[1] == SIN && T[2] == SIN && T[3] == SIN && T[4] == SIN && T[5] == SIN ) // cos sin sin sin sin sin
-  //   I = 0;
-  // else if (T[0] == COS && T[1] == COS && T[2] == COS && T[3] == COS && T[4] == COS && T[5] == COS ) // cos cos cos cos cos cos
-  //   {
-  //     I = 0;
-  //     double e;
-  //     for (int i=0;i<2;i++)
-  // 	for (int j=0;j<2;j++)
-  // 	  for (int k=0;k<2;k++)
-  // 	    for (int l=0;l<2;l++)
-  // 	      for (int m=0;m<2;m++)
-  // 		{
-  // 		  e = (a1 + MOD(i)*a2 + MOD(m)*a3 + MOD(j+m)*a4 + MOD(l+m)*a5 + MOD(l+k+m)*a6);
-  // 		  I += exp(-fabs(e)/epsilon);
-  // 		}
-  //     I /= 32.;
-  //   }
-  // else if (T[0] == COS && T[1] == COS && T[2] == COS && T[3] == COS && T[4] == SIN && T[5] == SIN ) // cos cos cos cos sin sin
-  //   {
-  //     I = 0;
-  //     double e;
-  //     for (int i=0;i<2;i++)
-  // 	for (int j=0;j<2;j++)
-  // 	  for (int k=0;k<2;k++)
-  // 	    for (int l=0;l<2;l++)
-  // 	      for (int m=0;m<2;m++)
-  // 		{
-  // 		  e = (a1 + MOD(i)*a2 + MOD(m)*a3 + MOD(j+m)*a4 + MOD(l+m)*a5 + MOD(l+k+m)*a6);
-  // 		  I += MOD(k+1)*exp(-fabs(e)/epsilon);
-  // 		}
-  //     I /= 32.;
-  //   }
-  // else if (T[0] == COS && T[1] == COS && T[2] == SIN && T[3] == SIN && T[4] == SIN && T[5] == SIN ) // cos cos sin sin sin sin
-  //   {
-  //     I = 0;
-  //     double e;
-  //     for (int i=0;i<2;i++)
-  // 	for (int j=0;j<2;j++)
-  // 	  for (int k=0;k<2;k++)
-  // 	    for (int l=0;l<2;l++)
-  // 	      for (int m=0;m<2;m++)
-  // 		{
-  // 		  e = (a1 + MOD(i)*a2 + MOD(m)*a3 + MOD(j+m)*a4 + MOD(l+m)*a5 + MOD(l+k+m)*a6);
-  // 		  I += MOD(j+k+2)*exp(-fabs(e)/epsilon);
-  // 		}
-  //     I /= 32.;
-  //   }
-  // else if (T[0] == SIN && T[1] == SIN && T[2] == SIN && T[3] == SIN && T[4] == SIN && T[5] == SIN ) // sin sin sin sin sin sin
-  //   {
-  //     I = 0;
-  //     double e;
-  //     for (int i=0;i<2;i++)
-  // 	for (int j=0;j<2;j++)
-  // 	  for (int k=0;k<2;k++)
-  // 	    for (int l=0;l<2;l++)
-  // 	      for (int m=0;m<2;m++)
-  // 		{
-  // 		  e = (a1 + MOD(i)*a2 + MOD(m)*a3 + MOD(j+m)*a4 + MOD(l+m)*a5 + MOD(l+k+m)*a6);
-  // 		  I += MOD(i+j+k+3)*exp(-fabs(e)/epsilon);
-  // 		}
-  //     I /= 32.;
-  //   }
   return I;
 }
 
