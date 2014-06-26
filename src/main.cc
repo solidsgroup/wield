@@ -1,3 +1,15 @@
+/// 
+/// \mainpage WIELD: (W)eak approximation of (I)nterface (E)nergy for bicrysta(L) boun(D)aries 
+/// This is a small research program to compute the energy of a bicrystal interface using the Site Potential method.
+/// 
+
+///
+/// \file main.cpp
+/// \brief This is the short description for main.cpp
+///
+/// This is the long description for main.cpp
+/// \f[\int_{\Omega}\nabla\cdot\mathbb{V}dV = \int_{\partial\Omega}\mathbb{V}\cdot\mathbb{n}dA\f]
+///
 
 
 #include <iostream>

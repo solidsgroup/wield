@@ -1,5 +1,7 @@
 intercept = -24.1631
 multiplier= 4
+#intercept = -23.9807
+#multiplier= 10
 
 set termoption dashed
 set style line 1 lt 1 lc 1 lw 2

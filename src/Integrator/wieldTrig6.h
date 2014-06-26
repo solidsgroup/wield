@@ -1,3 +1,15 @@
+///
+/// @file wieldTrig6.h
+/// \brief Compute an integral with 6 cosines in the integrand
+///
+/// Compute the following integral
+/// \f[\int_{-\infty}^\infty\int_{-\infty}^\infty g_\varepsilon(x,y)T^a_1(a_1x)T^a_2(a_2x)T^a_3(a_3x)T^a_4(a_4x)T^a_5(a_5x)T^a_6(a_6x)T^b_1(b_1y)T^b_2(b_2y)T^b_3(b_3y)T^b_4(b_4y)T^b_5(b_5y)T^b_6(b_6y)\f]
+/// Where \f$T_1\ldots T_6\f$ are given in the T arrays and \f$a_1\ldots a_6\f$ are given in the a arrays. 
+/// Elements in the T array can take values of 0 or 1, and indicate whether the function is a sine or cosine. For instance, if T[2]==1 then \f$T_2(a_2x)=\sin(a_2 x)\f$
+///
+/// The function \f$g_\varepsilon(x,y)\f$ is unique to the different functions listed below.
+///
+
 #ifndef WIELD_INTEGRATOR_TRIG6_H
 #define WIELD_INTEGRATOR_TRIG6_H
 
@@ -5,15 +17,29 @@
 #include <math.h>
 #include "Utils/wieldTypes.h"
 
+/// \cond SUPERFLUOUS
 #define COS 0
 #define SIN 1
 #define MOD(a) (double)(1 - 2*((a)%2))
-
+/// \endcond
 
 using namespace std;
 
-double Trig6_Gaussian(int *_T, double *_a, double epsilon)
+///
+/// \fn Trig6_Gaussian
+/// \brief Use a Gaussian weighted function
+///
+double Trig6_Gaussian(int *_T,         ///< Trig indicator functions (must be size 6)
+		      double *_a,      ///< Argument for trig functions
+		      double epsilon)  ///< Std. dev. for the Gaussian weight function
 {
+  ///
+  /// This function uses a weight function of the form
+  /// \f[g_\varepsilon(x,y) = \exp\bigg(-\frac{(x^2+y^2)}{\varepsilon^2}\bigg)\f]
+  /// Because of the nature of Gaussian integrals, a full 12 trig integral can be decoupled and evaluated as 
+  /// Trig6_Gaussian(T1...T6,a1...a6,epsilon)Trig6_Gaussian(T7..T12,a7...a12,epsilon) 
+  /// which is much faster.
+  ///
   double I;  double eps2 = epsilon*epsilon;
   int T[6]; double a[6];
   int ctr=0;
@@ -103,8 +129,23 @@ double Trig6_Gaussian(int *_T, double *_a, double epsilon)
   return I;
 }
 
-double Trig6_Cauchy(int *_T1, int *_T2, double *_a, double *_b, double epsilon)
+///
+/// \fn Trig6_Cauchy
+/// \brief Use a Cauchy (like) weight function
+///
+double Trig6_Cauchy(int *_T1,         ///< Trig indicator functions (size 6)
+		    int *_T2,         ///< Trig indicator functions (size 6)
+		    double *_a,       ///< Coefficients for the first six trig functions (size 6)
+		    double *_b,       ///< Coefficients for the second six trig functions (size 6)
+		    double epsilon)   ///< Std. dev. for the Gaussian weight function
 {
+  ///
+  /// This function uses a weight function \f$g_\varepsilon\f$ which is <i>unknown</i>; however its Fourier transform is
+  /// \f[\mathcal{F}[g_\varepsilon](\omega_1,\omega_2) = G_\varepsilon(\omega_1,\omega_2) = \exp\bigg(-\frac{\sqrt{\omega_1^2+\omega_2^2}}{\sigma}\bigg)\f]
+  ///
+  /// Because of the way that the integral is computed, the peaks in the energy curve will have the form of \f$G_\varepsilon\f$; 
+  /// furthermore \f$G_{\varepsilon}\f$ is all that is required to compute the integral.
+  /// 
   double eps2 = epsilon*epsilon;
   int T1[6], T2[6]; double a[6], b[6];
   int ctr1=0, ctr2=0;
@@ -184,8 +225,15 @@ double Trig6_Cauchy(int *_T1, int *_T2, double *_a, double *_b, double epsilon)
   return I;
 }
 
+///
+/// \fn Trig6_FakeCauchy
+/// \brief <b>DANGER</b>: do not use, I don't remember what this function does.
+///
 double Trig6_FakeCauchy(int *_T, double *_a, double epsilon)
 {
+  ///
+  /// DO NOT USE
+  ///
   double I;  double eps2 = epsilon*epsilon;
   int T[6]; double a[6];
   int ctr=0;
