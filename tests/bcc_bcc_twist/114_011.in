@@ -1,26 +1,28 @@
-$DISTRIBUTION cauchy
+ $DISTRIBUTION cauchy
 
 #IO SETTINGS
 
-$outfile 111.dat
+$outfile 114_011.dat
 
 #CRYSTAL PARAMETERS
 
-$C_1 fcc.in
-$C_2 fcc.in
+$C_1 bcc.in
+$C_2 bcc.in
 $f_constants constants.in
 
 #CONFIGURATION PARAMETERS
 
-$Z1 1 1 1
+$Z1 1  1 4
+$Z2 0  1 1
+
 $X1 1 -1 0
-$Z2 1 1 1
-$X2 1 -1 0
+$X2 0  1 -1
+
 $ThetaRotZ1 0.5
 $ThetaRotZ2 -0.5
 $theta_min 0
 $theta_max 90
-$dtheta 5
+$dtheta 2.5
 
 #NUMERICAL PARAMETERS
 

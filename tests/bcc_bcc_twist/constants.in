@@ -5,5 +5,5 @@ $multiplier 1.
 
 $A $multiplier*$intercept
 $B $multiplier
-$stdev 1.0
+$stdev 6.
 
