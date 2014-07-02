@@ -1,6 +1,6 @@
 reset
-intercept = -27.6383
-multiplier= 5.4
+intercept = -0.0586099
+multiplier= 90
 #intercept = -24.1631 +.17
 #multiplier= 9
 
@@ -18,24 +18,24 @@ set title "100 Tilt Axis"
 #set output "BCC_100.png";
 set xrange [0:90]    
 set yrange [0:2]
-plot "100.dat" using (90-$1):(multiplier*($2-intercept)) with lines ls 1 title "WIELD", "Shibuta_BCC_100.csv" with linespoints ls 2 title "MD"
+plot "100.dat" using (90-$1):(multiplier*($2-intercept)) with lines ls 1 title "WIELD", "Shibuta/100.dat" with linespoints ls 2 title "MD"
 
 set title "110 Tilt Axis"
 #set output "BCC_110.png"
 set xrange [0:180]
 set yrange [-0.5:2]
-plot "110.dat" using (180-$1):(multiplier*($2-intercept)) with lines ls 1 title "WIELD", "Shibuta_BCC_110.csv" with linespoints ls 2 title "MD"
+plot "110.dat" using (180-$1):(multiplier*($2-intercept)) with lines ls 1 title "WIELD", "Shibuta/110.dat" with linespoints ls 2 title "MD"
 
 set title "111 Tilt Axis"
 #set output "BCC_111.png"
 set xrange [0:60]
 set yrange [0:2]
-plot "111.dat" using 1:(multiplier*($2-intercept)) with lines ls 1 title "WIELD", "Shibuta_BCC_111.csv" with linespoints ls 2 title "MD"
+plot "111.dat" using 1:(multiplier*($2-intercept)) with lines ls 1 title "WIELD", "Shibuta/111.dat" with linespoints ls 2 title "MD"
 
 set title "112 Tilt Axis"
 #set output "BCC_112.png"
 set xrange [0:105] 
-plot "112.dat" using 1:(multiplier*($2-intercept)) with lines ls 1 title "WIELD", "Shibuta_BCC_112.csv" with linespoints ls 2 title "MD"
+plot "112.dat" using 1:(multiplier*($2-intercept)) with lines ls 1 title "WIELD", "Shibuta/112.dat" with linespoints ls 2 title "MD"
 
 unset multiplot
 #unset output

@@ -112,9 +112,12 @@ int main(int argc, char* argv[])
     {
       string f_constants = reader.Read<string>("f_constants");
       Reader constantsReader(f_constants, "$", "#", "...");
-      A = constantsReader.Read<double>("A");
-      B = constantsReader.Read<double>("B");
-      stdev = constantsReader.Read<double>("stdev");
+      if (reader.Find("A"))     A = reader.Read<double>("A");
+      else                      A = constantsReader.Read<double>("A");
+      if (reader.Find("B"))     B = reader.Read<double>("B");
+      else                      B = constantsReader.Read<double>("B");
+      if (reader.Find("stdev")) stdev = reader.Read<double>("stdev");
+      else                      stdev = constantsReader.Read<double>("stdev");
     }
   else // Otherwise, look in the current file
     {

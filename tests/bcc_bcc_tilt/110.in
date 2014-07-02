@@ -13,9 +13,9 @@ $f_constants constants.in
 #CONFIGURATION PARAMETERS
 
 $X1 1 1 0
-$Z1 0 0 1
+$Z1 1 -1 0
 $X2 1 1 0
-$Z2 0 0 1
+$Z2 1 -1 0
 $ThetaRotX1 0.5
 $ThetaRotX2 -0.5
 $theta_min 0

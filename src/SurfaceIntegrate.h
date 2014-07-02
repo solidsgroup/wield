@@ -97,7 +97,8 @@ double SurfaceIntegrate(CosSeries C1,
 				if (S != S)
 				  WIELD_NEW_EXCEPTION("Nan detected! S="<<S<<", ijklmnpqrstu="<<i<<j<<k<<l<<m<<n<<p<<q<<r<<s<<t<<u);
 			      }
-  return S * (epsilon * sqrt(pi)) * (epsilon * sqrt(pi));
+  return S;
+  //return S * (epsilon * sqrt(pi)) * (epsilon * sqrt(pi));
   WIELD_CATCH;
 }
 
