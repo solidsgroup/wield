@@ -11,7 +11,7 @@ template<> struct Interpreter<Vector3d >
 {
   void operator() (const string varUnparsed, Vector3d *varParsed)
   {
-    WIELD_TRY;
+    WIELD_EXCEPTION_TRY;
     istringstream iss(varUnparsed); 
     string token;
     for (unsigned int i=0;i<3;i++)
@@ -19,7 +19,7 @@ template<> struct Interpreter<Vector3d >
 	iss >> token;
 	(*varParsed)(i,0) = EvaluateMath(token);
       }
-    WIELD_CATCH_MSG("Error parsing Vector3d: " << varUnparsed);
+    WIELD_EXCEPTION_CATCH_MSG("Error parsing Vector3d: " << varUnparsed);
   }
 };
 
@@ -28,7 +28,7 @@ template<> struct Interpreter<Vector6d >
 {
   void operator() (const string varUnparsed, Vector6d *varParsed)
   {
-    WIELD_TRY;
+    WIELD_EXCEPTION_TRY;
     istringstream iss(varUnparsed); 
     string token;
     for (unsigned int i=0;i<6;i++)
@@ -36,7 +36,7 @@ template<> struct Interpreter<Vector6d >
 	iss >> token;
 	(*varParsed)(i,0) = EvaluateMath(token);
       }
-    WIELD_CATCH_MSG("Error parsing Vector6d: " << varUnparsed);
+    WIELD_EXCEPTION_CATCH_MSG("Error parsing Vector6d: " << varUnparsed);
   }
 };
 

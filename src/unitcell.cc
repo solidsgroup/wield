@@ -24,14 +24,14 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-  WIELD_TRY;
+  WIELD_EXCEPTION_TRY;
   //
   // Import Lattice Data
   //
 
   string filename;
   if (argc < 2) 
-    {WIELD_NEW_EXCEPTION("You must specify a filename!");}
+    {WIELD_EXCEPTION_NEW("You must specify a filename!");}
   else filename=argv[1];
 
   Reader crystal1Reader(filename, "$", "#", "...");
@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
 			     (int)((double)crystal1Reader.Read<double>("resolution",50)/C1.alpha1), 
 			     0.6,0.)));
   
-  WIELD_CATCH_FINAL;
+  WIELD_EXCEPTION_CATCH_FINAL;
 }
 
 

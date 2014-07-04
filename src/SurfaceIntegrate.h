@@ -33,7 +33,7 @@ double SurfaceIntegrate(CosSeries C1,
 			double tolerance = 0, 
 			string distribution = "cauchy")
 {
-  WIELD_TRY;
+  WIELD_EXCEPTION_TRY;
   int type; 
   if (distribution=="gaussian") type = 0;
   else if (distribution=="cauchy") type = 1;
@@ -41,9 +41,9 @@ double SurfaceIntegrate(CosSeries C1,
   else {cout << "Error: Distribution type not specified" << endl; throw(0);}
 
   if ((R1.transpose()*R1 - Matrix3d::Identity()).norm() > 1E-10)
-    WIELD_NEW_EXCEPTION("R1 is not a rotation matrix");
+    WIELD_EXCEPTION_NEW("R1 is not a rotation matrix");
   if ((R2.transpose()*R2 - Matrix3d::Identity()).norm() > 1E-10)
-    WIELD_NEW_EXCEPTION("R2 is not a rotation matrix");
+    WIELD_EXCEPTION_NEW("R2 is not a rotation matrix");
 
   Vector3d na1 = R1.col(0);
   Vector3d nb1 = R2.col(0);
@@ -95,11 +95,11 @@ double SurfaceIntegrate(CosSeries C1,
 				    * Trig6_FakeCauchy(F, a1, epsilon)
 				    * Trig6_FakeCauchy(F, a2, epsilon);
 				if (S != S)
-				  WIELD_NEW_EXCEPTION("Nan detected! S="<<S<<", ijklmnpqrstu="<<i<<j<<k<<l<<m<<n<<p<<q<<r<<s<<t<<u);
+				  WIELD_EXCEPTION_NEW("Nan detected! S="<<S<<", ijklmnpqrstu="<<i<<j<<k<<l<<m<<n<<p<<q<<r<<s<<t<<u);
 			      }
   return S;
   //return S * (epsilon * sqrt(pi)) * (epsilon * sqrt(pi));
-  WIELD_CATCH;
+  WIELD_EXCEPTION_CATCH;
 }
 
 #endif //SURFACEINTEGRATE_D

@@ -38,7 +38,7 @@ double computeGaussCosIntegral(int n, double x0, double sigma, double alpha)
      -Faddeeva::erf(thirdErfArg) *exp(thirdExpArg)
      +Faddeeva::erf(fourthErfArg)*exp(fourthExpArg));
   if (fabs(ret.imag()/ret.real()) > 1E-10)
-    WIELD_NEW_EXCEPTION("Fourier series integral returned imaginary part: ret="<<ret<<", n="<<n<<", x0="<<x0<<", alpha="<<alpha);
+    WIELD_EXCEPTION_NEW("Fourier series integral returned imaginary part: ret="<<ret<<", n="<<n<<", x0="<<x0<<", alpha="<<alpha);
   //cout << "val=" << ret.real()<< " n=" << n << " x0=" << x0 << " sigma=" << sigma << " alpha=" << alpha << endl;
   if (n==0)
     return ret.real() / (alpha);
@@ -48,11 +48,11 @@ double computeGaussCosIntegral(int n, double x0, double sigma, double alpha)
 
 int main(int argc, char* argv[])
 {
-  WIELD_TRY;
+  WIELD_EXCEPTION_TRY;
 
   string filename;
   if (argc < 2) 
-    {WIELD_NEW_EXCEPTION("You must specify a filename!");}
+    {WIELD_EXCEPTION_NEW("You must specify a filename!");}
   else filename=argv[1];
   Reader reader(filename, "$", "#", "...");
 
@@ -66,7 +66,7 @@ int main(int argc, char* argv[])
   vector<double> Z   = reader.Read<vector<double> >("Z");
 
   if ((X.size() != Y.size()) || (Y.size() != Z.size()) || (Z.size() != X.size()))
-    WIELD_NEW_EXCEPTION("Error: X, Y, Z vectors must be the same size");
+    WIELD_EXCEPTION_NEW("Error: X, Y, Z vectors must be the same size");
   int size = X.size();
 
   CosSeries C(order);
@@ -145,7 +145,6 @@ int main(int argc, char* argv[])
 	R = createMatrixFromZX(reader.Read<Vector3d>("NZ"), reader.Read<Vector3d>("NX"));
       else R = Matrix3d::Identity();
 
-  cout << "Hello" << endl;
       renderCrystal(drawCrystal(C, R,
 				reader.Read<double>("xmin"),
 				reader.Read<double>("ymin"),
@@ -162,7 +161,7 @@ int main(int argc, char* argv[])
 
 
   
-  WIELD_CATCH
+  WIELD_EXCEPTION_CATCH
 }
 
 

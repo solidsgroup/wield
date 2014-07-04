@@ -10,9 +10,9 @@ include ~/.make.color
 include ~/.make.vtk
 endif
 
-CC                    = g++
-CPP_COMPILER_OPTIONS += -c -m64 -g3 -Wno-deprecated -ggdb -fbuiltin -no-canonical-prefixes -include ~/Include/colors.h 
-CPP_LINKER_OPTIONS   += -m64 -g3 -ggdb
+CC                    = clang++
+CPP_COMPILER_OPTIONS += -c -g3 -ggdb -include ~/Include/colors.h  -Wno-deprecated
+CPP_LINKER_OPTIONS   += -g3 -ggdb
 
 ifdef EMACS
 PREFIX                = $(shell pwd)/

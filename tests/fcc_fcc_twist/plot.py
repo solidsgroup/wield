@@ -6,11 +6,12 @@ import numpy
 
 #files1=["100.dat"]; files2=["Wolf/100.dat"]; print(wield.leastSquares(files1,files2)); files1=["111.dat"]; files2=["Wolf/111.dat"]; print(wield.leastSquares(files1,files2)); exit(); 
 
+#print(wield.leastSquares(["100.dat"],["Wolf/100.dat"])); exit();
 
-A1 = 1353.86
-B1 = 21581.03
-A2 = 717.3
-B2 = 10759.8
+A1 = 18000 * 0.0527911
+B1 = 18000
+A2 = A1 #717.3
+B2 = B1 #10759.8
 
 Tilt_100_Model  = numpy.loadtxt("100.dat", delimiter=" ");
 Tilt_111_Model  = numpy.loadtxt("111.dat", delimiter=" ");

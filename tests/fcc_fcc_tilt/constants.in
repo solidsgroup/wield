@@ -3,6 +3,6 @@ $multiplier 1.
 
 $A $multiplier*$intercept
 $B $multiplier
-$stdev 0.5
+$stdev 0.7
 
 

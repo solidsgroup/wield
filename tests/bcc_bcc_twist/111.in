@@ -2,7 +2,7 @@
 
 #IO SETTINGS
 
-$outfile 011.dat
+$outfile 111.dat
 
 #CRYSTAL PARAMETERS
 
@@ -12,23 +12,24 @@ $f_constants constants.in
 
 #CONFIGURATION PARAMETERS
 
-$X1 1 0 0
-$Z1 0 1 1
-$X2 1 0 0
-$Z2 0 1 1
+$X1 1 -1 0
+$Z1 1 1 1
+$X2 1 -1 0
+$Z2 1 1 1
 $ThetaRotZ1 0.5
 $ThetaRotZ2 -0.5
 $theta_min 0
-$theta_max 180
-$dtheta 2.5
+$theta_max 60
+$dtheta 5
 
 #NUMERICAL PARAMETERS
 
 $tolerance 1E-2
 $distribution DISTRIBUTION
 
+$test sin(3.1415926535)
 
 #$vtk
-$vtk_rot_x1 55
-$vtk_rot_x2 -55
-$resolution 50
+#$vtk_rot_x1 55
+#$vtk_rot_x2 -55
+$resolution 30

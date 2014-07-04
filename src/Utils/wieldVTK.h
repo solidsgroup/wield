@@ -46,7 +46,7 @@ typedef vtkSmartPointer<vtkActor> Actor;
 
 double computeDensityFunction(double x, double y, double z, CosSeries C)
 {
-  WIELD_TRY;
+  WIELD_EXCEPTION_TRY;
   int order = C.order;
   double alpha1 = C.alpha1;
   double alpha2 = C.alpha2;
@@ -61,7 +61,7 @@ double computeDensityFunction(double x, double y, double z, CosSeries C)
 	  cos(m*pi*y/alpha2) *
 	  cos(n*pi*z/alpha3);
   return phi;
-  WIELD_CATCH;
+  WIELD_EXCEPTION_CATCH;
 }
 
 
@@ -72,10 +72,10 @@ Actor drawCrystal(CosSeries C, Matrix3d R,
 		    int resolution,
 		    double FactorTop=0, double FactorBottom=0)
 {
-  WIELD_TRY;
-  if (xmin > xmax) WIELD_NEW_EXCEPTION("xmin > xmax");
-  if (ymin > ymax) WIELD_NEW_EXCEPTION("ymin > ymax");
-  if (zmin > zmax) WIELD_NEW_EXCEPTION("zmin > zmax");
+  WIELD_EXCEPTION_TRY;
+  if (xmin > xmax) WIELD_EXCEPTION_NEW("xmin > xmax");
+  if (ymin > ymax) WIELD_EXCEPTION_NEW("ymin > ymax");
+  if (zmin > zmax) WIELD_EXCEPTION_NEW("zmin > zmax");
   double x0=xmin,y0=ymin,z0=zmin;
   double xl=xmax-xmin,yl=ymax-ymin,zl=zmax-zmin;
   int nx = (int)(resolution*xl), ny=(int)(resolution*yl), nz=(int)(resolution*zl);
@@ -108,7 +108,7 @@ Actor drawCrystal(CosSeries C, Matrix3d R,
 	    else 
 	      phi->InsertNextValue(computeDensityFunction(x[0],x[1],x[2],C));
 	  }
-      WIELD_PROGRESS("Calculating phi(box)", k,nz);
+      WIELD_PROGRESS("Calculating phi(box)", k, nz, 1);
     }
   cout << endl;
 
@@ -144,12 +144,12 @@ Actor drawCrystal(CosSeries C, Matrix3d R,
   actor->SetMapper(mapper);
   
   return actor;
-  WIELD_CATCH;
+  WIELD_EXCEPTION_CATCH;
 }
 
 void renderCrystals(vector<Actor> actors)
 {
-  WIELD_TRY;
+  WIELD_EXCEPTION_TRY;
   // Visualize
   vtkSmartPointer<vtkRenderer> renderer = 
     vtkSmartPointer<vtkRenderer>::New();
@@ -180,7 +180,7 @@ void renderCrystals(vector<Actor> actors)
   renderer->SetBackground(1,1,1); // Background color white
   renderWindow->Render();
   renderWindowInteractor->Start();
-  WIELD_CATCH;
+  WIELD_EXCEPTION_CATCH;
 }
 		  
 void renderCrystal(Actor actor)

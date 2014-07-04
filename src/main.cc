@@ -36,7 +36,7 @@ using namespace Eigen;
 
 int main(int argc, char* argv[])
 {
-  WIELD_TRY;
+  WIELD_EXCEPTION_TRY;
 
   //
   // OPEN INPUT FILE READER
@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
 
   string filename;
   if (argc < 2) 
-    {WIELD_NEW_EXCEPTION("You must specify a filename!");}
+    {WIELD_EXCEPTION_NEW("You must specify a filename!");}
   else filename=argv[1];
   Reader reader(filename, "$", "#", "...");
 
@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
     Omega_1 = createMatrixFromYZ(reader.Read<Vector3d>("Y1"), reader.Read<Vector3d>("Z1"));
   else if (reader.Find("Z1") && reader.Find("X1"))
     Omega_1 = createMatrixFromZX(reader.Read<Vector3d>("Z1"), reader.Read<Vector3d>("X1"));
-  else WIELD_NEW_EXCEPTION("Missing two vectors to specify Omega_1");
+  else WIELD_EXCEPTION_NEW("Missing two vectors to specify Omega_1");
 
   // Specify orientation of crystal 2
   Matrix3d Omega_2; 
@@ -71,7 +71,7 @@ int main(int argc, char* argv[])
     Omega_2 = createMatrixFromYZ(reader.Read<Vector3d>("Y2"), reader.Read<Vector3d>("Z2"));
   else if (reader.Find("Z2") && reader.Find("X2"))
     Omega_2 = createMatrixFromZX(reader.Read<Vector3d>("Z2"), reader.Read<Vector3d>("X2"));
-  else WIELD_NEW_EXCEPTION("Missing two vectors to specify Omega_2");
+  else WIELD_EXCEPTION_NEW("Missing two vectors to specify Omega_2");
 
 
   //
@@ -218,11 +218,11 @@ int main(int argc, char* argv[])
       out << theta << " " << 
 	A - B*SurfaceIntegrate(C1, Rot1,C2, Rot2,stdev,tolerance) << endl;
 
-      WIELD_PROGRESS("Computing energy curve", theta-theta_min, theta_max-theta_min)
+      WIELD_PROGRESS("Computing energy curve", theta-theta_min, theta_max-theta_min, dtheta)
     }
   cout << endl;
   
-  WIELD_CATCH_FINAL;
+  WIELD_EXCEPTION_CATCH_FINAL;
 }
 
 
