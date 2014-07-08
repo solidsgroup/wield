@@ -30,6 +30,6 @@ pylab.plot(Tilt_111_Wolf[:,0],Tilt_111_Wolf[:,1],color="green",linewidth=2,marke
 
 pylab.xlabel("Twist Angle (Degrees)");
 pylab.ylabel("Energy");
-pylab.legend(loc='upper left');
+pylab.legend(loc='upper left',fancybox=True,shadow=True);
 pylab.show();
 

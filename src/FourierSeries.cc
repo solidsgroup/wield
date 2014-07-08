@@ -18,6 +18,7 @@ using namespace Eigen;
 #include "Utils/wieldRotations.h"
 #include "Utils/wieldExceptions.h"
 #include "Utils/wieldVTK.h"
+#include "Utils/wieldProgress.h"
 
 double computeGaussCosIntegral(int n, double x0, double sigma, double alpha)
 {
@@ -87,9 +88,10 @@ int main(int argc, char* argv[])
 	      }
 	    if (l==0 && m==0 & n==0)
 	      C(l,m,n)=0;
+	    WIELD_PROGRESS("Computing Coefficients", order*order*l + order*m + n, order*order*order , 1);
 	  }
       }
-
+  cout << endl;
 
   //
   // Print to file

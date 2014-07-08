@@ -1,0 +1,33 @@
+
+#CRYSTAL PARAMETERS
+
+$C_1 fcc.in
+$C_2 fcc.in
+$A 0
+$B 1
+$stdev 1.0
+
+#IO SETTINGS
+
+$outfile 100_0.4.dat
+
+#CONFIGURATION PARAMETERS
+
+$X1 1 1 0
+$Z1 1 -1 0
+$X2 1 1 0
+$Z2 1 -1 0
+
+$ThetaRotX1 0.5
+$ThetaRotX2 -0.5
+$theta_min 0
+$theta_max 180
+$dtheta 2.5
+
+#NUMERICAL PARAMETERS
+
+$tolerance 1E-2
+#$tolerance 1E-6 # uncommenting this reveals another peak
+$distribution cauchy
+
+

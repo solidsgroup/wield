@@ -1,0 +1,22 @@
+$DISTRIBUTION cauchy
+
+$order 8
+
+$alpha1 1
+$alpha2 1
+$alpha3 1
+
+$sigma 0.4
+
+#Y (3)   (4)   #Y    (8)      #Y (12)    (13)
+#Y    (2)      #Y (6)   (7)   #Y     (11)
+#Y (0)   (1)   #Y    (5)      #Y (9)     (10)    
+# XXXXXXXXXX   # XXXXXXXXXX   # XXXXXXXXXXXXX
+
+$X $alpha1*0.0 $alpha1*1.0 $alpha1*0.5 $alpha1*0.0 $alpha1*1.0 $alpha1*0.5 $alpha1*0.0 $alpha1*1.0 $alpha1*0.5 $alpha1*0.0 $alpha1*1.0 $alpha1*0.5 $alpha1*0.0 $alpha1*1.0
+$Y $alpha2*0.0 $alpha2*0.0 $alpha2*0.5 $alpha2*1.0 $alpha2*1.0 $alpha2*0.0 $alpha2*0.5 $alpha2*0.5 $alpha2*1.0 $alpha2*0.0 $alpha2*0.0 $alpha2*0.5 $alpha2*1.0 $alpha2*1.0 
+$Z $alpha3*0.0 $alpha3*0.0 $alpha3*0.0 $alpha3*0.0 $alpha3*0.0 $alpha3*0.5 $alpha3*0.5 $alpha3*0.5 $alpha3*0.5 $alpha3*1.0 $alpha3*1.0 $alpha3*1.0 $alpha3*1.0 $alpha3*1.0
+
+$outfile fcc.in
+
+
