@@ -1,8 +1,14 @@
 #ifndef WIELD_TYPE_DEFINITIONS
 #define WIELD_TYPE_DEFINITIONS
 
+#undef eigen_assert
+#define eigen_assert(A) if (!(A)) throw new std::runtime_error("Eigen threw an exception");
+#include "Eigen/Core"
+#include "Eigen/Geometry"
 #include "Utils/wieldExceptions.h"
 #include "Reader.h"
+
+using namespace Eigen;
 
 const double pi = 3.14159265358979323846264338327950288419716939937510582;
 

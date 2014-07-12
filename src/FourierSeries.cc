@@ -147,7 +147,7 @@ int main(int argc, char* argv[])
 	R = createMatrixFromZX(reader.Read<Vector3d>("NZ"), reader.Read<Vector3d>("NX"));
       else R = Matrix3d::Identity();
 
-      renderCrystal(drawCrystal(C, R,
+      renderCrystal(drawCrystal(C, R, Matrix3d::Identity(),
 				reader.Read<double>("xmin"),
 				reader.Read<double>("ymin"),
 				reader.Read<double>("zmin"),

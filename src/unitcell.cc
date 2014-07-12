@@ -44,6 +44,7 @@ int main(int argc, char* argv[])
 
   renderCrystal((drawCrystal(C1, 
 			     Matrix3d::Identity(),
+			     Matrix3d::Identity(),
 			     0, 0, 0,
 			     C1.alpha1, C1.alpha2, C1.alpha3,
 			     (int)((double)crystal1Reader.Read<double>("resolution",50)/C1.alpha1), 

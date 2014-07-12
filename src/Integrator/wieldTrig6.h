@@ -20,7 +20,8 @@
 /// \cond SUPERFLUOUS
 #define COS 0
 #define SIN 1
-#define MOD(a) (double)(1 - 2*((a)%2))
+//#define MOD(a) (double)(1 - 2*((a)%2))
+#define MOD(a) (1 - 2*((a) & 1))
 /// \endcond
 
 using namespace std;
@@ -193,34 +194,38 @@ double Trig6_Cauchy(int *_T1,         ///< Trig indicator functions (size 6)
   double tI;
   double I = 0;
   double e1,e2;
+
   for (int i=0;i<2;i++)
     for (int j=0;j<2;j++)
       for (int k=0;k<2;k++)
-	for (int l=0;l<2;l++)
-	  for (int m=0;m<2;m++)
-	    for (int p=0;p<2;p++)
-	      for (int q=0;q<2;q++)
-		for (int r=0;r<2;r++)
-		  for (int s=0;s<2;s++)
-		    for (int t=0;t<2;t++)
-		      {
-			e1 = (a1 + MOD(i)*a2 + MOD(m)*a3 + MOD(j+m)*a4 + MOD(l+m)*a5 + MOD(l+k+m)*a6);
-			e2 = (b1 + MOD(p)*b2 + MOD(t)*b3 + MOD(q+t)*b4 + MOD(s+t)*b5 + MOD(s+r+t)*b6);
-			tI = exp(-sqrt(e1*e1 + e2*e2)/epsilon);
-			if (S1==6) // SSSSSS
-			  tI *= MOD(i+j+k+3);
-			else if (S1==4) // CCSSSS
-			  tI *= MOD(j+k+2);
-			else if (S1==2) // CCCCSS
-			  tI *= MOD(k+1);
-			if (S2==6)
-			  tI *= MOD(p+q+r+3);
-			else if (S2==4)
-			  tI *= MOD(q+r+2);
-			else if (S2==2)
-			  tI *= MOD(r+1);
-			I += tI;
-		      }
+  	for (int l=0;l<2;l++)
+  	  for (int m=0;m<2;m++)
+	    {
+	      e1 = (a1 + MOD(i)*a2 + MOD(m)*a3 + MOD(j+m)*a4 + MOD(l+m)*a5 + MOD(l+k+m)*a6);
+	      for (int p=0;p<2;p++)
+		for (int q=0;q<2;q++)
+		  for (int r=0;r<2;r++)
+		    for (int s=0;s<2;s++)
+		      for (int t=0;t<2;t++)
+			{
+			  e2 = (b1 + MOD(p)*b2 + MOD(t)*b3 + MOD(q+t)*b4 + MOD(s+t)*b5 + MOD(s+r+t)*b6);
+			  tI = exp(-sqrt(e1*e1 + e2*e2)/epsilon);
+			  if (S1==6) // SSSSSS
+			    tI *= MOD(i+j+k+3);
+			  else if (S1==4) // CCSSSS
+			    tI *= MOD(j+k+2);
+			  else if (S1==2) // CCCCSS
+			    tI *= MOD(k+1);
+			  if (S2==6)
+			    tI *= MOD(p+q+r+3);
+			  else if (S2==4)
+			    tI *= MOD(q+r+2);
+			  else if (S2==2)
+			    tI *= MOD(r+1);
+			  I += tI;
+			}
+	    }
+
   I /= 1024.;
   return I;
 }

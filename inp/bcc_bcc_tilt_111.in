@@ -1,4 +1,4 @@
-
+$DynamicPlotting
 IO SETTINGS
 
 $outfile dat/bcc_bcc_tilt_111.dat

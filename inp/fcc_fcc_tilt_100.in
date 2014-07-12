@@ -1,3 +1,4 @@
+$DynamicPlotting
 IO SETTINGS
 
 $outfile dat/fcc_fcc_tilt_100.dat

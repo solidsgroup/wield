@@ -17,6 +17,7 @@
 #include <vector>
 #include <fstream>
 #include <stdexcept>
+#include <getopt.h>
 #define eigen_assert(A) if (!(A)) throw new std::runtime_error("Eigen threw an exception");
 #include "Eigen/Core"
 #include "Eigen/Geometry"
@@ -25,7 +26,9 @@ using namespace std;
 using namespace Eigen;
 
 #include "/home/brandon/Research/Reader/Reader.h"
+#include "/home/brandon/Research/Reader/Arguments.h"
 
+//#include "ezOptionParser.hpp"
 
 #include "Utils/wieldTypes.h"
 #include "Utils/wieldRotations.h"
@@ -37,6 +40,11 @@ using namespace Eigen;
 int main(int argc, char* argv[])
 {
   WIELD_EXCEPTION_TRY;
+
+  // ez::ezOptionParser opt;
+  // opt.overview = "Compute interface energy";
+  // opt.syntax = "main inputfile.in [options]";
+  // opt.add("", 0, -1, ',', "Dynamically plot energy curve", "-p", "-plt", "-plot", "--plot");
 
   //
   // OPEN INPUT FILE READER
@@ -180,6 +188,7 @@ int main(int argc, char* argv[])
 				   *createMatrixFromXAngle(reader.Read<double>("vtk_rot_x1",0.)) 
 				   *createMatrixFromYAngle(reader.Read<double>("vtk_rot_y1",0.))
 				   *createMatrixFromZAngle(reader.Read<double>("vtk_rot_z1",0.)),
+				   Matrix3d::Identity(),
 				   0*C1.alpha1, -2*C1.alpha2, 0*C1.alpha3,
 				   2*C1.alpha1,  2*C1.alpha2, 2*C1.alpha3,
 				   (int)((double)reader.Read<double>("resolution",50)/C1.alpha1), 
@@ -189,6 +198,7 @@ int main(int argc, char* argv[])
 				   *createMatrixFromXAngle(reader.Read<double>("vtk_rot_x2",0.)) 
 				   *createMatrixFromYAngle(reader.Read<double>("vtk_rot_y2",0.))
 				   *createMatrixFromZAngle(reader.Read<double>("vtk_rot_z2",0.)),
+				   Matrix3d::Identity(),
 				   0*C2.alpha1, -2*C2.alpha2, -2*C2.alpha3,
 				   2*C2.alpha1,  2*C2.alpha2, 0*C2.alpha3,
 				   (int)((double)reader.Read<double>("resolution",50)/C1.alpha1), 
@@ -202,6 +212,10 @@ int main(int argc, char* argv[])
   // ROTATE ORIENTATION RELATIONSHIP AND COMPUTE GRAIN BOUNDARY ENERGY
   //
 
+  bool DynamicPlotting = reader.Find("DynamicPlotting");
+  PlotWindow2D plotWindow;
+  if (DynamicPlotting) plotWindow = createNewPlotWindow2D();
+  vector<double> X,Y;
   for (double theta = theta_min; theta <= theta_max; theta += dtheta)
     {
       Matrix3d Rot1 = 
@@ -215,12 +229,18 @@ int main(int argc, char* argv[])
 	createMatrixFromYAngle(theta*ThetaRotY2) *
 	createMatrixFromZAngle(theta*ThetaRotZ2);
       
-      out << theta << " " << 
-	A - B*SurfaceIntegrate(C1, Rot1,C2, Rot2,stdev,tolerance) << endl;
+      double W = A - B*SurfaceIntegrate(C1, Rot1,C2, Rot2,stdev,tolerance);
+      out << theta << " " << W << endl;
+
+      X.push_back(theta);
+      Y.push_back(W);
+      if (DynamicPlotting) if (X.size() > 1) plotLine(plotWindow, X,Y);
 
       WIELD_PROGRESS("Computing energy curve", theta-theta_min, theta_max-theta_min, dtheta)
     }
   cout << endl;
+  plotLine(plotWindow, X,Y, true);
+
   
   WIELD_EXCEPTION_CATCH_FINAL;
 }

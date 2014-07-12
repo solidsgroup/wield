@@ -33,6 +33,6 @@
 #define WIELD_EXCEPTION_TRY try {
 #define WIELD_EXCEPTION_CATCH } catch (exception &e) {WIELD_EXCEPTION("");throw;} catch (int i) {WIELD_EXCEPTION("");throw;}
 #define WIELD_EXCEPTION_CATCH_MSG(MESSAGE) } catch (exception &e) {WIELD_EXCEPTION(MESSAGE);throw;} catch (int i) {WIELD_EXCEPTION(MESSAGE);throw;}
-#define WIELD_EXCEPTION_CATCH_FINAL } catch (exception &e) {WIELD_EXCEPTION("");} catch (int i) {WIELD_EXCEPTION("");}
+#define WIELD_EXCEPTION_CATCH_FINAL } catch (exception &e) {WIELD_EXCEPTION("");std::cout << "\tWhat: " << e.what() << endl;} catch (int i) {WIELD_EXCEPTION(""); std::cout << "\tError code = " << i << endl;}
 
 #endif // WIELD_EXCEPTION_H

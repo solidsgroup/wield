@@ -58,14 +58,14 @@ double SurfaceIntegrate(CosSeries C1,
 	for (int l=0;l<C2.order;l++)
 	  for (int m=0;m<C2.order;m++)
 	    for (int n=0;n<C2.order;n++)
-	      for (int p=0;p<2;p++)
-		for (int q=0;q<2;q++)
-		  for (int r=0;r<2;r++)
-		    for (int s=0;s<2;s++)
-		      for (int t=0;t<2;t++)
-			for (int u=0;u<2;u++)
-			  if ( (p+q+r+s+t+u)%2 == 0 ) // only do if p+q+r+s+t+u is even
-			    if (abs(C1(i,j,k)*C2(l,m,n)) > tolerance) // skip terms with low coefficients
+	      if (fabs(C1(i,j,k)*C2(l,m,n)) > tolerance) // skip terms with low coefficients
+		for (int p=0;p<2;p++)
+		  for (int q=0;q<2;q++)
+		    for (int r=0;r<2;r++)
+		      for (int s=0;s<2;s++)
+			for (int t=0;t<2;t++)
+			  for (int u=0;u<2;u++)
+			    if ( (p+q+r+s+t+u)%2 == 0 ) // only do if p+q+r+s+t+u is even
 			      {
 				double Ia1_1 = (double)i*pi*na1[0]/C1.alpha1; double Ia2_1 = (double)i*pi*na2[0]/C1.alpha1;
 				double Ja1_2 = (double)j*pi*na1[1]/C1.alpha2; double Ja2_2 = (double)j*pi*na2[1]/C1.alpha2;
@@ -86,7 +86,7 @@ double SurfaceIntegrate(CosSeries C1,
 				    * Trig6_Gaussian(F, a1, epsilon)
 				    * Trig6_Gaussian(F, a2, epsilon);
 				else if (type==1) // Cauchy
-				  S += 
+				  S +=
 				    C1(i,j,k)*C2(l,m,n)
 				    * Trig6_Cauchy(F,F,a1,a2,epsilon);
 				else // Fake Cauchy
