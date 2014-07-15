@@ -25,10 +25,9 @@
 using namespace std;
 using namespace Eigen;
 
+#include "tclap/CmdLine.h"
 #include "/home/brandon/Research/Reader/Reader.h"
 #include "/home/brandon/Research/Reader/Arguments.h"
-
-//#include "ezOptionParser.hpp"
 
 #include "Utils/wieldTypes.h"
 #include "Utils/wieldRotations.h"
@@ -37,31 +36,29 @@ using namespace Eigen;
 #include "Utils/wieldVTK.h"
 #include "Utils/wieldProgress.h"
 
+
 int main(int argc, char* argv[])
 {
   WIELD_EXCEPTION_TRY;
 
-  // ez::ezOptionParser opt;
-  // opt.overview = "Compute interface energy";
-  // opt.syntax = "main inputfile.in [options]";
-  // opt.add("", 0, -1, ',', "Dynamically plot energy curve", "-p", "-plt", "-plot", "--plot");
-
   //
-  // OPEN INPUT FILE READER
+  // COMMAND LINE PARSING
+  // {{{
+  TCLAP::CmdLine cmd("(W)eak approximation of (I)nterface (Energy) for bicrysta(L) boun(D)aries");
+  TCLAP::SwitchArg switchDynamicPlot("p", "dynamic-plot", "Show real-time VTK plot of energy", cmd, false);
+  TCLAP::UnlabeledValueArg<string> argFileName("name", "Path to input file", true, "", "inputfile", cmd);
+  cmd.parse(argc, argv);
+  bool dynamicPlot = switchDynamicPlot.getValue();
+  string fileName = argFileName.getValue();
+  // }}}
+
   // 
-
-  string filename;
-  if (argc < 2) 
-    {WIELD_EXCEPTION_NEW("You must specify a filename!");}
-  else filename=argv[1];
-  Reader reader(filename, "$", "#", "...");
-
-
-  //
-  // SPECIFICATION OF THE ORIENTATION RELATIONSHIP
-  // 
-
-  // Specify orientation of crystal 1
+  // INPUT FILE PARSING
+  // {{{ 
+  // {{{ OPEN INPUT FILE READER
+  Reader reader(fileName, "$", "#", "...");
+  // }}}
+  // {{{ SPECIFY ORIENTATION OF CRYSTAL 1
   Matrix3d Omega_1;
   if (reader.Find("X1") && reader.Find("Y1"))
     Omega_1 = createMatrixFromXY(reader.Read<Vector3d>("X1"), reader.Read<Vector3d>("Y1"));
@@ -70,8 +67,8 @@ int main(int argc, char* argv[])
   else if (reader.Find("Z1") && reader.Find("X1"))
     Omega_1 = createMatrixFromZX(reader.Read<Vector3d>("Z1"), reader.Read<Vector3d>("X1"));
   else WIELD_EXCEPTION_NEW("Missing two vectors to specify Omega_1");
-
-  // Specify orientation of crystal 2
+  // }}}
+  // {{{ SPECIFY ORIENTATION OF CRYSTAL 2
   Matrix3d Omega_2; 
   if (reader.Find("X2") && reader.Find("Y2"))
     Omega_2 = createMatrixFromXY(reader.Read<Vector3d>("X2"), reader.Read<Vector3d>("Y2"));
@@ -80,41 +77,32 @@ int main(int argc, char* argv[])
   else if (reader.Find("Z2") && reader.Find("X2"))
     Omega_2 = createMatrixFromZX(reader.Read<Vector3d>("Z2"), reader.Read<Vector3d>("X2"));
   else WIELD_EXCEPTION_NEW("Missing two vectors to specify Omega_2");
-
-
-  //
-  // VARIATION OF THE ORIENTATION RELATIONSHIP
-  //
-
-  // Specify the range of the FREE VARIABLES:
+  // }}}
+  // {{{ Specify the range of the FREE VARIABLES:
   double theta_min = reader.Read<double>("theta_min");
   double dtheta    = reader.Read<double>("dtheta");
   double theta_max = reader.Read<double>("theta_max");
   double phi_min   = reader.Read<double>("phi_min",0.);
   double dphi      = reader.Read<double>("dphi",0.);
   double phi_max   = reader.Read<double>("phi_max",0.);
-
-  // Specify the rotation of the CRYSTAL 
+  // }}}
+  // {{{ Specify the rotation of the CRYSTAL 
   double ThetaRotX1 = reader.Read<double>("ThetaRotX1",0.);
   double ThetaRotY1 = reader.Read<double>("ThetaRotY1",0.);
   double ThetaRotZ1 = reader.Read<double>("ThetaRotZ1",0.);
   double ThetaRotX2 = reader.Read<double>("ThetaRotX2",0.);
   double ThetaRotY2 = reader.Read<double>("ThetaRotY2",0.);
   double ThetaRotZ2 = reader.Read<double>("ThetaRotZ2",0.);
-
-  // Specify the rotation of the INTERFACE
+  // }}}
+  // {{{ Specify the rotation of the INTERFACE
   double PhiRotX1 = reader.Read<double>("PhiRotX1",0.);
   double PhiRotY1 = reader.Read<double>("PhiRotY1",0.);
   double PhiRotZ1 = reader.Read<double>("PhiRotZ1",0.);
   double PhiRotX2 = reader.Read<double>("PhiRotX2",0.);
   double PhiRotY2 = reader.Read<double>("PhiRotY2",0.);
   double PhiRotZ2 = reader.Read<double>("PhiRotZ2",0.);
-
-
-  //
-  // ADJUSTABLE PARAMETERS
-  //
-
+  // }}}
+  // {{{ ADJUSTABLE PARAMETERS
   double A,B,stdev;
   if (reader.Find("f_constants"))
     {
@@ -133,13 +121,8 @@ int main(int argc, char* argv[])
       B = reader.Read<double>("B");
       stdev = reader.Read<double>("stdev");
     }
-
-
-  //
-  // LATTICE FOURIER COEFFICIENTS FROM FILE
-  //
-
-  // Top crystal
+  // }}}
+  // {{{ LATTICE COEFFICIENTS: TOP CRYSTAL
   string f1 = reader.Read<string>("C_1");
   Reader crystal1Reader(f1, "$", "#", "...");
   int order1 = crystal1Reader.Read<int>("order");
@@ -148,8 +131,8 @@ int main(int argc, char* argv[])
   C1.alpha1 = crystal1Reader.Read<double>("a1");
   C1.alpha2 = crystal1Reader.Read<double>("a2");
   C1.alpha3 = crystal1Reader.Read<double>("a3");
-
-  // Bottom crystal
+  // }}}
+  // {{{ LATTICE COEFFICIENTS: BOTTOM CRYSTAL
   string f2 = reader.Read<string>("C_2");
   Reader crystal2Reader(f2, "$", "#", "...");
   int order2 = crystal2Reader.Read<int>("order");
@@ -158,28 +141,19 @@ int main(int argc, char* argv[])
   C2.alpha1 = crystal2Reader.Read<double>("a1");
   C2.alpha2 = crystal2Reader.Read<double>("a2");
   C2.alpha3 = crystal2Reader.Read<double>("a3");
-
-
-  //
-  // MISC
-  //
-
+  // }}}
+  // {{{ MISC
   double tolerance = reader.Read<double>("tolerance",0.);
-
-
-  //
-  // OUTPUT FILE STREAM
-  //
-
+  // }}}
+  // {{{ OUTPUT FILE STREAM
   string outfile = reader.Read<string>("outfile"); // file to store computation data
   ofstream out(outfile.c_str());        // output stream
+  // }}}
+  // }}}
 
-
-
-  //
+  // 
   // VTK VISUALIZATION
-  //
-
+  // {{{ 
   if (reader.Find("vtk"))
     {
       vector<Actor> actors;
@@ -206,15 +180,13 @@ int main(int argc, char* argv[])
       renderCrystals(actors);
       return 0;
     }	
-
+  // }}}
 
   //
   // ROTATE ORIENTATION RELATIONSHIP AND COMPUTE GRAIN BOUNDARY ENERGY
-  //
-
-  bool DynamicPlotting = reader.Find("DynamicPlotting");
+  // {{{
   PlotWindow2D plotWindow;
-  if (DynamicPlotting) plotWindow = createNewPlotWindow2D();
+  if (dynamicPlot) plotWindow = createNewPlotWindow2D();
   vector<double> X,Y;
   for (double theta = theta_min; theta <= theta_max; theta += dtheta)
     {
@@ -234,13 +206,13 @@ int main(int argc, char* argv[])
 
       X.push_back(theta);
       Y.push_back(W);
-      if (DynamicPlotting) if (X.size() > 1) plotLine(plotWindow, X,Y);
+      if (dynamicPlot) if (X.size() > 1) plotLine(plotWindow, X,Y);
 
       WIELD_PROGRESS("Computing energy curve", theta-theta_min, theta_max-theta_min, dtheta)
     }
   cout << endl;
-  plotLine(plotWindow, X,Y, true);
-
+  if (dynamicPlot) plotLine(plotWindow, X,Y, true);
+  // }}}
   
   WIELD_EXCEPTION_CATCH_FINAL;
 }
