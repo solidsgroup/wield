@@ -1,0 +1,48 @@
+$C_1 fcc.in
+$C_2 fcc.in
+$f_constants constants.in
+$A 3.4234
+$B 64.2913
+
+$areaNormalization
+
+$outfile 1.b.dat
+
+$X1 1 -1 0
+$X2 1 -1 0
+
+#$Z1 1 1 1    #(1.a)
+#$Z2 1 1 -1   #(1.a)
+#$Z1 5 5 8    #(1.b)
+#$Z2 -7 -7 4  #(1.b)
+#$Z1 1 1 2    #(1.c)
+#$Z2 -5 -5 2  #(1.c)
+#$Z1 1 1 4    #(1.d)
+#$Z2 1 1 0    #(1.d)
+#$Z1 0 0 1    #(1.e)
+#$Z2 2 2 1    #(1.e)
+#$Z1 1 1 -8   #(1.f)
+#$Z2 5 5 4    #(1.f)
+
+#$Z1 1 1 -5   #(2.a)
+#$Z2 1 1 1    #(2.a)
+#$Z1 1 1 -4   #(2.b)
+#$Z2 7 7 8    #(2.b)
+#$Z1 2 2 -7   #(2.c)
+#$Z2 4 4 5    #(2.c)
+#$Z1 1 1 -3   #(2.d)
+#$Z2 5 5 7    #(2.d)
+#$Z1 4 4 -11  #(2.e)
+#$Z2 2 2 3    #(2.e)
+#$Z1 1 1 -2  #(2.f)
+#$Z2 1 1 2   #(2.f)
+
+$phi_min -90
+$phi_max 90
+$dphi 1.
+$PhiRotX 1.
+
+#NUMERICAL PARAMETERS
+
+$tolerance 1E-2
+$distribution cauchy

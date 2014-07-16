@@ -1,0 +1,8 @@
+#$intercept 0.
+#$multiplier 1.
+
+#$A $multiplier*$intercept
+#$B $multiplier
+$stdev 0.7
+
+

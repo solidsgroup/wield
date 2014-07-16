@@ -17,7 +17,8 @@
 #include <vector>
 #include <fstream>
 #include <stdexcept>
-#include <getopt.h>
+#include <csignal>
+
 #define eigen_assert(A) if (!(A)) throw new std::runtime_error("Eigen threw an exception");
 #include "Eigen/Core"
 #include "Eigen/Geometry"
@@ -29,26 +30,38 @@ using namespace Eigen;
 #include "/home/brandon/Research/Reader/Reader.h"
 #include "/home/brandon/Research/Reader/Arguments.h"
 
+#include "SurfaceIntegrate.h"
+#include "Utils/wieldColor.h"
 #include "Utils/wieldTypes.h"
 #include "Utils/wieldRotations.h"
 #include "Utils/wieldExceptions.h"
-#include "SurfaceIntegrate.h"
 #include "Utils/wieldVTK.h"
 #include "Utils/wieldProgress.h"
+#include "Optimization/wieldConvexify2d.h"
 
+void signalHandler(int signum)
+{
+  cout << endl;
+  cout << WIELD_COLOR_RESET << "Program terminated" << endl;
+  exit(signum);
+}
 
 int main(int argc, char* argv[])
 {
   WIELD_EXCEPTION_TRY;
 
+  signal(SIGINT, signalHandler);
+
   //
   // COMMAND LINE PARSING
   // {{{
-  TCLAP::CmdLine cmd("(W)eak approximation of (I)nterface (Energy) for bicrysta(L) boun(D)aries");
+  TCLAP::CmdLine cmd("(W)eak approximation of (I)nterface (E)nergy for bicrysta(L) boun(D)aries");
   TCLAP::SwitchArg switchDynamicPlot("p", "dynamic-plot", "Show real-time VTK plot of energy", cmd, false);
+  TCLAP::SwitchArg switchVisualize("s", "show-crystal", "Show VTK plot of initial OR", cmd, false);
   TCLAP::UnlabeledValueArg<string> argFileName("name", "Path to input file", true, "", "inputfile", cmd);
   cmd.parse(argc, argv);
   bool dynamicPlot = switchDynamicPlot.getValue();
+  bool visualize = switchVisualize.getValue();
   string fileName = argFileName.getValue();
   // }}}
 
@@ -79,9 +92,9 @@ int main(int argc, char* argv[])
   else WIELD_EXCEPTION_NEW("Missing two vectors to specify Omega_2");
   // }}}
   // {{{ Specify the range of the FREE VARIABLES:
-  double theta_min = reader.Read<double>("theta_min");
-  double dtheta    = reader.Read<double>("dtheta");
-  double theta_max = reader.Read<double>("theta_max");
+  double theta_min = reader.Read<double>("theta_min",0.);
+  double dtheta    = reader.Read<double>("dtheta",0.);
+  double theta_max = reader.Read<double>("theta_max",0.);
   double phi_min   = reader.Read<double>("phi_min",0.);
   double dphi      = reader.Read<double>("dphi",0.);
   double phi_max   = reader.Read<double>("phi_max",0.);
@@ -95,12 +108,15 @@ int main(int argc, char* argv[])
   double ThetaRotZ2 = reader.Read<double>("ThetaRotZ2",0.);
   // }}}
   // {{{ Specify the rotation of the INTERFACE
-  double PhiRotX1 = reader.Read<double>("PhiRotX1",0.);
-  double PhiRotY1 = reader.Read<double>("PhiRotY1",0.);
-  double PhiRotZ1 = reader.Read<double>("PhiRotZ1",0.);
-  double PhiRotX2 = reader.Read<double>("PhiRotX2",0.);
-  double PhiRotY2 = reader.Read<double>("PhiRotY2",0.);
-  double PhiRotZ2 = reader.Read<double>("PhiRotZ2",0.);
+  double PhiRotX = reader.Read<double>("PhiRotX",0.);
+  double PhiRotY = reader.Read<double>("PhiRotY",0.);
+  double PhiRotZ = reader.Read<double>("PhiRotZ",0.);
+  double PhiRotX1 = reader.Read<double>("PhiRotX1",0.); /* DEPRICATED */
+  double PhiRotY1 = reader.Read<double>("PhiRotY1",0.); /* DEPRICATED */
+  double PhiRotZ1 = reader.Read<double>("PhiRotZ1",0.); /* DEPRICATED */
+  double PhiRotX2 = reader.Read<double>("PhiRotX2",0.); /* DEPRICATED */
+  double PhiRotY2 = reader.Read<double>("PhiRotY2",0.); /* DEPRICATED */
+  double PhiRotZ2 = reader.Read<double>("PhiRotZ2",0.); /* DEPRICATED */
   // }}}
   // {{{ ADJUSTABLE PARAMETERS
   double A,B,stdev;
@@ -143,6 +159,7 @@ int main(int argc, char* argv[])
   C2.alpha3 = crystal2Reader.Read<double>("a3");
   // }}}
   // {{{ MISC
+  bool areaNormalization = reader.Find("areaNormalization");
   double tolerance = reader.Read<double>("tolerance",0.);
   // }}}
   // {{{ OUTPUT FILE STREAM
@@ -154,64 +171,116 @@ int main(int argc, char* argv[])
   // 
   // VTK VISUALIZATION
   // {{{ 
-  if (reader.Find("vtk"))
+  if (visualize)
     {
       vector<Actor> actors;
       actors.push_back(drawCrystal(C1, 
-				   Omega_1
-				   *createMatrixFromXAngle(reader.Read<double>("vtk_rot_x1",0.)) 
-				   *createMatrixFromYAngle(reader.Read<double>("vtk_rot_y1",0.))
-				   *createMatrixFromZAngle(reader.Read<double>("vtk_rot_z1",0.)),
+				   Omega_1 *
+				   createMatrixFromXAngle(theta_min*ThetaRotX1) *
+				   createMatrixFromYAngle(theta_min*ThetaRotY1) *
+				   createMatrixFromZAngle(theta_min*ThetaRotZ1) *
+				   createMatrixFromXAngle(phi_min*PhiRotX) *
+				   createMatrixFromYAngle(phi_min*PhiRotY) *
+				   createMatrixFromZAngle(phi_min*PhiRotZ),
 				   Matrix3d::Identity(),
 				   0*C1.alpha1, -2*C1.alpha2, 0*C1.alpha3,
 				   2*C1.alpha1,  2*C1.alpha2, 2*C1.alpha3,
 				   (int)((double)reader.Read<double>("resolution",50)/C1.alpha1), 
 				   0.6,0.));
       actors.push_back(drawCrystal(C2, 
-				   Omega_2
-				   *createMatrixFromXAngle(reader.Read<double>("vtk_rot_x2",0.)) 
-				   *createMatrixFromYAngle(reader.Read<double>("vtk_rot_y2",0.))
-				   *createMatrixFromZAngle(reader.Read<double>("vtk_rot_z2",0.)),
+				   Omega_2 *
+				   createMatrixFromXAngle(theta_min*ThetaRotX2) *
+				   createMatrixFromYAngle(theta_min*ThetaRotY2) *
+				   createMatrixFromZAngle(theta_min*ThetaRotZ2) *
+				   createMatrixFromXAngle(phi_min*PhiRotX) *
+				   createMatrixFromYAngle(phi_min*PhiRotY) *
+				   createMatrixFromZAngle(phi_min*PhiRotZ),
 				   Matrix3d::Identity(),
 				   0*C2.alpha1, -2*C2.alpha2, -2*C2.alpha3,
 				   2*C2.alpha1,  2*C2.alpha2, 0*C2.alpha3,
 				   (int)((double)reader.Read<double>("resolution",50)/C1.alpha1), 
 				   0.6,0.));
       renderCrystals(actors);
-      return 0;
     }	
   // }}}
 
   //
   // ROTATE ORIENTATION RELATIONSHIP AND COMPUTE GRAIN BOUNDARY ENERGY
   // {{{
-  PlotWindow2D plotWindow;
-  if (dynamicPlot) plotWindow = createNewPlotWindow2D();
+  PlotWindow2D *plotWindow;
+  if (dynamicPlot) plotWindow = new PlotWindow2D();
   vector<double> X,Y;
-  for (double theta = theta_min; theta <= theta_max; theta += dtheta)
+  if (fabs(theta_max-theta_min) > 1E-8)
     {
-      Matrix3d Rot1 = 
-	Omega_1 *
-	createMatrixFromXAngle(theta*ThetaRotX1) *
-	createMatrixFromYAngle(theta*ThetaRotY1) *
-	createMatrixFromZAngle(theta*ThetaRotZ1);
-      Matrix3d Rot2 = 
-	Omega_2 *
-	createMatrixFromXAngle(theta*ThetaRotX2) *
-	createMatrixFromYAngle(theta*ThetaRotY2) *
-	createMatrixFromZAngle(theta*ThetaRotZ2);
+      for (double theta = theta_min; theta <= theta_max; theta += dtheta)
+	{
+	  Matrix3d Rot1 = 
+	    Omega_1 *
+	    createMatrixFromXAngle(theta*ThetaRotX1) *
+	    createMatrixFromYAngle(theta*ThetaRotY1) *
+	    createMatrixFromZAngle(theta*ThetaRotZ1);
+	  Matrix3d Rot2 = 
+	    Omega_2 *
+	    createMatrixFromXAngle(theta*ThetaRotX2) *
+	    createMatrixFromYAngle(theta*ThetaRotY2) *
+	    createMatrixFromZAngle(theta*ThetaRotZ2);
       
-      double W = A - B*SurfaceIntegrate(C1, Rot1,C2, Rot2,stdev,tolerance);
-      out << theta << " " << W << endl;
+	  double W = A - B*SurfaceIntegrate(C1, Rot1, C2, Rot2, stdev, tolerance);
+	  out << theta << " " << W << endl;
+	  X.push_back(theta);
+	  Y.push_back(W);
+	  if (dynamicPlot) if (X.size() > 1) {plotWindow->clear(); plotWindow->plotLine(X,Y);}
 
-      X.push_back(theta);
-      Y.push_back(W);
-      if (dynamicPlot) if (X.size() > 1) plotLine(plotWindow, X,Y);
+	  WIELD_PROGRESS("Computing energy curve", theta-theta_min, theta_max-theta_min, dtheta);
+	}
+      cout << endl;
 
-      WIELD_PROGRESS("Computing energy curve", theta-theta_min, theta_max-theta_min, dtheta)
+      if (dynamicPlot) 
+	{
+	  plotWindow->clear(); 
+	  plotWindow->plotLine(X,Y, true);
+	}
     }
-  cout << endl;
-  if (dynamicPlot) plotLine(plotWindow, X,Y, true);
+  else
+    if (fabs(phi_max-phi_min) > 1E-8)
+      {
+	for (double phi = phi_min; phi <= phi_max; phi += dphi)
+	  {
+	    WIELD_PROGRESS("Computing energy curve", phi-phi_min, phi_max-phi_min, dphi);
+
+	    Matrix3d N = 
+	      createMatrixFromXAngle(phi*PhiRotX) *
+	      createMatrixFromYAngle(phi*PhiRotY) *
+	      createMatrixFromZAngle(phi*PhiRotZ);
+      
+	    if (fabs(N(2,2)) < 1E-8) continue;
+	  
+	    double W = (A - B*SurfaceIntegrate(C1, Omega_1*N, C2, Omega_2*N, stdev, tolerance));
+	    if (areaNormalization) W /= N(2,2);
+	    X.push_back(phi);
+	    Y.push_back(W);
+	    if (dynamicPlot) 
+	      if (X.size() > 1) 
+		{
+		  plotWindow->clear(); 
+		  plotWindow->plotLine(X,Y);
+		}
+	  }
+
+	cout << endl;
+
+	vector<double> Yc = Wield::Optimization::Convexify2D(X,Y);
+	for (int i=0; i<X.size(); i++)
+	  out << X[i] << " " << Y[i] << " " << Yc[i] << endl;
+
+	if (dynamicPlot) 
+	  {
+	    plotWindow->clear(); 
+	    plotWindow->plotLine(X,Y);
+	    plotWindow->plotLine(X,Yc, true);
+	  }
+
+      }
   // }}}
   
   WIELD_EXCEPTION_CATCH_FINAL;

@@ -1,0 +1,25 @@
+$C_1 fcc.in
+$C_2 fcc.in
+$f_constants constants.in
+$A 3.4234
+$B 64.2913
+
+$areaNormalization
+
+$outfile 1.b.dat
+
+$X1 1 -1 0
+$X2 1 -1 0
+
+$Z1 5 5 8    #(1.b)
+$Z2 -7 -7 4  #(1.b)
+
+$phi_min -90
+$phi_max 90
+$dphi 0.25
+$PhiRotX 1.
+
+#NUMERICAL PARAMETERS
+
+$tolerance 1E-2
+$distribution cauchy

@@ -56,8 +56,68 @@ using namespace Eigen;
 
 
 typedef vtkSmartPointer<vtkActor> Actor;
-struct PlotWindow2D
+class PlotWindow2D
 {
+ public:
+  PlotWindow2D()
+  {
+    view = vtkSmartPointer<vtkContextView>::New();
+    view->GetRenderer()->SetBackground(1.0, 1.0, 1.0);
+    view->GetRenderWindow()->SetSize(400, 300);
+    chart = vtkSmartPointer<vtkChartXY>::New();
+    view->GetScene()->AddItem(chart);
+    chart->SetShowLegend(false);
+  }
+  void clear()
+  {
+    chart->ClearPlots();
+  }
+  void plotLine(vector<double> X, vector<double> Y, bool blocking=false)
+  {
+    WIELD_EXCEPTION_TRY;
+
+    if (X.size() != Y.size())
+      WIELD_EXCEPTION_NEW("X.size()=" << X.size() << " but " << "Y.size()=" << Y.size());
+
+    vtkSmartPointer<vtkTable> table =
+      vtkSmartPointer<vtkTable>::New();
+ 
+    vtkSmartPointer<vtkFloatArray> arrX =
+      vtkSmartPointer<vtkFloatArray>::New();
+    arrX->SetName("X Axis");
+    table->AddColumn(arrX);
+ 
+    vtkSmartPointer<vtkFloatArray> arrC =
+      vtkSmartPointer<vtkFloatArray>::New();
+    arrC->SetName("Cosine");
+    table->AddColumn(arrC);
+ 
+    // Test charting with a few more points...
+    table->SetNumberOfRows(X.size());
+    for (int i = 0; i < X.size(); ++i)
+      {
+	table->SetValue(i, 0, X[i]);
+	table->SetValue(i, 1, Y[i]);
+      }
+ 
+    vtkPlot *line = chart->AddPlot(vtkChart::LINE);
+    line->SetInput(table, 0, 1);
+    line->SetColor(0, 0, 0, 255);
+    line->SetWidth(2.0);
+    vtkPlotLine::SafeDownCast(line)->SetMarkerStyle(vtkPlotPoints::CIRCLE);
+    vtkPlotLine::SafeDownCast(line)->SetMarkerSize(4.);
+ 
+ 
+    //Finally render the scene
+    view->GetRenderWindow()->SetMultiSamples(0);
+    view->GetInteractor()->Initialize();
+    if (blocking) view->GetInteractor()->Start();
+    else view->GetInteractor()->Render();
+
+    WIELD_EXCEPTION_CATCH;
+  }
+
+ private:
   vtkSmartPointer<vtkContextView> view;
   vtkSmartPointer<vtkChartXY> chart;
 };
@@ -82,66 +142,8 @@ double computeDensityFunction(double x, double y, double z, CosSeries C)
   WIELD_EXCEPTION_CATCH;
 }
 
-PlotWindow2D createNewPlotWindow2D()
-{
-  PlotWindow2D plotWindow;
-  plotWindow.view =
-    vtkSmartPointer<vtkContextView>::New();
-  plotWindow.view->GetRenderer()->SetBackground(1.0, 1.0, 1.0);
-  plotWindow.view->GetRenderWindow()->SetSize(400, 300);
-  plotWindow.chart =
-    vtkSmartPointer<vtkChartXY>::New();
-  plotWindow.view->GetScene()->AddItem(plotWindow.chart);
-  plotWindow.chart->SetShowLegend(false);
-  return plotWindow;
-}
 
-int plotLine(PlotWindow2D plotWindow, vector<double> X, vector<double> Y, bool blocking=false)
-{
-  WIELD_EXCEPTION_TRY;
 
-  if (X.size() != Y.size())
-    WIELD_EXCEPTION_NEW("X.size()=" << X.size() << " but " << "Y.size()=" << Y.size());
-
-  vtkSmartPointer<vtkTable> table =
-    vtkSmartPointer<vtkTable>::New();
- 
-  vtkSmartPointer<vtkFloatArray> arrX =
-    vtkSmartPointer<vtkFloatArray>::New();
-  arrX->SetName("X Axis");
-  table->AddColumn(arrX);
- 
-  vtkSmartPointer<vtkFloatArray> arrC =
-    vtkSmartPointer<vtkFloatArray>::New();
-  arrC->SetName("Cosine");
-  table->AddColumn(arrC);
- 
-  // Test charting with a few more points...
-  table->SetNumberOfRows(X.size());
-  for (int i = 0; i < X.size(); ++i)
-    {
-      table->SetValue(i, 0, X[i]);
-      table->SetValue(i, 1, Y[i]);
-    }
- 
-  // Add multiple scatter plots, setting the colors etc
-  plotWindow.chart->ClearPlots();
-  vtkPlot *points = plotWindow.chart->AddPlot(vtkChart::LINE);
-  points->SetInput(table, 0, 1);
-  points->SetColor(0, 0, 0, 255);
-  points->SetWidth(1.0);
-  vtkPlotLine::SafeDownCast(points)->SetMarkerStyle(vtkPlotPoints::CIRCLE);
- 
- 
-  //Finally render the scene
-  plotWindow.view->GetRenderWindow()->SetMultiSamples(0);
-  plotWindow.view->GetInteractor()->Initialize();
-  if (blocking) plotWindow.view->GetInteractor()->Start();
-  else plotWindow.view->GetInteractor()->Render();
-  return 0;
-
-  WIELD_EXCEPTION_CATCH;
-}
 
 
 
