@@ -253,10 +253,10 @@ int main(int argc, char* argv[])
 	      createMatrixFromYAngle(phi*PhiRotY) *
 	      createMatrixFromZAngle(phi*PhiRotZ);
       
-	    if (fabs(N(2,2)) < 1E-8) continue;
+	    //if (fabs(N(2,2)) < 1E-8) continue;
 	  
 	    double W = (A - B*SurfaceIntegrate(C1, Omega_1*N, C2, Omega_2*N, stdev, tolerance));
-	    if (areaNormalization) W /= N(2,2);
+	    //if (areaNormalization) W /= N(2,2);
 	    X.push_back(phi);
 	    Y.push_back(W);
 	    if (dynamicPlot) 
@@ -269,7 +269,7 @@ int main(int argc, char* argv[])
 
 	cout << endl;
 
-	vector<double> Yc = Wield::Optimization::Convexify2D(X,Y);
+	vector<double> Yc = Wield::Optimization::Convexify2DAngles(X,Y);
 	for (int i=0; i<X.size(); i++)
 	  out << X[i] << " " << Y[i] << " " << Yc[i] << endl;
 

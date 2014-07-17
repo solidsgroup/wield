@@ -6,15 +6,15 @@ $B 64.2913
 
 $areaNormalization
 
-$outfile 1.b.dat
+$outfile test.dat
 
 $X1 1 -1 0
 $X2 1 -1 0
 
 #$Z1 1 1 1    #(1.a)
 #$Z2 1 1 -1   #(1.a)
-#$Z1 5 5 8    #(1.b)
-#$Z2 -7 -7 4  #(1.b)
+$Z1 5 5 8    #(1.b)
+$Z2 -7 -7 4  #(1.b)
 #$Z1 1 1 2    #(1.c)
 #$Z2 -5 -5 2  #(1.c)
 #$Z1 1 1 4    #(1.d)
@@ -39,7 +39,7 @@ $X2 1 -1 0
 
 $phi_min -90
 $phi_max 90
-$dphi 1.
+$dphi 5.
 $PhiRotX 1.
 
 #NUMERICAL PARAMETERS

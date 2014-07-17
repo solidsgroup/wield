@@ -33,8 +33,8 @@ pylab.subplot(221)
 pylab.xlim(0,90)
 pylab.ylim(0,1800)
 pylab.plot(Tilt_001_Model[:,0],
-           A + B*Tilt_001_Model[:,1],color="blue",linewidth=2,linestyle='-',label="001 Model")
-pylab.plot(Tilt_001_Wolf[:,0],Tilt_001_Wolf[:,1],color="blue",marker='o',linestyle='--',label="001 MD")
+           A + B*Tilt_001_Model[:,1],color="black",linewidth=2,linestyle='-',label="001 Model")
+pylab.plot(Tilt_001_Wolf[:,0],Tilt_001_Wolf[:,1],color="black",marker='o',linestyle='--',label="001 MD")
 pylab.legend(loc='lower center',ncol=2,fancybox=True,shadow=True);
 pylab.xlabel("Twist Angle (Degrees)");
 pylab.ylabel("Energy");
@@ -43,8 +43,8 @@ pylab.subplot(222)
 pylab.xlim(0,180)
 pylab.ylim(0,1600)
 pylab.plot(Tilt_011_Model[:,0],
-           A + B*Tilt_011_Model[:,1],color="blue",linewidth=2,linestyle='-',label="011 Model")
-pylab.plot(Tilt_011_Wolf[:,0],Tilt_011_Wolf[:,1],color="blue",linewidth=2,marker='o',linestyle='--',label='011 MD')
+           A + B*Tilt_011_Model[:,1],color="black",linewidth=2,linestyle='-',label="011 Model")
+pylab.plot(Tilt_011_Wolf[:,0],Tilt_011_Wolf[:,1],color="black",linewidth=2,marker='o',linestyle='--',label='011 MD')
 pylab.legend(loc='lower center',ncol=2,fancybox=True,shadow=True);
 pylab.xlabel("Twist Angle (Degrees)");
 pylab.ylabel("Energy");
@@ -53,8 +53,8 @@ pylab.subplot(223)
 pylab.xlim(0,180)
 pylab.ylim(0,1800)
 pylab.plot(Tilt_031_Model[:,0],
-           A + B*Tilt_031_Model[:,1],color="blue",linewidth=2,linestyle='-',label="031 Model")
-pylab.plot(Tilt_031_Wolf[:,0],Tilt_031_Wolf[:,1],color="blue",linewidth=2,marker='o',linestyle='--',label='031 MD')
+           A + B*Tilt_031_Model[:,1],color="black",linewidth=2,linestyle='-',label="031 Model")
+pylab.plot(Tilt_031_Wolf[:,0],Tilt_031_Wolf[:,1],color="black",linewidth=2,marker='o',linestyle='--',label='031 MD')
 pylab.legend(loc='lower center',ncol=2,fancybox=True,shadow=True);
 pylab.xlabel("Twist Angle (Degrees)");
 pylab.ylabel("Energy");
@@ -63,8 +63,8 @@ pylab.subplot(224)
 pylab.xlim(0,180)
 pylab.ylim(0,1800)
 pylab.plot(Tilt_112_Model[:,0],
-           A + B*Tilt_112_Model[:,1],color="blue",linewidth=2,linestyle='-',label="112 Model")
-pylab.plot(Tilt_112_Wolf[:,0],Tilt_112_Wolf[:,1],color="blue",linewidth=2,marker='o',linestyle='--',label='112 MD')
+           A + B*Tilt_112_Model[:,1],color="black",linewidth=2,linestyle='-',label="112 Model")
+pylab.plot(Tilt_112_Wolf[:,0],Tilt_112_Wolf[:,1],color="black",linewidth=2,marker='o',linestyle='--',label='112 MD')
 pylab.legend(loc='lower center',ncol=2,fancybox=True,shadow=True);
 pylab.xlabel("Twist Angle (Degrees)");
 pylab.ylabel("Energy");

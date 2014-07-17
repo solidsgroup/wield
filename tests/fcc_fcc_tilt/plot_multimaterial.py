@@ -33,24 +33,33 @@ Tilt_110_Au  = numpy.loadtxt("Wolf/110_Au.dat", delimiter=" ");
 Tilt_110_Cu  = numpy.loadtxt("Wolf/110_Cu.dat", delimiter=" ");
 Tilt_110_Ni  = numpy.loadtxt("Wolf/110_Ni.dat", delimiter=" ");
 
+ax = pylab.subplot(111);
 
 pylab.plot(Tilt_110_Model[:,0],
-           A_Al + B_Al*Tilt_110_Model[:,1],color="green",linewidth="2",linestyle='-',label='Al')
-pylab.errorbar(Tilt_110_Al[:,0],Tilt_110_Al[:,1],yerr=0.1*Tilt_110_Al[:,1],color="green",linewidth="2",marker='o',linestyle=' ')
-
+           A_Al + B_Al*Tilt_110_Model[:,1],color="black",linewidth="2",linestyle='-',label='Al')
 pylab.plot(Tilt_110_Model[:,0],
-           A_Au + B_Au*Tilt_110_Model[:,1],color="red",linewidth="2",linestyle='-',label='Au')
-pylab.errorbar(Tilt_110_Au[:,0],Tilt_110_Au[:,1],yerr=0.1*Tilt_110_Au[:,1],color="red",linewidth="2",marker='o',linestyle=' ')
-
+           A_Au + B_Au*Tilt_110_Model[:,1],color="black",linewidth="2",linestyle='-.',label='Au')
 pylab.plot(Tilt_110_Model[:,0],
-           A_Cu + B_Cu*Tilt_110_Model[:,1],color="turquoise",linewidth="2",linestyle='-',label='Cu')
-pylab.errorbar(Tilt_110_Cu[:,0],Tilt_110_Cu[:,1],yerr=0.1*Tilt_110_Cu[:,1],color="turquoise",linewidth="2",marker='o',linestyle=' ')
-
+           A_Cu + B_Cu*Tilt_110_Model[:,1],color="black",linewidth="2",linestyle='--',label='Cu')
 pylab.plot(Tilt_110_Model[:,0],
-           A_Ni + B_Ni*Tilt_110_Model[:,1],color="blue",linewidth="2",linestyle='-',label='Ni')
-pylab.errorbar(Tilt_110_Ni[:,0],Tilt_110_Ni[:,1],yerr=Tilt_110_Ni[:,1]*0.1,color="blue",linewidth="2",marker='o',linestyle=' ')
+           A_Ni + B_Ni*Tilt_110_Model[:,1],color="black",linewidth="2",linestyle=':',label='Ni')
 
-pylab.legend(loc="upper center",ncol=4,fancybox=True,shadow=True);
+pylab.plot(Tilt_110_Al[:,0],Tilt_110_Al[:,1],#yerr=0.1*Tilt_110_Al[:,1],
+           color="white",linewidth="2",markersize=7,marker='o',linestyle=' ',label='Al (MD)',markeredgecolor='black',markeredgewidth='2')
+pylab.plot(Tilt_110_Au[:,0],Tilt_110_Au[:,1],#yerr=0.1*Tilt_110_Au[:,1],
+           color="white",linewidth="2",markersize=7,marker='s',linestyle=' ', label='Au (MD)',markeredgecolor='black',markeredgewidth='2')
+pylab.plot(Tilt_110_Cu[:,0],Tilt_110_Cu[:,1],#yerr=0.1*Tilt_110_Cu[:,1],
+           color="white",linewidth="2",markersize=7,marker='^',linestyle=' ',label='Cu (MD)',markeredgecolor='black',markeredgewidth='2')
+pylab.plot(Tilt_110_Ni[:,0],Tilt_110_Ni[:,1],#yerr=Tilt_110_Ni[:,1]*0.1,
+           color="white",linewidth="2",markersize=7,marker='v',linestyle=' ', label='Ni (MD)',markeredgecolor='black',markeredgewidth='2')
+
+
+handles, labels = ax.get_legend_handles_labels()
+
+handles = [handles[0],handles[4],handles[1],handles[5],handles[2],handles[6],handles[3],handles[7]]
+labels = [labels[0],labels[4],labels[1],labels[5],labels[2],labels[6],labels[3],labels[7]]
+
+pylab.legend(handles,labels,loc="upper center",ncol=4,fancybox=True,shadow=True,numpoints=2,columnspacing=1);
 pylab.xlim(0,180);
 pylab.ylim(0,1.5);
 pylab.xlabel("Tilt angle (degrees)");
