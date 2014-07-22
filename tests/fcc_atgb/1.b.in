@@ -22,4 +22,4 @@ $PhiRotX 1.
 #NUMERICAL PARAMETERS
 
 $tolerance 1E-2
-$distribution cauchy
+$distribution gaussian

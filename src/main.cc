@@ -1,6 +1,6 @@
 /// 
 /// \mainpage WIELD: (W)eak approximation of (I)nterface (E)nergy for bicrysta(L) boun(D)aries 
-/// This is a small research program to compute the energy of a bicrystal interface using the Site Potential method.
+/// This is a small research program to compute the energy of a bicrystal interface. 
 /// 
 
 ///
@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
   // INPUT FILE PARSING
   // {{{ 
   // {{{ OPEN INPUT FILE READER
-  Reader reader(fileName, "$", "#", "...");
+  Reader reader(fileName, argc, argv, "$", "#", "...");
   // }}}
   // {{{ SPECIFY ORIENTATION OF CRYSTAL 1
   Matrix3d Omega_1;
@@ -225,7 +225,7 @@ int main(int argc, char* argv[])
 	    createMatrixFromYAngle(theta*ThetaRotY2) *
 	    createMatrixFromZAngle(theta*ThetaRotZ2);
       
-	  double W = A - B*SurfaceIntegrate(C1, Rot1, C2, Rot2, stdev, tolerance);
+	  double W = A - B*SurfaceIntegrate(C1, Rot1, C2, Rot2, stdev, tolerance, reader.Read<string>("distribution","cauchy"));
 	  out << theta << " " << W << endl;
 	  X.push_back(theta);
 	  Y.push_back(W);
@@ -255,7 +255,7 @@ int main(int argc, char* argv[])
       
 	    //if (fabs(N(2,2)) < 1E-8) continue;
 	  
-	    double W = (A - B*SurfaceIntegrate(C1, Omega_1*N, C2, Omega_2*N, stdev, tolerance));
+	    double W = (A - B*SurfaceIntegrate(C1, Omega_1*N, C2, Omega_2*N, stdev, tolerance, reader.Read<string>("distribution","cauchy")));
 	    //if (areaNormalization) W /= N(2,2);
 	    X.push_back(phi);
 	    Y.push_back(W);
@@ -269,15 +269,20 @@ int main(int argc, char* argv[])
 
 	cout << endl;
 
-	vector<double> Yc = Wield::Optimization::Convexify2DAngles(X,Y);
+	
+	vector<double> T1(X.size()), T2(X.size());
+	vector<double> Yc = Wield::Optimization::Convexify2DAngles(X,Y,T1,T2);
 	for (int i=0; i<X.size(); i++)
-	  out << X[i] << " " << Y[i] << " " << Yc[i] << endl;
-
+	  out << X[i] << " " << Y[i] << " " << Yc[i] << " " << T1[i] << " " << T2[i] << endl;
+	
 	if (dynamicPlot) 
 	  {
 	    plotWindow->clear(); 
 	    plotWindow->plotLine(X,Y);
-	    plotWindow->plotLine(X,Yc, true);
+	    plotWindow->plotLine(X,Yc, false);
+	    PlotWindow2D pw2;
+	    pw2.plotLine(X,T1);
+	    pw2.plotLine(X,T2, true);
 	  }
 
       }

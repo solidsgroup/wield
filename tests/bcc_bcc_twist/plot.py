@@ -19,6 +19,8 @@ Tilt_111_Model  = numpy.loadtxt("114_011.dat", delimiter=" ");
 Tilt_100_Wolf  = numpy.loadtxt("Wolf/011.dat", delimiter=" ");
 Tilt_111_Wolf  = numpy.loadtxt("Wolf/114_011.dat", delimiter=" ");
 
+pylab.figure(figsize=(10*8/10,8*8/10));
+
 pylab.xlim(0,180);
 pylab.ylim(0,1500);
 pylab.plot(Tilt_100_Model[:,0],
@@ -35,5 +37,6 @@ pylab.plot(Tilt_111_Wolf[:,0],Tilt_111_Wolf[:,1],color="green",linewidth=2,marke
 pylab.xlabel("Twist Angle (Degrees)");
 pylab.ylabel("Energy");
 pylab.legend(loc='lower center',ncol=2,fancybox=True,shadow=True);
+pylab.tight_layout();
 pylab.show();
 

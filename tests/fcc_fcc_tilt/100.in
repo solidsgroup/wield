@@ -21,7 +21,7 @@ $ThetaRotX1 0.5
 $ThetaRotX2 -0.5
 $theta_min 0
 $theta_max 90
-$dtheta 5
+$dtheta 1
 
 #NUMERICAL PARAMETERS
 

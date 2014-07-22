@@ -13,6 +13,8 @@ Sigma_0_2  = numpy.loadtxt("100_0.2.dat", delimiter=" ");
 Sigma_0_15  = numpy.loadtxt("100_0.15.dat", delimiter=" ");
 Sigma_0_1  = numpy.loadtxt("100_0.1.dat", delimiter=" ");
 
+pylab.figure(figsize=(10*8/10,8*8/10));
+
 pylab.plot(Sigma_0_5[:,0], (Sigma_0_5[:,1] - min(Sigma_0_5[:,1]))/(max(Sigma_0_5[:,1])-min(Sigma_0_5[:,1])),color="black",linewidth=2,linestyle='-',label='$\sigma=0.5\alpha$')
 #pylab.plot(Sigma_0_4[:,0], (Sigma_0_4[:,1] - min(Sigma_0_4[:,1]))/(max(Sigma_0_4[:,1])-min(Sigma_0_4[:,1])),color="yellow",linewidth=2,linestyle='-',label='$\sigma=0.40\alpha$')
 pylab.plot(Sigma_0_35[:,0], (Sigma_0_35[:,1] - min(Sigma_0_35[:,1]))/(max(Sigma_0_35[:,1])-min(Sigma_0_35[:,1])),color="black",linewidth=2,linestyle='--',label='$\sigma=0.35\alpha$')
@@ -28,5 +30,6 @@ pylab.plot(Sigma_0_1[:,0], (Sigma_0_1[:,1] - min(Sigma_0_1[:,1]))/(max(Sigma_0_1
 pylab.xlabel("Tilt Angle (Degrees)");
 pylab.ylabel("Energy");
 pylab.legend(loc='lower right',fancybox=True,shadow=True);
+pylab.tight_layout();
 pylab.show();
 

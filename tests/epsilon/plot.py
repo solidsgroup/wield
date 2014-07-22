@@ -8,6 +8,8 @@ import numpy
 
 #print(wield.leastSquares(["100.dat"],["Wolf/100.dat"])); exit();
 
+pylab.figure(figsize=(10*8/10,8*8/10));
+
 A=.0490/0.0244991;
 B=1/0.0244991;
 
@@ -37,5 +39,6 @@ pylab.xlim(-2,10);
 pylab.xlabel("Tilt Angle (Degrees)");
 pylab.ylabel("Energy");
 pylab.legend(loc='lower right',fancybox=True,shadow=True);
+pylab.tight_layout();
 pylab.show();
 

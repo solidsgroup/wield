@@ -19,17 +19,25 @@ Tilt_111_Model  = numpy.loadtxt("111.dat", delimiter=" ");
 Tilt_100_Wolf  = numpy.loadtxt("Wolf/100.dat", delimiter=" ");
 Tilt_111_Wolf  = numpy.loadtxt("Wolf/111.dat", delimiter=" ");
 
+pylab.figure(figsize=(10*8/10,8*8/10));
+
 pylab.xlim(0,90);
 pylab.ylim(0,875);
 pylab.plot(Tilt_100_Model[:,0],
-           A1 + B1*Tilt_100_Model[:,1],color="black",linewidth=2,linestyle='--',label='100 Model')
-pylab.plot(Tilt_100_Wolf[:,0],Tilt_100_Wolf[:,1],color="white",marker='o',linestyle='',label='100 MD',markeredgecolor='black',markeredgewidth='2')
+           A1 + B1*Tilt_100_Model[:,1],
+           color="black",linewidth=2,linestyle='-',marker="",label='100 Model')
+pylab.plot(Tilt_100_Wolf[:,0],Tilt_100_Wolf[:,1],
+           color="black",linewidth=2,linestyle='--',marker='o',label='100 MD')
+
 pylab.plot(Tilt_111_Model[:,0],
-           A2 + B2*Tilt_111_Model[:,1],color="black",linewidth=2,linestyle='-.',label='111 Model')
-pylab.plot(Tilt_111_Wolf[:,0],Tilt_111_Wolf[:,1],color="white",linewidth=2,marker='s',linestyle='',label='111 MD',markeredgecolor='black',markeredgewidth='2')
+           A2 + B2*Tilt_111_Model[:,1],
+           color="#777777",linewidth=2,linestyle='-',label='111 Model')
+pylab.plot(Tilt_111_Wolf[:,0],Tilt_111_Wolf[:,1],
+           color="#777777",linewidth=2,linestyle='--',marker='o',label='111 MD')
 
 pylab.xlabel("Twist Angle (Degrees)");
 pylab.ylabel("Energy");
 pylab.legend(loc='upper center',fancybox=True,shadow=True,ncol=2);
+pylab.tight_layout();
 pylab.show();
 

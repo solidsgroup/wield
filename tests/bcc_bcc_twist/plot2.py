@@ -27,7 +27,8 @@ Tilt_112_Wolf  = numpy.loadtxt("Wolf/112.dat", delimiter=" ");
 A = 2145.89
 B = 38073.25
 
-pylab.figure(figsize=(14,7));
+#pylab.figure(figsize=(14,7));
+pylab.figure(figsize=(14*16/14,7*16/14));
 
 pylab.subplot(221)
 pylab.xlim(0,90)
