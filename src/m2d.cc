@@ -22,7 +22,7 @@ using namespace std;
 #include "Utils/wieldRotations.h"
 #include "Utils/wieldExceptions.h"
 #include "SurfaceIntegrate.h"
-#include "Utils/wieldVTK.h"
+#include "Utils/VTK/wieldVTK.h"
 #include "Utils/wieldProgress.h"
 
 

@@ -5,22 +5,18 @@
 #include <vector>
 #include <fstream>
 #include <stdexcept>
-#define eigen_assert(A) if (!(A)) throw new std::runtime_error("Eigen threw an exception");
-#include "Eigen/Core"
-#include "Eigen/Geometry"
 
 using namespace std;
-using namespace Eigen;
-
-#include "/home/brandon/Research/Reader/Reader.h"
-
 
 #include "Utils/wieldTypes.h"
 #include "Utils/wieldRotations.h"
 #include "Utils/wieldExceptions.h"
 #include "SurfaceIntegrate.h"
-#include "Utils/wieldVTK.h"
+#include "Utils/VTK/wieldVTK.h"
 #include "Utils/wieldProgress.h"
+#include "Utils/wieldEigen.h"
+#include "Reader.h"
+
 
 int main(int argc, char* argv[])
 {

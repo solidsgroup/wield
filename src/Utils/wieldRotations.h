@@ -1,10 +1,10 @@
 #ifndef WIELD_UTILS_ROTATIONS_H
 #define WIELD_UTILS_ROTATIONS_H
-#include "Eigen/Core"
-#include "Eigen/Geometry"
-using namespace Eigen;
+
 #include "Utils/wieldTypes.h"
 #include "Utils/wieldExceptions.h"
+#include "Utils/wieldEigen.h"
+
 using namespace std;
 Matrix3d createMatrixFromXAngle(double theta)
 {
@@ -79,6 +79,23 @@ Matrix3d createMatrixFromZX(Vector3d ez, Vector3d ex)
   Omega.col(1) = ey / ey.norm();
   Omega.col(2) = ez / ez.norm();
   return Omega;
+  WIELD_EXCEPTION_CATCH;
+}
+
+Matrix3d createMatrixFromNormalVector(Vector3d n)
+{
+  WIELD_EXCEPTION_TRY;
+  n /= n.norm();
+  Matrix3d N;
+  Vector3d nOrth(1,0,0);
+  if (nOrth.cross(n).norm() < 1E-4) nOrth << 0, 1, 0; // off chance that n is ex
+  N.col(0) = n;    
+  N.col(1) = nOrth - (nOrth.dot(n))*n;
+  N.col(2) = N.col(0).cross(N.col(1)); // Problem occurs here
+  N.col(0) /= N.col(0).norm();
+  N.col(1) /= N.col(1).norm();
+  N.col(2) /= N.col(2).norm();
+  return N;
   WIELD_EXCEPTION_CATCH;
 }
 #endif

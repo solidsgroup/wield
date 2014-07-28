@@ -19,25 +19,23 @@
 #include <stdexcept>
 #include <csignal>
 
-#define eigen_assert(A) if (!(A)) throw new std::runtime_error("Eigen threw an exception");
-#include "Eigen/Core"
-#include "Eigen/Geometry"
-
-using namespace std;
-using namespace Eigen;
 
 #include "tclap/CmdLine.h"
 #include "/home/brandon/Research/Reader/Reader.h"
-#include "/home/brandon/Research/Reader/Arguments.h"
 
-#include "SurfaceIntegrate.h"
+#include "Main/wieldGammaSurfaceSphere.h"
+#include "Utils/wieldExceptions.h"
 #include "Utils/wieldColor.h"
 #include "Utils/wieldTypes.h"
 #include "Utils/wieldRotations.h"
-#include "Utils/wieldExceptions.h"
-#include "Utils/wieldVTK.h"
+#include "Utils/VTK/wieldVTK.h"
 #include "Utils/wieldProgress.h"
+#include "Utils/wieldEigen.h"
 #include "Optimization/wieldConvexify2d.h"
+#include "SurfaceIntegrate.h"
+
+
+using namespace std;
 
 void signalHandler(int signum)
 {
@@ -67,10 +65,12 @@ int main(int argc, char* argv[])
 
   // 
   // INPUT FILE PARSING
-  // {{{ 
+  // {{{
   // {{{ OPEN INPUT FILE READER
   Reader reader(fileName, argc, argv, "$", "#", "...");
   // }}}
+  if (reader.Find("GammaSurfaceSphere"))
+    {wield::main::gammaSurfaceSphere(reader, dynamicPlot); exit(0);}
   // {{{ SPECIFY ORIENTATION OF CRYSTAL 1
   Matrix3d Omega_1;
   if (reader.Find("X1") && reader.Find("Y1"))
@@ -100,7 +100,7 @@ int main(int argc, char* argv[])
   double phi_max   = reader.Read<double>("phi_max",0.);
   // }}}
   // {{{ Specify the rotation of the CRYSTAL 
-  double ThetaRotX1 = reader.Read<double>("ThetaRotX1",0.);
+   double ThetaRotX1 = reader.Read<double>("ThetaRotX1",0.);
   double ThetaRotY1 = reader.Read<double>("ThetaRotY1",0.);
   double ThetaRotZ1 = reader.Read<double>("ThetaRotZ1",0.);
   double ThetaRotX2 = reader.Read<double>("ThetaRotX2",0.);
@@ -168,13 +168,14 @@ int main(int argc, char* argv[])
   // }}}
   // }}}
 
+
   // 
   // VTK VISUALIZATION
-  // {{{ 
+  // {{{
   if (visualize)
     {
-      vector<Actor> actors;
-      actors.push_back(drawCrystal(C1, 
+      vector<wield::utils::vtk::Actor> actors;
+      actors.push_back(wield::utils::vtk::drawCrystal(C1, 
 				   Omega_1 *
 				   createMatrixFromXAngle(theta_min*ThetaRotX1) *
 				   createMatrixFromYAngle(theta_min*ThetaRotY1) *
@@ -187,7 +188,7 @@ int main(int argc, char* argv[])
 				   2*C1.alpha1,  2*C1.alpha2, 2*C1.alpha3,
 				   (int)((double)reader.Read<double>("resolution",50)/C1.alpha1), 
 				   0.6,0.));
-      actors.push_back(drawCrystal(C2, 
+      actors.push_back(wield::utils::vtk::drawCrystal(C2, 
 				   Omega_2 *
 				   createMatrixFromXAngle(theta_min*ThetaRotX2) *
 				   createMatrixFromYAngle(theta_min*ThetaRotY2) *
@@ -200,15 +201,15 @@ int main(int argc, char* argv[])
 				   2*C2.alpha1,  2*C2.alpha2, 0*C2.alpha3,
 				   (int)((double)reader.Read<double>("resolution",50)/C1.alpha1), 
 				   0.6,0.));
-      renderCrystals(actors);
+      wield::utils::vtk::renderCrystals(actors);
     }	
   // }}}
 
   //
   // ROTATE ORIENTATION RELATIONSHIP AND COMPUTE GRAIN BOUNDARY ENERGY
   // {{{
-  PlotWindow2D *plotWindow;
-  if (dynamicPlot) plotWindow = new PlotWindow2D();
+  wield::utils::vtk::PlotWindow2D *plotWindow;
+  if (dynamicPlot) plotWindow = new wield::utils::vtk::PlotWindow2D();
   vector<double> X,Y;
   if (fabs(theta_max-theta_min) > 1E-8)
     {
@@ -241,8 +242,7 @@ int main(int argc, char* argv[])
 	  plotWindow->plotLine(X,Y, true);
 	}
     }
-  else
-    if (fabs(phi_max-phi_min) > 1E-8)
+  else if (fabs(phi_max-phi_min) > 1E-8)
       {
 	for (double phi = phi_min; phi <= phi_max; phi += dphi)
 	  {
@@ -280,14 +280,14 @@ int main(int argc, char* argv[])
 	    plotWindow->clear(); 
 	    plotWindow->plotLine(X,Y);
 	    plotWindow->plotLine(X,Yc, false);
-	    PlotWindow2D pw2;
+	    wield::utils::vtk::PlotWindow2D pw2;
 	    pw2.plotLine(X,T1);
 	    pw2.plotLine(X,T2, true);
 	  }
 
       }
   // }}}
-  
+
   WIELD_EXCEPTION_CATCH_FINAL;
 }
 

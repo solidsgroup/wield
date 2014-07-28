@@ -13,11 +13,10 @@
 #define SURFACEINTEGRATE_D
 #include <iostream>
 #include <math.h>
-#include "Eigen/Core"
-#include "Eigen/Geometry"
 
 #include "Utils/wieldTypes.h"
 #include "Integrator/wieldTrig6.h"
+#include "Utils/wieldEigen.h"
 
 using namespace Eigen;
 using namespace std;

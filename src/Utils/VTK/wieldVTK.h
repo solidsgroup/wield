@@ -5,19 +5,17 @@
 #include <vector>
 #include <fstream>
 #include <stdexcept>
-#undef eigen_assert
-#define eigen_assert(A) if (!(A)) throw new std::runtime_error("Eigen threw an exception");
-#include "Eigen/Core"
-#include "Eigen/Geometry"
-#include "Faddeeva/Faddeeva.h"
 
 using namespace std;
-using namespace Eigen;
 
-#include "/home/brandon/Research/Reader/Reader.h"
 #include "Utils/wieldTypes.h"
 #include "Utils/wieldRotations.h"
 #include "Utils/wieldProgress.h"
+#include "Utils/wieldEigen.h"
+
+#include "Reader.h"
+
+#include "Faddeeva/Faddeeva.h"
 
 #include <vtkVersion.h>
 #include <vtkSmartPointer.h>
@@ -54,7 +52,12 @@ using namespace Eigen;
 #include <vtkTable.h>
 
 
-
+namespace wield
+{
+namespace utils
+{
+namespace vtk
+{
 typedef vtkSmartPointer<vtkActor> Actor;
 class PlotWindow2D
 {
@@ -269,5 +272,8 @@ void renderCrystal(Actor actor)
   vector<Actor> actors;
   actors.push_back(actor);
   renderCrystals(actors);
+}
+}
+}
 }
 #endif

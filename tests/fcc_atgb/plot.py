@@ -1,7 +1,7 @@
 #!/usr/bin/python
 import pylab
 import numpy
-
+from matplotlib.widgets import Slider
 
 num = 1
 
@@ -55,17 +55,52 @@ angles = [00.00,
           81.95,
           90.00]
 
+
+
 energies = [];
 relaxedEnergies = [];
+num;
 for f in filenames:
-    dat = numpy.loadtxt(f,delimiter=" ");
-    pylab.plot(dat[:,0],dat[:,1],color="blue",linewidth="2",linestyle='-')
-    pylab.plot(dat[:,0],dat[:,2],color="blue",linewidth="2",linestyle='--')
-    pylab.plot(dat[90,0],dat[90,2],color="blue",linestyle="",marker="o");
-    pylab.show();
-    energies.append(dat[90,1]);
-    relaxedEnergies.append(dat[90,2]);
+    dat = numpy.loadtxt(f,delimiter=' ');
+    num = len(dat[:,1])/2;
+    energies.append(dat[num,1]);
+    relaxedEnergies.append(dat[num,2]);
 
-pylab.plot(angles,energies,color="blue",linewidth="2",linestyle='-',marker='o')
-pylab.plot(angles,relaxedEnergies,color="blue",linewidth="2",linestyle='-',marker='o')
+pylab.subplot(121)
+pylab.axis();
+pltUnrelaxed, = pylab.plot(dat[:,0],dat[:,1],color='green',linewidth=2,linestyle='--',label='unrelaxed')
+pltRelaxed, = pylab.plot(dat[:,0],dat[:,2],color='blue',linewidth=2,linestyle='-',label='relaxed')
+pylab.plot([[0,0], [0,2]])
+pylab.ylabel('Energy');
+pylab.xlabel('Interface angle');
+pylab.legend(loc='lower center');
+
+pylab.subplot(122)
+pylab.axis();
+pylab.xlim(min(angles),max(angles));
+pltZeroUnrelaxed, = pylab.plot(angles,energies,color='green',linewidth=2,linestyle='--',label='unrelaxed')
+pltZeroRelaxed,   = pylab.plot(angles,relaxedEnergies,color='blue',linewidth=2,linestyle='-',label='relaxed')
+pylab.ylim(0,max(energies));
+# Data from Tschopp and McDowell
+tschoppDat = numpy.loadtxt('Tschopp.dat');
+plotTschopp, = pylab.plot(tschoppDat[:,0],tschoppDat[:,1]-tschoppDat[0,1],linewidth=2,linestyle='--',marker='o',color='red',label='MD (Tschopp)')
+pylab.xlabel('Misorientation Angle');
+pylab.ylabel('Energy');
+pylab.legend(loc='lower right')
+
+
+pnum = Slider(pylab.axes([0.25,0.04,0.65,0.01]),'Theta',1,len(energies)+1,valinit=len(energies)+1);
+tschoppSlider = Slider(pylab.axes([0.25,0.02,0.65,0.01]),'Tschopp',0,0.005,0);
+
+def updatePnum(val):
+    dat = numpy.loadtxt(filenames[int(val)-1]);
+    pltUnrelaxed.set_ydata(dat[:,1]);
+    pltRelaxed.set_ydata(dat[:,2]);
+    pltZeroUnrelaxed.set_data(angles[:int(val)],energies[:int(val)]);
+    pltZeroRelaxed.set_data(angles[:int(val)],relaxedEnergies[:int(val)]);
+pnum.on_changed(updatePnum);
+def updateTschopp(val):
+    plotTschopp.set_data(tschoppDat[:,0],val*(tschoppDat[:,1]-tschoppDat[0,1]));
+tschoppSlider.on_changed(updateTschopp)
+pylab.tight_layout();
 pylab.show();

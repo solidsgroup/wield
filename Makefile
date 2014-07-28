@@ -12,7 +12,7 @@ endif
 
 CC                    = clang++
 CPP_COMPILER_OPTIONS += -c -g3 -ggdb -include ~/Include/colors.h  -Wno-deprecated
-CPP_LINKER_OPTIONS   += -g3 -ggdb
+CPP_LINKER_OPTIONS   += -g3 -ggdb -lpthread -lX11
 
 ifdef EMACS
 PREFIX                = $(shell pwd)/
@@ -59,9 +59,9 @@ $(PREFIX)bin/%: ./obj/%.o $(OBJ)
 make_directories: $(SRC)
 	mkdir -p $(dir $(OBJ)) $(dir $(OBJ_MAIN)) bin
 
-%.cpp:
+%.cpp: $(HDR)
 
-%.cc:
+%.cc: $(HDR)
 
 %.h :
 

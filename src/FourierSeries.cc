@@ -5,19 +5,14 @@
 #include <vector>
 #include <fstream>
 #include <stdexcept>
-#define eigen_assert(A) if (!(A)) throw new std::runtime_error("Eigen threw an exception");
-#include "Eigen/Core"
-#include "Eigen/Geometry"
-#include "Faddeeva/Faddeeva.h"
-
 using namespace std;
-using namespace Eigen;
 
 #include "Reader.h"
 #include "Utils/wieldTypes.h"
 #include "Utils/wieldRotations.h"
 #include "Utils/wieldExceptions.h"
-#include "Utils/wieldVTK.h"
+#include "Utils/wieldEigen.h"
+#include "Utils/VTK/wieldVTK.h"
 #include "Utils/wieldProgress.h"
 
 double computeGaussCosIntegral(int n, double x0, double sigma, double alpha)
