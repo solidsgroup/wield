@@ -3,7 +3,7 @@ $C_2 fcc.in
 $f_constants constants.in
 $A 3.4234
 $B 64.2913
-$tolerance 1E-2
+$Tolerance 1E-2
 $distribution cauchy
 $phi_min -90
 $phi_max 90
@@ -13,7 +13,7 @@ $X1 1 -1 0
 $X2 1 -1 0
 
 #Items to be specified by script
-#$outfile 1.a.dat
+#$OutFile 1.a.dat
 #$Z1 1 1 1    #(1.a)
 #$Z2 1 1 -1   #(1.a)
 

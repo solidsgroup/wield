@@ -11,7 +11,7 @@ include ~/.make.vtk
 endif
 
 CC                    = clang++
-CPP_COMPILER_OPTIONS += -c -g3 -ggdb -include ~/Include/colors.h  -Wno-deprecated
+CPP_COMPILER_OPTIONS += -c -g3 -ggdb -include ~/Include/colors.h  -Wno-deprecated -Wunused-variable
 CPP_LINKER_OPTIONS   += -g3 -ggdb -lpthread -lX11
 
 ifdef EMACS

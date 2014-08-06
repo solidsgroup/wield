@@ -12,6 +12,7 @@ using namespace std;
 #include "Utils/wieldRotations.h"
 #include "Utils/wieldProgress.h"
 #include "Utils/wieldEigen.h"
+#include "Series/wieldCosSeries.h"
 
 #include "Reader.h"
 
@@ -52,17 +53,17 @@ using namespace std;
 #include <vtkTable.h>
 
 
-namespace wield
+namespace Wield
 {
-namespace utils
+namespace Utils
 {
-namespace vtk
+namespace VTK
 {
 typedef vtkSmartPointer<vtkActor> Actor;
-class PlotWindow2D
+class PlotLine
 {
  public:
-  PlotWindow2D()
+  PlotLine()
   {
     view = vtkSmartPointer<vtkContextView>::New();
     view->GetRenderer()->SetBackground(1.0, 1.0, 1.0);
@@ -75,7 +76,7 @@ class PlotWindow2D
   {
     chart->ClearPlots();
   }
-  void plotLine(vector<double> X, vector<double> Y, bool blocking=false)
+  void SetData(vector<double> X, vector<double> Y, bool blocking=false)
   {
     WIELD_EXCEPTION_TRY;
 
@@ -125,7 +126,7 @@ class PlotWindow2D
   vtkSmartPointer<vtkChartXY> chart;
 };
 
-double computeDensityFunction(double x, double y, double z, CosSeries C)
+double computeDensityFunction(double x, double y, double z, Wield::Series::CosSeries C)
 {
   WIELD_EXCEPTION_TRY;
   int order = C.order;
@@ -147,10 +148,7 @@ double computeDensityFunction(double x, double y, double z, CosSeries C)
 
 
 
-
-
-
-Actor drawCrystal(CosSeries C, Matrix3d R, Matrix3d BoxR,
+Actor drawCrystal(Wield::Series::CosSeries C, Matrix3d R, Matrix3d BoxR,
 		    double xmin, double ymin, double zmin,
 		    double xmax, double ymax, double zmax,
 		    int resolution,
@@ -175,7 +173,6 @@ Actor drawCrystal(CosSeries C, Matrix3d R, Matrix3d BoxR,
   vtkSmartPointer<vtkDoubleArray> phi = 
     vtkSmartPointer<vtkDoubleArray>::New();
 
-  double min=0, max=0, val=0;
   for(unsigned int k = 0; k < nz; k++)
     {
       for(unsigned int j = 0; j < ny; j++)

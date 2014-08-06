@@ -1,8 +1,8 @@
- $DISTRIBUTION cauchy
+ $Distribution cauchy
 
 #IO SETTINGS
 
-$outfile 031.dat
+$OutFile 031.dat
 
 #CRYSTAL PARAMETERS
 
@@ -18,14 +18,14 @@ $X2 1 0 0
 $Z2 0 3 1
 $ThetaRotZ1 0.5
 $ThetaRotZ2 -0.5
-$theta_min 0
-$theta_max 180
-$dtheta 5
+$ThetaMin 0
+$ThetaMax 180
+$DTheta 5
 
 #NUMERICAL PARAMETERS
 
-$tolerance 1E-2
-$distribution DISTRIBUTION
+$Tolerance 1E-2
+$distribution Distribution
 
 $test sin(3.1415926535)
 

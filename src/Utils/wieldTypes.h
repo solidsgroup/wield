@@ -1,13 +1,17 @@
-#ifndef WIELD_TYPE_DEFINITIONS
-#define WIELD_TYPE_DEFINITIONS
-
-#include "Utils/wieldExceptions.h"
-#include "Utils/wieldEigen.h"
-#include "Reader.h"
+#ifndef WIELD_TYPE_DEFINITIONS_H
+#define WIELD_TYPE_DEFINITIONS_H
 
 const double pi = 3.14159265358979323846264338327950288419716939937510582;
 
+
+#include "Utils/wieldExceptions.h"
+#include "Utils/wieldEigen.h"
+#include "Series/wieldCosSeries.h"
+
+
 typedef Matrix<double,3,1> Vector3d;
+namespace Reader
+{
 template<> struct Interpreter<Vector3d >
 {
   void operator() (const string varUnparsed, Vector3d *varParsed)
@@ -23,8 +27,11 @@ template<> struct Interpreter<Vector3d >
     WIELD_EXCEPTION_CATCH_MSG("Error parsing Vector3d: " << varUnparsed);
   }
 };
+}
 
 typedef Matrix<double,6,1> Vector6d;
+namespace Reader
+{
 template<> struct Interpreter<Vector6d >
 {
   void operator() (const string varUnparsed, Vector6d *varParsed)
@@ -40,7 +47,9 @@ template<> struct Interpreter<Vector6d >
     WIELD_EXCEPTION_CATCH_MSG("Error parsing Vector6d: " << varUnparsed);
   }
 };
+}
 
+/*
 class CosSeries
 {
 public:
@@ -66,9 +75,10 @@ private:
   double *C;
 };
 
-template<> struct Interpreter<CosSeries>
+
+template<> struct Interpreter<Wield::Series::CosSeries>
 {
-  void operator() (const string varUnparsed, CosSeries *varParsed)
+  void operator() (const string varUnparsed, Wield::Series::CosSeries *varParsed)
   {
     istringstream iss(varUnparsed); 
     string token;
@@ -83,7 +93,7 @@ template<> struct Interpreter<CosSeries>
   }
 };
 
-
+*/
 
 
 

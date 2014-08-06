@@ -8,7 +8,7 @@ $stdev 1.0
 
 #IO SETTINGS
 
-$outfile 100_0.25.dat
+$OutFile 100_0.25.dat
 
 #CONFIGURATION PARAMETERS
 
@@ -19,14 +19,14 @@ $Z2 1 -1 0
 
 $ThetaRotX1 0.5
 $ThetaRotX2 -0.5
-$theta_min 0
-$theta_max 180
-$dtheta 0.5
+$ThetaMin 0
+$ThetaMax 180
+$DTheta 0.5
 
 #NUMERICAL PARAMETERS
 
-$tolerance 1E-2
-#$tolerance 1E-6 # uncommenting this reveals another peak
+$Tolerance 1E-2
+#$Tolerance 1E-6 # uncommenting this reveals another peak
 $distribution cauchy
 
 

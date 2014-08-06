@@ -1,4 +1,4 @@
-$DISTRIBUTION cauchy
+$Distribution cauchy
 
 
 #CRYSTAL PARAMETERS
@@ -11,7 +11,7 @@ $stdev 0.05
 
 #IO SETTINGS
 
-$outfile 100_$stdev.dat
+$OutFile 100_$stdev.dat
 
 #CONFIGURATION PARAMETERS
 
@@ -22,15 +22,15 @@ $Z2 1 0 0
 
 $ThetaRotX1 0.5
 $ThetaRotX2 -0.5
-$theta_min 0
-$theta_max 10
-$dtheta .1
+$ThetaMin 0
+$ThetaMax 10
+$DTheta .1
 
 #NUMERICAL PARAMETERS
 
-$tolerance 1E-2
-#$tolerance 1E-6 # uncommenting this reveals another peak
-$distribution DISTRIBUTION
+$Tolerance 1E-2
+#$Tolerance 1E-6 # uncommenting this reveals another peak
+$distribution Distribution
 
 $test sin(3.1415926535)
 

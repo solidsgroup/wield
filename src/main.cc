@@ -21,9 +21,11 @@
 
 
 #include "tclap/CmdLine.h"
-#include "/home/brandon/Research/Reader/Reader.h"
+#include "Reader.h"
 
 #include "Main/wieldGammaSurfaceSphere.h"
+#include "Main/wieldGammaInterface1D.h"
+#include "Main/wieldGammaOR1D.h"
 #include "Utils/wieldExceptions.h"
 #include "Utils/wieldColor.h"
 #include "Utils/wieldTypes.h"
@@ -31,9 +33,10 @@
 #include "Utils/VTK/wieldVTK.h"
 #include "Utils/wieldProgress.h"
 #include "Utils/wieldEigen.h"
-#include "Optimization/wieldConvexify2d.h"
+#include "Series/wieldCosSeries.h"
+#include "Optimization/wieldConvexify1D.h"
 #include "SurfaceIntegrate.h"
-
+//#include "IO/wieldReaderMacros.h"
 
 using namespace std;
 
@@ -52,26 +55,38 @@ int main(int argc, char* argv[])
 
   //
   // COMMAND LINE PARSING
-  // {{{
+  // 
   TCLAP::CmdLine cmd("(W)eak approximation of (I)nterface (E)nergy for bicrysta(L) boun(D)aries");
   TCLAP::SwitchArg switchDynamicPlot("p", "dynamic-plot", "Show real-time VTK plot of energy", cmd, false);
   TCLAP::SwitchArg switchVisualize("s", "show-crystal", "Show VTK plot of initial OR", cmd, false);
   TCLAP::UnlabeledValueArg<string> argFileName("name", "Path to input file", true, "", "inputfile", cmd);
   cmd.parse(argc, argv);
   bool dynamicPlot = switchDynamicPlot.getValue();
-  bool visualize = switchVisualize.getValue();
+  //bool visualize = switchVisualize.getValue();
   string fileName = argFileName.getValue();
-  // }}}
 
-  // 
+  //
   // INPUT FILE PARSING
-  // {{{
-  // {{{ OPEN INPUT FILE READER
-  Reader reader(fileName, argc, argv, "$", "#", "...");
-  // }}}
+  // 
+
+  // Create reader
+  Reader::Reader reader(fileName, argc, argv, "$", "#", "...");
+
+
+  if (reader.Find("GammaOR1D"))
+    Wield::Main::GammaOR1D(reader, dynamicPlot);
   if (reader.Find("GammaSurfaceSphere"))
-    {wield::main::gammaSurfaceSphere(reader, dynamicPlot); exit(0);}
-  // {{{ SPECIFY ORIENTATION OF CRYSTAL 1
+    Wield::Main::GammaSurfaceSphere(reader, dynamicPlot); 
+
+
+
+  // WARN ABOUT UNUSED VARIABLES
+  reader.PrintUnusedVariableWarnings();
+
+
+
+  /*
+  // SPECIFY ORIENTATION OF CRYSTAL 1
   Matrix3d Omega_1;
   if (reader.Find("X1") && reader.Find("Y1"))
     Omega_1 = createMatrixFromXY(reader.Read<Vector3d>("X1"), reader.Read<Vector3d>("Y1"));
@@ -80,8 +95,7 @@ int main(int argc, char* argv[])
   else if (reader.Find("Z1") && reader.Find("X1"))
     Omega_1 = createMatrixFromZX(reader.Read<Vector3d>("Z1"), reader.Read<Vector3d>("X1"));
   else WIELD_EXCEPTION_NEW("Missing two vectors to specify Omega_1");
-  // }}}
-  // {{{ SPECIFY ORIENTATION OF CRYSTAL 2
+  // SPECIFY ORIENTATION OF CRYSTAL 2
   Matrix3d Omega_2; 
   if (reader.Find("X2") && reader.Find("Y2"))
     Omega_2 = createMatrixFromXY(reader.Read<Vector3d>("X2"), reader.Read<Vector3d>("Y2"));
@@ -90,44 +104,40 @@ int main(int argc, char* argv[])
   else if (reader.Find("Z2") && reader.Find("X2"))
     Omega_2 = createMatrixFromZX(reader.Read<Vector3d>("Z2"), reader.Read<Vector3d>("X2"));
   else WIELD_EXCEPTION_NEW("Missing two vectors to specify Omega_2");
-  // }}}
-  // {{{ Specify the range of the FREE VARIABLES:
+  // Specify the range of the FREE VARIABLES:
   double theta_min = reader.Read<double>("theta_min",0.);
   double dtheta    = reader.Read<double>("dtheta",0.);
   double theta_max = reader.Read<double>("theta_max",0.);
   double phi_min   = reader.Read<double>("phi_min",0.);
   double dphi      = reader.Read<double>("dphi",0.);
   double phi_max   = reader.Read<double>("phi_max",0.);
-  // }}}
-  // {{{ Specify the rotation of the CRYSTAL 
+  // Specify the rotation of the CRYSTAL 
    double ThetaRotX1 = reader.Read<double>("ThetaRotX1",0.);
   double ThetaRotY1 = reader.Read<double>("ThetaRotY1",0.);
   double ThetaRotZ1 = reader.Read<double>("ThetaRotZ1",0.);
   double ThetaRotX2 = reader.Read<double>("ThetaRotX2",0.);
   double ThetaRotY2 = reader.Read<double>("ThetaRotY2",0.);
   double ThetaRotZ2 = reader.Read<double>("ThetaRotZ2",0.);
-  // }}}
-  // {{{ Specify the rotation of the INTERFACE
+  // Specify the rotation of the INTERFACE
   double PhiRotX = reader.Read<double>("PhiRotX",0.);
   double PhiRotY = reader.Read<double>("PhiRotY",0.);
   double PhiRotZ = reader.Read<double>("PhiRotZ",0.);
-  double PhiRotX1 = reader.Read<double>("PhiRotX1",0.); /* DEPRICATED */
-  double PhiRotY1 = reader.Read<double>("PhiRotY1",0.); /* DEPRICATED */
-  double PhiRotZ1 = reader.Read<double>("PhiRotZ1",0.); /* DEPRICATED */
-  double PhiRotX2 = reader.Read<double>("PhiRotX2",0.); /* DEPRICATED */
-  double PhiRotY2 = reader.Read<double>("PhiRotY2",0.); /* DEPRICATED */
-  double PhiRotZ2 = reader.Read<double>("PhiRotZ2",0.); /* DEPRICATED */
-  // }}}
-  // {{{ ADJUSTABLE PARAMETERS
+  reader.Find("PhiRotX1",Reader::DEPRICATED);
+  reader.Find("PhiRotY1",Reader::DEPRICATED);
+  reader.Find("PhiRotZ1",Reader::DEPRICATED);
+  reader.Find("PhiRotX2",Reader::DEPRICATED);
+  reader.Find("PhiRotY2",Reader::DEPRICATED);
+  reader.Find("PhiRotZ2",Reader::DEPRICATED);
+  // ADJUSTABLE PARAMETERS
   double A,B,stdev;
   if (reader.Find("f_constants"))
     {
       string f_constants = reader.Read<string>("f_constants");
-      Reader constantsReader(f_constants, "$", "#", "...");
-      if (reader.Find("A"))     A = reader.Read<double>("A");
-      else                      A = constantsReader.Read<double>("A");
-      if (reader.Find("B"))     B = reader.Read<double>("B");
-      else                      B = constantsReader.Read<double>("B");
+      Reader::Reader constantsReader(f_constants, "$", "#", "...");
+      if (reader.Find("A"))     A     = reader.Read<double>("A");
+      else                      A     = constantsReader.Read<double>("A");
+      if (reader.Find("B"))     B     = reader.Read<double>("B");
+      else                      B     = constantsReader.Read<double>("B");
       if (reader.Find("stdev")) stdev = reader.Read<double>("stdev");
       else                      stdev = constantsReader.Read<double>("stdev");
     }
@@ -137,45 +147,21 @@ int main(int argc, char* argv[])
       B = reader.Read<double>("B");
       stdev = reader.Read<double>("stdev");
     }
-  // }}}
-  // {{{ LATTICE COEFFICIENTS: TOP CRYSTAL
-  string f1 = reader.Read<string>("C_1");
-  Reader crystal1Reader(f1, "$", "#", "...");
-  int order1 = crystal1Reader.Read<int>("order");
-  CosSeries C1(order1); crystal1Reader.Read<CosSeries>("C", &C1);
-  C1.order = order1;
-  C1.alpha1 = crystal1Reader.Read<double>("a1");
-  C1.alpha2 = crystal1Reader.Read<double>("a2");
-  C1.alpha3 = crystal1Reader.Read<double>("a3");
-  // }}}
-  // {{{ LATTICE COEFFICIENTS: BOTTOM CRYSTAL
-  string f2 = reader.Read<string>("C_2");
-  Reader crystal2Reader(f2, "$", "#", "...");
-  int order2 = crystal2Reader.Read<int>("order");
-  CosSeries C2(order2); crystal2Reader.Read<CosSeries>("C", &C2);
-  C2.order = order2;
-  C2.alpha1 = crystal2Reader.Read<double>("a1");
-  C2.alpha2 = crystal2Reader.Read<double>("a2");
-  C2.alpha3 = crystal2Reader.Read<double>("a3");
-  // }}}
-  // {{{ MISC
-  bool areaNormalization = reader.Find("areaNormalization");
+  // MISC
+  reader.Find("areaNormalization",Reader::DEPRICATED); //bool areaNormalization = reader.Find("areaNormalization");
   double tolerance = reader.Read<double>("tolerance",0.);
-  // }}}
-  // {{{ OUTPUT FILE STREAM
+  // OUTPUT FILE STREAM
   string outfile = reader.Read<string>("outfile"); // file to store computation data
   ofstream out(outfile.c_str());        // output stream
-  // }}}
-  // }}}
-
 
   // 
   // VTK VISUALIZATION
-  // {{{
+  // 
+
   if (visualize)
     {
-      vector<wield::utils::vtk::Actor> actors;
-      actors.push_back(wield::utils::vtk::drawCrystal(C1, 
+      vector<Wield::Utils::VTK::Actor> actors;
+      actors.push_back(Wield::Utils::VTK::drawCrystal(crystal1, 
 				   Omega_1 *
 				   createMatrixFromXAngle(theta_min*ThetaRotX1) *
 				   createMatrixFromYAngle(theta_min*ThetaRotY1) *
@@ -184,11 +170,11 @@ int main(int argc, char* argv[])
 				   createMatrixFromYAngle(phi_min*PhiRotY) *
 				   createMatrixFromZAngle(phi_min*PhiRotZ),
 				   Matrix3d::Identity(),
-				   0*C1.alpha1, -2*C1.alpha2, 0*C1.alpha3,
-				   2*C1.alpha1,  2*C1.alpha2, 2*C1.alpha3,
-				   (int)((double)reader.Read<double>("resolution",50)/C1.alpha1), 
+				   0*crystal1.alpha1, -2*crystal1.alpha2, 0*crystal1.alpha3,
+				   2*crystal1.alpha1,  2*crystal1.alpha2, 2*crystal1.alpha3,
+				   (int)((double)reader.Read<double>("resolution",50)/crystal1.alpha1), 
 				   0.6,0.));
-      actors.push_back(wield::utils::vtk::drawCrystal(C2, 
+      actors.push_back(Wield::Utils::VTK::drawCrystal(crystal2, 
 				   Omega_2 *
 				   createMatrixFromXAngle(theta_min*ThetaRotX2) *
 				   createMatrixFromYAngle(theta_min*ThetaRotY2) *
@@ -197,19 +183,19 @@ int main(int argc, char* argv[])
 				   createMatrixFromYAngle(phi_min*PhiRotY) *
 				   createMatrixFromZAngle(phi_min*PhiRotZ),
 				   Matrix3d::Identity(),
-				   0*C2.alpha1, -2*C2.alpha2, -2*C2.alpha3,
-				   2*C2.alpha1,  2*C2.alpha2, 0*C2.alpha3,
-				   (int)((double)reader.Read<double>("resolution",50)/C1.alpha1), 
+				   0*crystal2.alpha1, -2*crystal2.alpha2, -2*crystal2.alpha3,
+				   2*crystal2.alpha1,  2*crystal2.alpha2, 0*crystal2.alpha3,
+				   (int)((double)reader.Read<double>("resolution",50)/crystal1.alpha1), 
 				   0.6,0.));
-      wield::utils::vtk::renderCrystals(actors);
+      Wield::Utils::VTK::renderCrystals(actors);
     }	
-  // }}}
 
   //
   // ROTATE ORIENTATION RELATIONSHIP AND COMPUTE GRAIN BOUNDARY ENERGY
-  // {{{
-  wield::utils::vtk::PlotWindow2D *plotWindow;
-  if (dynamicPlot) plotWindow = new wield::utils::vtk::PlotWindow2D();
+  // 
+
+  Wield::Utils::VTK::PlotLine *plotWindow;
+  if (dynamicPlot) plotWindow = new Wield::Utils::VTK::PlotLine();
   vector<double> X,Y;
   if (fabs(theta_max-theta_min) > 1E-8)
     {
@@ -226,11 +212,11 @@ int main(int argc, char* argv[])
 	    createMatrixFromYAngle(theta*ThetaRotY2) *
 	    createMatrixFromZAngle(theta*ThetaRotZ2);
       
-	  double W = A - B*SurfaceIntegrate(C1, Rot1, C2, Rot2, stdev, tolerance, reader.Read<string>("distribution","cauchy"));
+	  double W = A - B*SurfaceIntegrate(crystal1, Rot1, crystal2, Rot2, stdev, tolerance, reader.Read<string>("distribution","cauchy"));
 	  out << theta << " " << W << endl;
 	  X.push_back(theta);
 	  Y.push_back(W);
-	  if (dynamicPlot) if (X.size() > 1) {plotWindow->clear(); plotWindow->plotLine(X,Y);}
+	  if (dynamicPlot) if (X.size() > 1) {plotWindow->clear(); plotWindow->SetData(X,Y);}
 
 	  WIELD_PROGRESS("Computing energy curve", theta-theta_min, theta_max-theta_min, dtheta);
 	}
@@ -239,7 +225,7 @@ int main(int argc, char* argv[])
       if (dynamicPlot) 
 	{
 	  plotWindow->clear(); 
-	  plotWindow->plotLine(X,Y, true);
+	  plotWindow->SetData(X,Y, true);
 	}
     }
   else if (fabs(phi_max-phi_min) > 1E-8)
@@ -255,7 +241,7 @@ int main(int argc, char* argv[])
       
 	    //if (fabs(N(2,2)) < 1E-8) continue;
 	  
-	    double W = (A - B*SurfaceIntegrate(C1, Omega_1*N, C2, Omega_2*N, stdev, tolerance, reader.Read<string>("distribution","cauchy")));
+	    double W = (A - B*SurfaceIntegrate(crystal1, Omega_1*N, crystal2, Omega_2*N, stdev, tolerance, reader.Read<string>("distribution","cauchy")));
 	    //if (areaNormalization) W /= N(2,2);
 	    X.push_back(phi);
 	    Y.push_back(W);
@@ -263,7 +249,7 @@ int main(int argc, char* argv[])
 	      if (X.size() > 1) 
 		{
 		  plotWindow->clear(); 
-		  plotWindow->plotLine(X,Y);
+		  plotWindow->SetData(X,Y);
 		}
 	  }
 
@@ -271,22 +257,22 @@ int main(int argc, char* argv[])
 
 	
 	vector<double> T1(X.size()), T2(X.size());
-	vector<double> Yc = Wield::Optimization::Convexify2DAngles(X,Y,T1,T2);
+	vector<double> Yc = Wield::Optimization::Convexify1DAngles(X,Y,T1,T2);
 	for (int i=0; i<X.size(); i++)
 	  out << X[i] << " " << Y[i] << " " << Yc[i] << " " << T1[i] << " " << T2[i] << endl;
 	
 	if (dynamicPlot) 
 	  {
 	    plotWindow->clear(); 
-	    plotWindow->plotLine(X,Y);
-	    plotWindow->plotLine(X,Yc, false);
-	    wield::utils::vtk::PlotWindow2D pw2;
-	    pw2.plotLine(X,T1);
-	    pw2.plotLine(X,T2, true);
+	    plotWindow->SetData(X,Y);
+	    plotWindow->SetData(X,Yc, false);
+	    Wield::Utils::VTK::PlotLine pw2;
+	    pw2.SetData(X,T1);
+	    pw2.SetData(X,T2, true);
 	  }
 
       }
-  // }}}
+  */
 
   WIELD_EXCEPTION_CATCH_FINAL;
 }

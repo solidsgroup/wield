@@ -16,7 +16,7 @@
 
 using namespace std;
 
-#include "/home/brandon/Research/Reader/Reader.h"
+#include "Reader.h"
 
 #include "Utils/wieldTypes.h"
 #include "Utils/wieldRotations.h"
@@ -45,10 +45,10 @@ int main(int argc, char* argv[])
 
   // 1) Initialization phase
 
-  PlotWindow2D plotWindow = createNewPlotWindow2D();
-  plotLine(plotWindow,X,Y);
+  PlotLine plotWindow = createNewPlotLine();
+  SetData(plotWindow,X,Y);
   GETC;
-  plotLine(plotWindow,Y,X);
+  SetData(plotWindow,Y,X);
   GETC;
   
   WIELD_EXCEPTION_CATCH_FINAL;

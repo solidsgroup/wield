@@ -17,6 +17,7 @@
 #include "Utils/wieldTypes.h"
 #include "Integrator/wieldTrig6.h"
 #include "Utils/wieldEigen.h"
+#include "Series/wieldCosSeries.h"
 
 using namespace Eigen;
 using namespace std;
@@ -24,9 +25,9 @@ using namespace std;
 
 
 
-double SurfaceIntegrate(CosSeries C1, 
+double SurfaceIntegrate(Wield::Series::CosSeries C1, 
 			Matrix3d R1,
-			CosSeries C2, 
+			Wield::Series::CosSeries C2, 
 			Matrix3d R2,
 			double epsilon, 
 			double tolerance = 0, 

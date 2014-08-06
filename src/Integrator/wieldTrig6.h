@@ -147,7 +147,6 @@ double Trig6_Cauchy(int *_T1,         ///< Trig indicator functions (size 6)
   /// Because of the way that the integral is computed, the peaks in the energy curve will have the form of \f$G_\varepsilon\f$; 
   /// furthermore \f$G_{\varepsilon}\f$ is all that is required to compute the integral.
   /// 
-  double eps2 = epsilon*epsilon;
   int T1[6], T2[6]; double a[6], b[6];
   int ctr1=0, ctr2=0;
   int S1, S2;
@@ -239,7 +238,7 @@ double Trig6_FakeCauchy(int *_T, double *_a, double epsilon)
   ///
   /// DO NOT USE
   ///
-  double I;  double eps2 = epsilon*epsilon;
+  double I;
   int T[6]; double a[6];
   int ctr=0;
   

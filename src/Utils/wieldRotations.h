@@ -1,9 +1,9 @@
 #ifndef WIELD_UTILS_ROTATIONS_H
 #define WIELD_UTILS_ROTATIONS_H
 
-#include "Utils/wieldTypes.h"
 #include "Utils/wieldExceptions.h"
 #include "Utils/wieldEigen.h"
+#include "Utils/wieldTypes.h"
 
 using namespace std;
 Matrix3d createMatrixFromXAngle(double theta)

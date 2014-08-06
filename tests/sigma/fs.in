@@ -1,4 +1,4 @@
-$DISTRIBUTION cauchy
+$Distribution cauchy
 
 $order 8
 
@@ -17,6 +17,6 @@ $X $alpha1*0.0 $alpha1*1.0 $alpha1*0.5 $alpha1*0.0 $alpha1*1.0 $alpha1*0.5 $alph
 $Y $alpha2*0.0 $alpha2*0.0 $alpha2*0.5 $alpha2*1.0 $alpha2*1.0 $alpha2*0.0 $alpha2*0.5 $alpha2*0.5 $alpha2*1.0 $alpha2*0.0 $alpha2*0.0 $alpha2*0.5 $alpha2*1.0 $alpha2*1.0 
 $Z $alpha3*0.0 $alpha3*0.0 $alpha3*0.0 $alpha3*0.0 $alpha3*0.0 $alpha3*0.5 $alpha3*0.5 $alpha3*0.5 $alpha3*0.5 $alpha3*1.0 $alpha3*1.0 $alpha3*1.0 $alpha3*1.0 $alpha3*1.0
 
-$outfile fcc_0.25.in
+$OutFile fcc_0.25.in
 
 

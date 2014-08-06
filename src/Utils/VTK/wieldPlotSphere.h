@@ -25,11 +25,11 @@
 #include <vtkOrientationMarkerWidget.h>
 #include <vtkScalarBarActor.h>
 
-namespace wield
+namespace Wield
 {
-namespace utils
+namespace Utils
 {
-namespace vtk
+namespace VTK
 {
 
 void *StartWindowInteractor(void *argument)
@@ -123,7 +123,7 @@ public:
     renderer->ResetCamera();
     renderWindow->Render();
  
-    int errorCode = pthread_create(&thread, NULL, StartWindowInteractor, (void*)renderWindowInteractor);
+    pthread_create(&thread, NULL, StartWindowInteractor, (void*)renderWindowInteractor);
   }
 
   ~PlotSphere()
@@ -144,7 +144,7 @@ public:
       }
   }
 
-  void SetScalarValues(const vector<double> values, bool blocking = false)
+  void SetData(const vector<double> values, bool blocking = false)
   {
     vtkSmartPointer<vtkMutexLock> mutexLock
       = vtkSmartPointer<vtkMutexLock>::New();
