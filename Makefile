@@ -21,7 +21,7 @@ EXCLUDE               = $(PREFIX)/src/MainOld.cpp
 SRC_MAIN              = $(filter-out $(EXCLUDE), $(shell find ./src/ -name '*.cc'))
 EXE 		      = $(subst ./src/,./bin/, $(SRC_MAIN:.cc=))
 SRC		      = $(filter-out $(EXCLUDE), $(shell find ./src/ -name '*.cpp'))
-HDR		      = $(filter-out $(EXCLUDE), $(shell find ./inc/ -name '*.h'))
+HDR		      = $(filter-out $(EXCLUDE), $(shell find ./inc/ ./src/ -name '*.h'))
 OBJ 		      = $(subst ./src/,./obj/, $(SRC:.cpp=.o)) 
 OBJ_MAIN              = $(subst ./src/,./obj/, $(SRC_MAIN:.cc=.o))
 INC 		      = -I./src \
@@ -32,6 +32,7 @@ LIB		      = $(LIB_EXT)
 .SECONDARY: $(OBJ) $(OBJ_MAIN)
 
 all: make_directories $(EXE)
+	@echo $(HDR)
 	@echo -e $(B_ON)$(FG_GREEN)"###"
 	@echo "### DONE" 
 	@echo -e "###"$(RESET)	
@@ -50,7 +51,7 @@ $(PREFIX)bin/%: ./obj/%.o $(OBJ)
 	@mkdir -p $(dir $@)
 	$(CC) $(CPP_COMPILER_OPTIONS) $(INC) -o $@ $(PREFIX)$<
 
-./obj/%.o: ./src/%.cc 
+./obj/%.o: ./src/%.cc $(HDR)
 	@echo -e $(B_ON)$(FG_YELLOW)"###"
 	@echo "### COMPILING $<" 
 	@echo -e "###"$(RESET)

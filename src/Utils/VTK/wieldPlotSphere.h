@@ -73,6 +73,7 @@ public:
     // Lookup table
     lookUpTable = vtkSmartPointer<vtkLookupTable>::New();
     lookUpTable->SetSaturationRange(1,1);
+    lookUpTable->SetHueRange(.75,0);
     lookUpTable->SetValueRange(1,1);
     lookUpTable->SetNanColor(0,0,0,0);
     lookUpTable->Build();

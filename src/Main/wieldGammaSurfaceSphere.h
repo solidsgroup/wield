@@ -1,3 +1,8 @@
+///
+/// \file wieldGammaSurfaceSphere.h
+/// \brief Wield::Main::GammaSurfaceSphere
+///
+
 #ifndef WIELD_MAIN_GAMMASURFACESPHERE_H
 #define WIELD_MAIN_GAMMASURFACESPHERE_H
 
@@ -15,7 +20,30 @@ namespace Wield
 {
 namespace Main
 {
-void GammaSurfaceSphere(Reader::Reader &reader, bool dynamicPlotting)
+///
+/// \brief Compute the energy with Orientation Relationship fixed, and varying interface normal. 
+///        The domain is specified by setting theta and phi ranges.
+///
+/// Input file options
+///   - \b Crystal1: Parameters for the upper crystal
+///   - \b Crystal2: Parameters for the lower crystal
+///   - \b GammaSurfaceSphere: 
+///     - (\b X1,\b Y1,\b Z1): Crystollographic axes corresponding to X,Y,Z axes. Two must be specified.
+///     - (\b X2,\b Y2,\b Z2): Crystollographic axes corresponding to X,Y,Z axes. Two must be specified.
+///     - \b PrePhiRotX: Additional rotation to apply about the X axis
+///     - \b PrePhiRotY: Additional rotation to apply about the Y axis
+///     - \b PrePhiRotZ: Additional rotation to apply about the Z axis
+///     - \b AzimuthMin [0]: Minimum azimuthal angle (angle between orthogonal projection and X axis)
+///     - \b AzimuthMin [360]: Maximum azimuthal angle
+///     - \b AzimuthResolution [20]: Number of azimuthal points
+///     - \b PolarMin [0]: Minimum polar angle (angle from Z axis)
+///     - \b PolarMin [180]: Maximum polar angle
+///     - \b PolarResolution [20]: Number of theta points
+///     - \b Tolerance [0]: Threshold for throwing out terms from the SurfaceIntegral calculation
+///     - \b OutputSkip [1]: Number of calculations between showing output visualization
+///
+void GammaSurfaceSphere(Reader::Reader &reader, ///< A Reader 
+			bool dynamicPlotting)   ///< Toggle to specify if plot window should show during run
 {
   WIELD_EXCEPTION_TRY;
 
@@ -30,20 +58,24 @@ void GammaSurfaceSphere(Reader::Reader &reader, bool dynamicPlotting)
   WIELD_IO_READ_CRYSTAL_ORIENTATION("GammaSurfaceSphere",1);
   WIELD_IO_READ_CRYSTAL_ORIENTATION("GammaSurfaceSphere",2);
   WIELD_IO_READ_PARAMETERS("GammaSurfaceSphere");
+  // ADDITIONAL INTERFACE ROTATION
+  double prePhiRotX = reader.Read<double>("GammaSurfaceSphere","PrePhiRotX",0.);
+  double prePhiRotY = reader.Read<double>("GammaSurfaceSphere","PrePhiRotY",0.);
+  double prePhiRotZ = reader.Read<double>("GammaSurfaceSphere","PrePhiRotZ",0.);		
   // CALCULATION RANGE
-  double thetaResolution = reader.Read<double>("GammaSurfaceSphere", "ThetaResolution", 20.);
-  double thetaMin        = reader.Read<double>("GammaSurfaceSphere", "ThetaMin", 0.);
-  double thetaMax        = reader.Read<double>("GammaSurfaceSphere", "ThetaMax", 360.);
-  double phiResolution   = reader.Read<double>("GammaSurfaceSphere", "PhiResolution", 20.);
-  double phiMin          = reader.Read<double>("GammaSurfaceSphere", "PhiMin", 0.);
-  double phiMax          = reader.Read<double>("GammaSurfaceSphere", "PhiMax", 180.);
+  double azimuthResolution = reader.Read<double>("GammaSurfaceSphere", "AzimuthResolution", 20.);
+  double azimuthMin        = reader.Read<double>("GammaSurfaceSphere", "AzimuthMin", 0.);
+  double azimuthMax        = reader.Read<double>("GammaSurfaceSphere", "AzimuthMax", 360.);
+  double polarResolution   = reader.Read<double>("GammaSurfaceSphere", "PolarResolution", 20.);
+  double polarMin          = reader.Read<double>("GammaSurfaceSphere", "PolarMin", 0.);
+  double polarMax          = reader.Read<double>("GammaSurfaceSphere", "PolarMax", 180.);
   // MISC
   double tolerance       = reader.Read<double>("GammaSurfaceSphere","Tolerance",0.);
   int    outputSkip      = reader.Read<int>   ("GammaSurfaceSphere","OutputSkip",1);
 
 
   // GENERATE A SPHERE USING VTK
-  Wield::Utils::VTK::PlotSphere plotSphere(thetaResolution,phiResolution,thetaMin,thetaMax,phiMin,phiMax);
+  Wield::Utils::VTK::PlotSphere plotSphere(azimuthResolution,polarResolution,azimuthMin,azimuthMax,polarMin,polarMax);
   vector<double> X,Y,Z;
   plotSphere.GetPointLocations(X,Y,Z);
   vector<double> vals;
@@ -52,7 +84,11 @@ void GammaSurfaceSphere(Reader::Reader &reader, bool dynamicPlotting)
   for (int i=0; i<X.size(); i++)
     {
       Vector3d n(X[i],Y[i],Z[i]);
-      Matrix3d N = createMatrixFromNormalVector(n);
+      Matrix3d N = 
+	createMatrixFromXAngle(prePhiRotX)*
+	createMatrixFromYAngle(prePhiRotY)*
+	createMatrixFromZAngle(prePhiRotZ)*
+	createMatrixFromNormalVector(n);
       double W = a - b*SurfaceIntegrate(crystal1, omega1*N, crystal2, omega2*N, stdDev, tolerance, "cauchy");
       vals.push_back(W);
       if (!(i % outputSkip) || i==X.size()-1)

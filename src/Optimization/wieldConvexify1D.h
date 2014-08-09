@@ -44,23 +44,29 @@ Convexify1D(vector<double> X, vector<double> Y)
 }
 
 vector<double>
-Convexify1DAngles(vector<double> X, vector<double> Y, vector<double> &T1, vector<double> &T2)
+Convexify1DAngles(vector<double> X, vector<double> Y,bool full=false)
 {
   WIELD_EXCEPTION_TRY;
   if (X.size() != Y.size())
     WIELD_EXCEPTION_NEW("X and Y not the same size");
   
-  // (j) -- (i) -- (k)
-
   vector<double> Yc;
   for (int i=0; i<X.size(); i++)  // With the simpler for loops, this has O(n^2) scaling
     {
       double inf = Y[i];
-      T1[i] = X[i]; T2[i] = X[i];
-      // for (int j=0; j<X.size(); j++)         // This for loop sequence gives an accurate
-      // 	for (int k=0; k<X.size(); k++)  //    relaxation for *all* theta
-      for (int j=0; j<i; j++)                   // But this one has O(n) scaling instead of
-	for (int k=i+1; k<X.size(); k++)        // O(n^2)!
+      
+      int jmin, jmax, kmin, kmax;
+
+      // These for loop parameters gives an accurate
+      // relaxation for *all* theta
+      if (full)
+	{jmin = 0; jmax = X.size(); kmin = 0; kmax = X.size();}
+      // But this one has O(n) scaling instead of O(n^2)
+      else
+	{jmin = 0; jmax = i; kmin = i+1; kmax = X.size();}
+
+      for (int j=jmin; j<jmax; j++)                   
+	for (int k=kmin; k<kmax; k++)        
 	  {
 	    if (j==k) continue;
 	    double theta1 = X[j]*pi/180, theta = X[i]*pi/180, theta2= X[k]*pi/180;
@@ -69,11 +75,7 @@ Convexify1DAngles(vector<double> X, vector<double> Y, vector<double> &T1, vector
 	    double lambda2 = sin(theta1 - theta)/det;
 	    double w = fabs(lambda1)*Y[j] + fabs(lambda2)*Y[k];
 	    if (w < inf)
-	      {
-		T1[i] = X[j];
-		T2[i] = X[k];
-		inf = w;
-	      }
+	      inf = w;
 	  }
       Yc.push_back(inf);
       WIELD_PROGRESS("Convexifying", i,X.size(),1);

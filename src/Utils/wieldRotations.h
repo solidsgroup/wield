@@ -89,9 +89,9 @@ Matrix3d createMatrixFromNormalVector(Vector3d n)
   Matrix3d N;
   Vector3d nOrth(1,0,0);
   if (nOrth.cross(n).norm() < 1E-4) nOrth << 0, 1, 0; // off chance that n is ex
-  N.col(0) = n;    
-  N.col(1) = nOrth - (nOrth.dot(n))*n;
-  N.col(2) = N.col(0).cross(N.col(1)); // Problem occurs here
+  N.col(2) = n;    
+  N.col(0) = nOrth - (nOrth.dot(n))*n;
+  N.col(1) = N.col(2).cross(N.col(0)); // Problem occurs here
   N.col(0) /= N.col(0).norm();
   N.col(1) /= N.col(1).norm();
   N.col(2) /= N.col(2).norm();

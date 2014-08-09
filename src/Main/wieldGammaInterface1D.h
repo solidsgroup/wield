@@ -27,6 +27,10 @@
 
 using namespace std;
 
+namespace Wield
+{
+namespace Main
+{
 void GammaInterface1D(Reader::Reader &reader,bool dynamicPlot)
 {
   WIELD_EXCEPTION_TRY;
@@ -39,19 +43,26 @@ void GammaInterface1D(Reader::Reader &reader,bool dynamicPlot)
   WIELD_IO_READ_PARAMETERS("GammaInterface1D");
 
   // Specify the range of the FREE VARIABLES:
-  double phiMin     = reader.Read<double>("PhiMin",0.);
-  double dPhi       = reader.Read<double>("DPhi",0.);
-  double phiMax     = reader.Read<double>("PhiMax",0.);
+  double phiMin       = reader.Read<double>("GammaInterface1D","PhiMin",0.);
+  double dPhi         = reader.Read<double>("GammaInterface1D","DPhi",0.);
+  double phiMax       = reader.Read<double>("GammaInterface1D","PhiMax",0.);
   // Specify the rotation of the INTERFACE
-  double phiRotX = reader.Read<double>("PhiRotX",0.);
-  double phiRotY = reader.Read<double>("PhiRotY",0.);
-  double phiRotZ = reader.Read<double>("PhiRotZ",0.);
+  double phiRotX      = reader.Read<double>("GammaInterface1D","PhiRotX",0.);
+  double phiRotY      = reader.Read<double>("GammaInterface1D","PhiRotY",0.);
+  double phiRotZ      = reader.Read<double>("GammaInterface1D","PhiRotZ",0.);
   // MISC
-  double tolerance = reader.Read<double>("tolerance",0.);
+  double tolerance    = reader.Read<double>("GammaInterface1D","Tolerance",0.);
+  string distribution = reader.Read<string>("GammaInterface1D","Distribution", "cauchy");
+  bool fullConvexify  = reader.Find("GammaInterface1D", "FullConvexify");
   // OUTPUT FILE STREAM
-  string outfile = reader.Read<string>("outfile"); 
-  ofstream out(outfile.c_str());       
-
+  bool printData      = reader.Find("GammaInterface1D","OutFile");
+  ofstream out;
+  if (printData)
+    {
+      string outFile      = reader.Read<string>("GammaInterface1D","OutFile"); 
+      out.open(outFile.c_str());
+      //open(out,outFile.c_str());
+    }
 
   // ROTATE ORIENTATION RELATIONSHIP AND COMPUTE GRAIN BOUNDARY ENERGY
   Wield::Utils::VTK::PlotLine *plotWindow;
@@ -68,7 +79,7 @@ void GammaInterface1D(Reader::Reader &reader,bool dynamicPlot)
       
       //if (fabs(N(2,2)) < 1E-8) continue;
 	  
-      double W = (a - b*SurfaceIntegrate(crystal1, omega1*N, crystal2, omega2*N, stdDev, tolerance, reader.Read<string>("distribution","cauchy")));
+      double W = (a - b*SurfaceIntegrate(crystal1, omega1*N, crystal2, omega2*N, stdDev, tolerance, distribution));
       //if (areaNormalization) W /= N(2,2);
       X.push_back(phi);
       Y.push_back(W);
@@ -81,25 +92,25 @@ void GammaInterface1D(Reader::Reader &reader,bool dynamicPlot)
     }
 
   cout << endl;
-
-	
-  vector<double> T1(X.size()), T2(X.size());
-  vector<double> Yc = Wield::Optimization::Convexify1DAngles(X,Y,T1,T2);
-  for (int i=0; i<X.size(); i++)
-    out << X[i] << " " << Y[i] << " " << Yc[i] << " " << T1[i] << " " << T2[i] << endl;
+  
+  vector<double> Yc = Wield::Optimization::Convexify1DAngles(X,Y,fullConvexify);
+  if (printData)
+    {
+      for (int i=0; i<X.size(); i++)
+	out << X[i] << " " << Y[i] << " " << Yc[i] << " " << endl;
+      out.close();
+    }
 	
   if (dynamicPlot) 
     {
       plotWindow->clear(); 
       plotWindow->SetData(X,Y);
-      plotWindow->SetData(X,Yc, false);
-      Wield::Utils::VTK::PlotLine pw2;
-      pw2.SetData(X,T1);
-      pw2.SetData(X,T2, true);
+      plotWindow->SetData(X,Yc, true);
     }
 
   WIELD_EXCEPTION_CATCH_FINAL;
 }
-
+}
+}
 
 #endif
