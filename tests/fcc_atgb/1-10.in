@@ -1,20 +1,32 @@
-$C_1 fcc.in
-$C_2 fcc.in
-$f_constants constants.in
-$A 3.4234
-$B 64.2913
-$Tolerance 1E-2
-$distribution cauchy
-$phi_min -90
-$phi_max 90
-$dphi 0.25
-$PhiRotX 1.
-$X1 1 -1 0
-$X2 1 -1 0
+$Crystal1 {
+    include fcc.in
+}
 
-#Items to be specified by script
-#$OutFile 1.a.dat
-#$Z1 1 1 1    #(1.a)
-#$Z2 1 1 -1   #(1.a)
+$Crystal2 {
+    include fcc.in
+}
+
+#$GammaInterface1D {
+$GammaSurfaceSphere {
+    $A 3.4234
+    $B 64.2913
+    $StdDev 0.7
+    $Tolerance 1E-2
+    $Distribution cauchy
+    $ThetaMin 0
+    $ThetaMax 90
+    $ThetaResolution 50
+    $PhiMin 0
+    $PhiMax 90
+    $PhiResolution 50
+    $DPhi 0.25
+    $PhiRotX 1.
+    $X1 1 -1 0
+    $X2 1 -1 0
+    $Z1 1 1 -1
+    $Z2 1 1 1
+    $OutFile 1-10_surface.dat
+}
+
 
 

@@ -1,8 +1,5 @@
-$intercept 0.
-$multiplier 1.
-
-$A $multiplier*$intercept
-$B $multiplier
-$stdev 0.7
+$A 0
+$B 1
+$StdDev 0.7
 
 

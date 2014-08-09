@@ -1,35 +1,24 @@
-$Distribution cauchy
+$Crystal1 {
+    include fcc.in
+}
 
-#IO SETTINGS
+$Crystal2 {
+    include fcc.in
+}
 
-$OutFile 112.dat
+$GammaOR1D {
+    include constants.in
+    $X1 1 1 2
+    $Z1 1 -1 0
+    $X2 1 1 2
+    $Z2 1 -1 0
+    $ThetaRotX1 0.5
+    $ThetaRotX2 -0.5
+    $ThetaMin 0
+    $ThetaMax 110
+    $DTheta 1.
+    $Tolerance 1E-2
+    $Distribution cauchy
+    $OutFile outfiles/112.dat
+}
 
-#CRYSTAL PARAMETERS
-
-$C_1 fcc.in
-$C_2 fcc.in
-$f_constants constants.in
-
-#CONFIGURATION PARAMETERS
-
-$X1 1 1 2
-$Z1 1 -1 0
-$X2 1 1 2
-$Z2 1 -1 0
-$ThetaRotX1 0.5
-$ThetaRotX2 -0.5
-$ThetaMin 0
-$ThetaMax 110
-$DTheta 1.
-
-#NUMERICAL PARAMETERS
-
-$Tolerance 1E-2
-$distribution Distribution
-
-$test sin(3.1415926535)
-
-#$vtk
-$vtk_rot_x1 55
-$vtk_rot_x2 -55
-$resolution 50

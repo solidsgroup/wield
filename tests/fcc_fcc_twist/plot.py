@@ -13,8 +13,8 @@ B1 = 18000
 A2 = A1 #717.3
 B2 = B1 #10759.8
 
-Tilt_100_Model  = numpy.loadtxt("100.dat", delimiter=" ");
-Tilt_111_Model  = numpy.loadtxt("111.dat", delimiter=" ");
+Tilt_100_Model  = numpy.loadtxt("outfiles/100.dat", delimiter=" ");
+Tilt_111_Model  = numpy.loadtxt("outfiles/111.dat", delimiter=" ");
 
 Tilt_100_Wolf  = numpy.loadtxt("Wolf/100.dat", delimiter=" ");
 Tilt_111_Wolf  = numpy.loadtxt("Wolf/111.dat", delimiter=" ");

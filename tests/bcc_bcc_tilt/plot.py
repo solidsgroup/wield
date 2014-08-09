@@ -9,10 +9,10 @@ import numpy
 A = 3.922#0.0586099*70
 B = 64.048#70
 
-Tilt_001_Model  = numpy.loadtxt("100.dat", delimiter=" ");
-Tilt_110_Model  = numpy.loadtxt("110.dat", delimiter=" ");
-Tilt_111_Model  = numpy.loadtxt("111.dat", delimiter=" ");
-Tilt_112_Model  = numpy.loadtxt("112.dat", delimiter=" ");
+Tilt_001_Model  = numpy.loadtxt("outfiles/100.dat", delimiter=" ");
+Tilt_110_Model  = numpy.loadtxt("outfiles/110.dat", delimiter=" ");
+Tilt_111_Model  = numpy.loadtxt("outfiles/111.dat", delimiter=" ");
+Tilt_112_Model  = numpy.loadtxt("outfiles/112.dat", delimiter=" ");
 
 Tilt_001_Shibuta  = numpy.loadtxt("Shibuta/100.dat", delimiter=" ");
 Tilt_110_Shibuta  = numpy.loadtxt("Shibuta/110.dat", delimiter=" ");

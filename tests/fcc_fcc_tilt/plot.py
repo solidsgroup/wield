@@ -13,10 +13,10 @@ A = 5.6468#2*3.0234 - 0.4
 B = 128.5826#2*64.2913
 
 
-Tilt_001_Model  = numpy.loadtxt("100.dat", delimiter=" ");
-Tilt_110_Model  = numpy.loadtxt("110.dat", delimiter=" ");
-Tilt_111_Model  = numpy.loadtxt("111.dat", delimiter=" ");
-Tilt_112_Model  = numpy.loadtxt("112.dat", delimiter=" ");
+Tilt_001_Model  = numpy.loadtxt("outfiles/100.dat", delimiter=" ");
+Tilt_110_Model  = numpy.loadtxt("outfiles/110.dat", delimiter=" ");
+Tilt_111_Model  = numpy.loadtxt("outfiles/111.dat", delimiter=" ");
+Tilt_112_Model  = numpy.loadtxt("outfiles/112.dat", delimiter=" ");
 
 Tilt_001_Shibuta  = numpy.loadtxt("Shibuta/100.dat", delimiter=" ");
 Tilt_110_Shibuta  = numpy.loadtxt("Shibuta/110.dat", delimiter=" ");

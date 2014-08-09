@@ -25,7 +25,7 @@ C_Cu = 40; [A_Cu, B_Cu] = [C_Cu*0.0527911,C_Cu];
 C_Ni = 60; [A_Ni, B_Ni] = [C_Ni*0.0527911,C_Ni];
 
 
-Tilt_110_Model  = numpy.loadtxt("110_multimat.dat", delimiter=" ");
+Tilt_110_Model  = numpy.loadtxt("outfiles/110.dat", delimiter=" ");
 
 
 Tilt_110_Al  = numpy.loadtxt("Wolf/110_Al.dat", delimiter=" ");
@@ -39,13 +39,13 @@ pylab.figure(figsize=(10*8/10,8*8/10));
 
 ax = pylab.subplot(111);
 
-pylab.plot(Tilt_110_Model[:,0],
+pylab.plot(180-Tilt_110_Model[:,0],
            A_Al + B_Al*Tilt_110_Model[:,1],color="black",linewidth=2,linestyle='-',label='Al')
-pylab.plot(Tilt_110_Model[:,0],
+pylab.plot(180-Tilt_110_Model[:,0],
            A_Au + B_Au*Tilt_110_Model[:,1],color="black",linewidth=2,linestyle='-.',label='Au')
-pylab.plot(Tilt_110_Model[:,0],
+pylab.plot(180-Tilt_110_Model[:,0],
            A_Cu + B_Cu*Tilt_110_Model[:,1],color="black",linewidth=2,linestyle='--',label='Cu')
-pylab.plot(Tilt_110_Model[:,0],
+pylab.plot(180-Tilt_110_Model[:,0],
            A_Ni + B_Ni*Tilt_110_Model[:,1],color="black",linewidth=2,linestyle=':',label='Ni')
 
 pylab.plot(Tilt_110_Al[:,0],Tilt_110_Al[:,1],#yerr=0.1*Tilt_110_Al[:,1],

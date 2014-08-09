@@ -19,5 +19,5 @@ $GammaOR1D {
     $DTheta 0.5
     $Tolerance 1E-2
     $Distribution cauchy
-    $OutFile 110.dat
+    $OutFile outfiles/110.dat
 }
