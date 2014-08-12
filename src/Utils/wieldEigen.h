@@ -3,6 +3,8 @@
 
 #include "Utils/wieldExceptions.h"
 
+using namespace std;
+
 #define Success_tmp Success
 #undef Success
 #undef eigen_assert
@@ -11,6 +13,7 @@
 
 #include "Eigen/Core"
 #include "Eigen/Geometry"
+#include "Eigen/LU"
 
 #define Success Success_tmp
 #undef  Success_tmp

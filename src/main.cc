@@ -27,6 +27,7 @@
 #include "Main/wieldGammaSurfaceSphere.h"
 #include "Main/wieldGammaInterface1D.h"
 #include "Main/wieldGammaOR1D.h"
+#include "Main/wieldFacet2D.h"
 #include "Utils/wieldExceptions.h"
 #include "Utils/wieldColor.h"
 #include "Utils/wieldTypes.h"
@@ -81,6 +82,8 @@ int main(int argc, char* argv[])
     Wield::Main::GammaInterface1D(reader, dynamicPlot);
   if (reader.Find("GammaSurfaceSphere"))
     Wield::Main::GammaSurfaceSphere(reader, dynamicPlot); 
+  if (reader.Find("Facet2D"))
+    Wield::Main::Facet2D(reader); 
 
   // WARN ABOUT UNUSED VARIABLES
   reader.PrintUnusedVariableWarnings();

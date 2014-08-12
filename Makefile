@@ -5,6 +5,7 @@
 include ~/.make.reader
 include ~/.make.eigen
 include ~/.make.muparser
+include ~/.make.lplib
 ifndef EMACS
 include ~/.make.color
 include ~/.make.vtk
