@@ -76,22 +76,6 @@ double Convexify2D<3>(//Vector3d e,       ///< Interface average normal vector
   WIELD_EXCEPTION_TRY;
   if (x.size() != y.size() || y.size() != z.size() || z.size() != w.size())
     WIELD_EXCEPTION_NEW("x, y, z, W not the same size");
-  // if (e.norm() < 1E-8)
-  //   WIELD_EXCEPTION_NEW("Normal vector e too small");
-
-  // srand(time(NULL));
-  // for (int i=0; i<100; i++)
-  //   {
-  //     double theta1 = (2.*(double)rand()/(double)RAND_MAX - 1.)*360.;
-  //     double theta2 = (2.*(double)rand()/(double)RAND_MAX - 1.)*360.;
-  //     double theta  = (2.*(double)rand()/(double)RAND_MAX - 1.)*360.;
-  //     cout << theta1 << ", " << theta2 << ", " << theta << endl;
-  //     if (ThetaInRange(theta,theta1,theta2))
-  // 	cout << "====> in range" << endl << endl;
-  //     else cout << "====> not in range" << endl << endl;
-  //   }
-  // exit(0);
-
 
   Vector3d e; e << 0, 0, 1; 
 
@@ -99,7 +83,7 @@ double Convexify2D<3>(//Vector3d e,       ///< Interface average normal vector
   for (int i=0; i<x.size(); i++)
     {
       r[i] = sqrt(x[i]*x[i] + y[i]*y[i]);
-      theta[i] = fmod(atan2(y[i],x[i])*180./pi,360); // get the range to be [0,360)
+      theta[i] = atan2(y[i],x[i])*180./pi; // get the range to be [0,360)
     }
 
   double wMin = *max_element(w.begin(), w.end());

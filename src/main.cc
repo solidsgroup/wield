@@ -19,7 +19,6 @@
 #include <stdexcept>
 #include <csignal>
 
-
 #include "tclap/CmdLine.h"
 #include "Reader.h"
 
@@ -60,11 +59,11 @@ int main(int argc, char* argv[])
   // 
   TCLAP::CmdLine cmd("(W)eak approximation of (I)nterface (E)nergy for bicrysta(L) boun(D)aries");
   TCLAP::SwitchArg switchDynamicPlot("p", "dynamic-plot", "Show real-time VTK plot of energy", cmd, false);
-  TCLAP::SwitchArg switchVisualize("s", "show-crystal", "Show VTK plot of initial OR", cmd, false);
+  TCLAP::ValueArg<int> valueNumThreads("n", "num-threads", "Number of pthreads to use",false,1,"", cmd);
   TCLAP::UnlabeledValueArg<string> argFileName("name", "Path to input file", true, "", "inputfile", cmd);
   cmd.parse(argc, argv);
   bool dynamicPlot = switchDynamicPlot.getValue();
-  //bool visualize = switchVisualize.getValue();
+  int numThreads = valueNumThreads.getValue();
   string fileName = argFileName.getValue();
 
   //
@@ -81,7 +80,7 @@ int main(int argc, char* argv[])
   if (reader.Find("GammaInterface1D"))
     Wield::Main::GammaInterface1D(reader, dynamicPlot);
   if (reader.Find("GammaSurfaceSphere"))
-    Wield::Main::GammaSurfaceSphere(reader, dynamicPlot); 
+    Wield::Main::GammaSurfaceSphere(reader, dynamicPlot, numThreads); 
   if (reader.Find("Facet2D"))
     Wield::Main::Facet2D(reader); 
 

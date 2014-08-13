@@ -11,7 +11,7 @@ include ~/.make.color
 include ~/.make.vtk
 endif
 
-CC                    = clang++
+include .make.local #provides CC, additional defines
 CPP_COMPILER_OPTIONS += -c -g3 -ggdb -include ~/Include/colors.h  -Wno-deprecated -Wunused-variable
 CPP_LINKER_OPTIONS   += -g3 -ggdb -lpthread -lX11
 
@@ -33,7 +33,6 @@ LIB		      = $(LIB_EXT)
 .SECONDARY: $(OBJ) $(OBJ_MAIN)
 
 all: make_directories $(EXE)
-	@echo $(HDR)
 	@echo -e $(B_ON)$(FG_GREEN)"###"
 	@echo "### DONE" 
 	@echo -e "###"$(RESET)	

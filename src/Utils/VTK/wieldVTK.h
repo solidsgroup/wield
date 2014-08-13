@@ -18,6 +18,7 @@ using namespace std;
 
 #include "Faddeeva/Faddeeva.h"
 
+#ifdef WIELD_USE_VTK
 #include <vtkVersion.h>
 #include <vtkSmartPointer.h>
 #include <vtkActor.h>
@@ -51,7 +52,7 @@ using namespace std;
 #include <vtkRenderWindowInteractor.h>
 #include <vtkRenderer.h>
 #include <vtkTable.h>
-
+#endif
 
 namespace Wield
 {
@@ -59,26 +60,36 @@ namespace Utils
 {
 namespace VTK
 {
+#ifdef WIELD_USE_VTK
 typedef vtkSmartPointer<vtkActor> Actor;
+#else
+typedef int Actor;
+#endif
 class PlotLine
 {
  public:
   PlotLine()
   {
+#ifdef WIELD_USE_VTK
     view = vtkSmartPointer<vtkContextView>::New();
     view->GetRenderer()->SetBackground(1.0, 1.0, 1.0);
     view->GetRenderWindow()->SetSize(400, 300);
     chart = vtkSmartPointer<vtkChartXY>::New();
     view->GetScene()->AddItem(chart);
     chart->SetShowLegend(false);
+#endif
   }
   void clear()
   {
+#ifdef WIELD_USE_VTK
     chart->ClearPlots();
+#endif
   }
   void SetData(vector<double> X, vector<double> Y, bool blocking=false)
   {
     WIELD_EXCEPTION_TRY;
+
+#ifdef WIELD_USE_VTK
 
     if (X.size() != Y.size())
       WIELD_EXCEPTION_NEW("X.size()=" << X.size() << " but " << "Y.size()=" << Y.size());
@@ -118,12 +129,16 @@ class PlotLine
     if (blocking) view->GetInteractor()->Start();
     else view->GetInteractor()->Render();
 
+#endif
+
     WIELD_EXCEPTION_CATCH;
   }
 
  private:
+#ifdef WIELD_USE_VTK
   vtkSmartPointer<vtkContextView> view;
   vtkSmartPointer<vtkChartXY> chart;
+#endif
 };
 
 double computeDensityFunction(double x, double y, double z, Wield::Series::CosSeries C)
@@ -155,6 +170,7 @@ Actor drawCrystal(Wield::Series::CosSeries C, Matrix3d R, Matrix3d BoxR,
 		    double FactorTop=0, double FactorBottom=0)
 {
   WIELD_EXCEPTION_TRY;
+#ifdef WIELD_USE_VTK
   if (xmin > xmax) WIELD_EXCEPTION_NEW("xmin > xmax");
   if (ymin > ymax) WIELD_EXCEPTION_NEW("ymin > ymax");
   if (zmin > zmax) WIELD_EXCEPTION_NEW("zmin > zmax");
@@ -225,12 +241,16 @@ Actor drawCrystal(Wield::Series::CosSeries C, Matrix3d R, Matrix3d BoxR,
   actor->SetMapper(mapper);
   
   return actor;
+#else
+  return 0;
+#endif
   WIELD_EXCEPTION_CATCH;
 }
 
 void renderCrystals(vector<Actor> actors)
 {
   WIELD_EXCEPTION_TRY;
+#ifdef WIELD_USE_VTK
   // Visualize
   vtkSmartPointer<vtkRenderer> renderer = 
     vtkSmartPointer<vtkRenderer>::New();
@@ -261,14 +281,17 @@ void renderCrystals(vector<Actor> actors)
   renderer->SetBackground(1,1,1); // Background color white
   renderWindow->Render();
   renderWindowInteractor->Start();
+#endif
   WIELD_EXCEPTION_CATCH;
 }
 		  
 void renderCrystal(Actor actor)
 {
+#ifdef WIELD_USE_VTK
   vector<Actor> actors;
   actors.push_back(actor);
   renderCrystals(actors);
+#endif
 }
 }
 }
