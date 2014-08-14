@@ -38,11 +38,7 @@ void Facet2D(Reader::Reader &reader,
   vector<double> x,y,z,w;
 
   string dataFile          = reader.Read<string>("Facet2D", "DataFile");
-<<<<<<< HEAD
-  //Eigen::Vector3d interfaceNormal = reader.Read<Vector3d>("Facet2D", "InterfaceNormal");
-=======
   int maxFacetOrder        = reader.Read<int>("Facet2D", "MaxFacetOrder", 3);
->>>>>>> 60eacbdc85897d5ff6ac243b8bda154eba82f9db
 
   ifstream in(dataFile.c_str());
   if (!in)
@@ -102,7 +98,7 @@ void Facet2D(Reader::Reader &reader,
     }
 
   double wMin = INFINITY;
-  Vector3d lambdaMin, n1Min, n2Min, n3Min;
+  Eigen::Vector3d lambdaMin, n1Min, n2Min, n3Min;
   Matrix3d nMin;
   for (int i=0; i<numThreads; i++)
     {

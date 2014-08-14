@@ -79,51 +79,35 @@ struct ConvexifyData2D<3>
   vector<double> *theta;
   vector<double> *w;
   double wMin;
-  Vector3d lambdaMin;
-  Vector3d n1Min;
-  Vector3d n2Min;
-  Vector3d n3Min;
+  Eigen::Vector3d lambdaMin;
+  Eigen::Vector3d n1Min;
+  Eigen::Vector3d n2Min;
+  Eigen::Vector3d n3Min;
 };
 
 
 template<int facetOrder>
-<<<<<<< HEAD
-double Convexify2D(//Eigen::Vector3d e,       ///< Interface average normal vector
-		   vector<double> x, ///< X component of normal
-		   vector<double> y, ///< Y component of normal
-		   vector<double> z, ///< Z component of normal
-		   vector<double> w); ///< Function values of points
-=======
 void *Convexify2D(void *args);
->>>>>>> 60eacbdc85897d5ff6ac243b8bda154eba82f9db
 
 template<>
-<<<<<<< HEAD
-double Convexify2D<3>(//Eigen::Vector3d e,       ///< Interface average normal vector
-		      vector<double> x, ///< X component of normal
-		      vector<double> y, ///< Y component of normal
-		      vector<double> z, ///< Z component of normal
-		      vector<double> w) ///< Function values of points
-=======
 void *Convexify2D<3>(void *args) 
->>>>>>> 60eacbdc85897d5ff6ac243b8bda154eba82f9db
 {
   WIELD_EXCEPTION_TRY;
 
-  int index             =   ((ConvexifyData2D<3> *)(args))->index;
-  int numThreads        =   ((ConvexifyData2D<3> *)(args))->numThreads;
-  int maxFacetOrder     =   ((ConvexifyData2D<3> *)(args))->maxFacetOrder;
-  vector<double> &x     = *(((ConvexifyData2D<3> *)(args))->x);
-  vector<double> &y     = *(((ConvexifyData2D<3> *)(args))->y);
-  vector<double> &z     = *(((ConvexifyData2D<3> *)(args))->z);
-  vector<double> &r     = *(((ConvexifyData2D<3> *)(args))->r);
-  vector<double> &theta = *(((ConvexifyData2D<3> *)(args))->theta);
-  vector<double> &w     = *(((ConvexifyData2D<3> *)(args))->w);
-  double &wMin          =   ((ConvexifyData2D<3> *)(args))->wMin;
-  Vector3d &lambdaMin   =   ((ConvexifyData2D<3> *)(args))->lambdaMin;
-  Vector3d &n1Min       =   ((ConvexifyData2D<3> *)(args))->n1Min;
-  Vector3d &n2Min       =   ((ConvexifyData2D<3> *)(args))->n2Min;
-  Vector3d &n3Min       =   ((ConvexifyData2D<3> *)(args))->n3Min;
+  int index                  =   ((ConvexifyData2D<3> *)(args))->index;
+  int numThreads             =   ((ConvexifyData2D<3> *)(args))->numThreads;
+  int maxFacetOrder          =   ((ConvexifyData2D<3> *)(args))->maxFacetOrder;
+  vector<double> &x          = *(((ConvexifyData2D<3> *)(args))->x);
+  vector<double> &y          = *(((ConvexifyData2D<3> *)(args))->y);
+  vector<double> &z          = *(((ConvexifyData2D<3> *)(args))->z);
+  vector<double> &r          = *(((ConvexifyData2D<3> *)(args))->r);
+  vector<double> &theta      = *(((ConvexifyData2D<3> *)(args))->theta);
+  vector<double> &w          = *(((ConvexifyData2D<3> *)(args))->w);
+  double &wMin               =   ((ConvexifyData2D<3> *)(args))->wMin;
+  Eigen::Vector3d &lambdaMin =   ((ConvexifyData2D<3> *)(args))->lambdaMin;
+  Eigen::Vector3d &n1Min     =   ((ConvexifyData2D<3> *)(args))->n1Min;
+  Eigen::Vector3d &n2Min     =   ((ConvexifyData2D<3> *)(args))->n2Min;
+  Eigen::Vector3d &n3Min     =   ((ConvexifyData2D<3> *)(args))->n3Min;
 
 
   if (x.size() != y.size() || y.size() != z.size() || z.size() != w.size())
@@ -131,33 +115,16 @@ void *Convexify2D<3>(void *args)
 
   Eigen::Vector3d e; e << 0, 0, 1; 
 
-<<<<<<< HEAD
-  vector<double> r(x.size()), theta(x.size());
-  for (int i=0; i<x.size(); i++)
-    {
-      r[i] = sqrt(x[i]*x[i] + y[i]*y[i]);
-      theta[i] = atan2(y[i],x[i])*180./pi; // get the range to be [0,360)
-    }
-
-  double wMin = *max_element(w.begin(), w.end());
-  Eigen::Vector3d lambdaMin;
-  Eigen::Vector3d n1Min, n2Min, n3Min;
-=======
   wMin = *max_element(w.begin(), w.end());
   // Vector3d lambdaMin;
   // Vector3d n1Min, n2Min, n3Min;
->>>>>>> 60eacbdc85897d5ff6ac243b8bda154eba82f9db
 
   Matrix3d n;
   for (int i =0; i < x.size(); i++) 
     {
-<<<<<<< HEAD
-      Eigen::Vector3d n1(x[i], y[i], z[i]);
-=======
       if ( i%numThreads != index ) continue;
       
-      Vector3d n1(x[i], y[i], z[i]);
->>>>>>> 60eacbdc85897d5ff6ac243b8bda154eba82f9db
+      Eigen::Vector3d n1(x[i], y[i], z[i]);
       n.col(0) = n1;
       for (int j =i+1; j < x.size(); j++) 
 	{
@@ -166,19 +133,6 @@ void *Convexify2D<3>(void *args)
 	  
 	  if (PolarOpposites(theta[i],theta[j]))
 	    {
-<<<<<<< HEAD
-	      //cout << "A: " << theta[k] << " " << theta[i]+180 << " " << theta[j]+180 << endl;
-	      if (!ThetaInRange(theta[k],theta[i]+180,theta[j]+180)) continue;
-	      //cout << "B" << endl;
-	      Eigen::Vector3d n3(x[k], y[k], z[k]);
-	      n.col(2) = n3;
-
-	      //cout << n << endl << endl;
-	      if (fabs(n.determinant()) < 1E-8) continue;
-
-	      Eigen::Vector3d lambda = n.fullPivLu().solve(e);
-
-=======
 	      double theta1 = asin(r[i]); double theta2 = -asin(r[j]);
 	      double det = sin(theta1-theta2);
 	      if (fabs(det)<1E-5) continue;
@@ -199,13 +153,12 @@ void *Convexify2D<3>(void *args)
 	      for (int k = j+1; k < x.size(); k++) 
 		{
 		  if (!ThetaInRange(theta[k],theta[i]+180,theta[j]+180)) continue;
-		  Vector3d n3(x[k], y[k], z[k]);
+		  Eigen::Vector3d n3(x[k], y[k], z[k]);
 		  n.col(2) = n3;
->>>>>>> 60eacbdc85897d5ff6ac243b8bda154eba82f9db
 
 		  if (fabs(n.determinant()) < 1E-8) continue;
 
-		  Vector3d lambda = n.fullPivLu().solve(e);
+		  Eigen::Vector3d lambda = n.fullPivLu().solve(e);
 
 
 		  if (lambda[0] < 0 || lambda[1] < 0 || lambda[2] < 0) continue;

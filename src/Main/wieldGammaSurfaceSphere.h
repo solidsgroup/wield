@@ -89,6 +89,7 @@ void *GammaSurfaceSphere_pthread(void *_args )
   double prePhiRotX                         = args->prePhiRotX;
   double prePhiRotY                         = args->prePhiRotY;
   double prePhiRotZ                         = args->prePhiRotZ;
+  bool dynamicPlotting                      = args->dynamicPlotting;
 #ifdef WIELD_USE_VTK
   Wield::Utils::VTK::PlotSphere &plotSphere = *(args->plotSphere);
 #endif
@@ -97,18 +98,6 @@ void *GammaSurfaceSphere_pthread(void *_args )
   // GENERATE GAMMA SURFACE 
   for (int i=0; i<X.size(); i++)
     {
-<<<<<<< HEAD
-      if ((index == 0) && (!(i % outputSkip) || i==X.size()-1))
-      	{
-#ifdef WIELD_USE_VTK
-	  if (args->dynamicPlotting)
-	    plotSphere.SetData(vals);
-#endif
-      	  WIELD_PROGRESS("Computing gamma surface", i, X.size(), 1);
-      	}      
-=======
->>>>>>> 60eacbdc85897d5ff6ac243b8bda154eba82f9db
-
       if ( i%numThreads != index ) continue;
 
       Eigen::Vector3d n(X[i],Y[i],Z[i]);
