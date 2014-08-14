@@ -15,14 +15,15 @@
 #include "Utils/wieldColor.h"
 #include "Utils/wieldTypes.h"
 #include "Utils/wieldRotations.h"
-#include "Utils/VTK/wieldVTK.h"
 #include "Utils/wieldProgress.h"
 #include "Utils/wieldEigen.h"
 #include "Series/wieldCosSeries.h"
 #include "Optimization/wieldConvexify1D.h"
 #include "SurfaceIntegrate.h"
 #include "IO/wieldReaderMacros.h"
-
+#ifdef WIELD_USE_VTK
+#include "Utils/VTK/wieldVTK.h"
+#endif
 
 using namespace std;
 
@@ -63,8 +64,10 @@ void GammaOR1D(Reader::Reader &reader,bool dynamicPlot)
   ofstream out(outFile.c_str());       
 
   // ROTATE ORIENTATION RELATIONSHIP AND COMPUTE GRAIN BOUNDARY ENERGY
+#ifdef WIELD_USE_VTK
   Wield::Utils::VTK::PlotLine *plotWindow;
   if (dynamicPlot) plotWindow = new Wield::Utils::VTK::PlotLine();
+#endif
   vector<double> X,Y;
   for (double theta = thetaMin; theta <= thetaMax; theta += dTheta)
     {
@@ -83,17 +86,20 @@ void GammaOR1D(Reader::Reader &reader,bool dynamicPlot)
       out << theta << " " << W << endl;
       X.push_back(theta);
       Y.push_back(W);
+#ifdef WIELD_USE_VTK
       if (dynamicPlot) if (X.size() > 1) {plotWindow->clear(); plotWindow->SetData(X,Y);}
-
+#endif
       WIELD_PROGRESS("Computing energy curve", theta-thetaMin, thetaMax-thetaMin, dTheta);
     }
   cout << endl;
 
+#ifdef WIELD_USE_VTK
   if (dynamicPlot) 
     {
       plotWindow->clear(); 
       plotWindow->SetData(X,Y, true);
     }
+#endif
 
   WIELD_EXCEPTION_CATCH_FINAL;
 }

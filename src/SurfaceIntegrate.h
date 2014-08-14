@@ -45,12 +45,12 @@ double SurfaceIntegrate(Wield::Series::CosSeries C1,
   if ((R2.transpose()*R2 - Matrix3d::Identity()).norm() > 1E-10)
     WIELD_EXCEPTION_NEW("R2 is not a rotation matrix");
 
-  Vector3d na1 = R1.col(0);
-  Vector3d nb1 = R2.col(0);
-  Vector3d na3 = R1.col(2);
-  Vector3d nb3 = R2.col(2);
+  Eigen::Vector3d na1 = R1.col(0);
+  Eigen::Vector3d nb1 = R2.col(0);
+  Eigen::Vector3d na3 = R1.col(2);
+  Eigen::Vector3d nb3 = R2.col(2);
 
-  Vector3d na2 = na3.cross(na1); Vector3d nb2 = nb3.cross(nb1);
+  Eigen::Vector3d na2 = na3.cross(na1); Eigen::Vector3d nb2 = nb3.cross(nb1);
   double S=0;
   for (int i=0;i<C1.order;i++)
     for (int j=0;j<C1.order;j++) 

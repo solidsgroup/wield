@@ -5,14 +5,13 @@
 include ~/.make.reader
 include ~/.make.eigen
 include ~/.make.muparser
-include ~/.make.lplib
+#include ~/.make.lplib
 ifndef EMACS
 include ~/.make.color
-include ~/.make.vtk
 endif
 
 include .make.local #provides CC, additional defines
-CPP_COMPILER_OPTIONS += -c -g3 -ggdb -include ~/Include/colors.h  -Wno-deprecated -Wunused-variable
+CPP_COMPILER_OPTIONS += -c -g3 -ggdb -Wno-deprecated -Wunused-variable
 CPP_LINKER_OPTIONS   += -g3 -ggdb -lpthread -lX11
 
 ifdef EMACS

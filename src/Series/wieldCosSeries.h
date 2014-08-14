@@ -23,7 +23,7 @@ using namespace std;
 // {
 //   void operator() (const string varUnparsed, Wield::Series::CosSeries *varParsed)
 //   {
-//     istringstream iss(varUnparsed); 
+//     std::istringstream iss(varUnparsed); 
 //     string token;
 //     int order = varParsed->order;
 //     for (unsigned int i=0;i<order;i++)

@@ -51,7 +51,7 @@ namespace Optimization
 
 
 template<int facetOrder>
-double Convexify2D(//Vector3d e,       ///< Interface average normal vector
+double Convexify2D(//Eigen::Vector3d e,       ///< Interface average normal vector
 		   vector<double> x, ///< X component of normal
 		   vector<double> y, ///< Y component of normal
 		   vector<double> z, ///< Z component of normal
@@ -67,7 +67,7 @@ double Convexify2D(//Vector3d e,       ///< Interface average normal vector
 /// \f[\lambda_1\mathbf{n}_1 + \lambda_2\mathbf{n}_2 + \lambda_2\mathbf{n}_2 = \mathbf{e}\f]
 ///
 template<>
-double Convexify2D<3>(//Vector3d e,       ///< Interface average normal vector
+double Convexify2D<3>(//Eigen::Vector3d e,       ///< Interface average normal vector
 		      vector<double> x, ///< X component of normal
 		      vector<double> y, ///< Y component of normal
 		      vector<double> z, ///< Z component of normal
@@ -77,7 +77,7 @@ double Convexify2D<3>(//Vector3d e,       ///< Interface average normal vector
   if (x.size() != y.size() || y.size() != z.size() || z.size() != w.size())
     WIELD_EXCEPTION_NEW("x, y, z, W not the same size");
 
-  Vector3d e; e << 0, 0, 1; 
+  Eigen::Vector3d e; e << 0, 0, 1; 
 
   vector<double> r(x.size()), theta(x.size());
   for (int i=0; i<x.size(); i++)
@@ -87,30 +87,30 @@ double Convexify2D<3>(//Vector3d e,       ///< Interface average normal vector
     }
 
   double wMin = *max_element(w.begin(), w.end());
-  Vector3d lambdaMin;
-  Vector3d n1Min, n2Min, n3Min;
+  Eigen::Vector3d lambdaMin;
+  Eigen::Vector3d n1Min, n2Min, n3Min;
 
   Matrix3d n;
   for (int i =0; i < x.size(); i++) 
     {
-      Vector3d n1(x[i], y[i], z[i]);
+      Eigen::Vector3d n1(x[i], y[i], z[i]);
       n.col(0) = n1;
       for (int j =i+1; j < x.size(); j++) 
 	{
-	  Vector3d n2(x[j], y[j], z[j]);
+	  Eigen::Vector3d n2(x[j], y[j], z[j]);
 	  n.col(1) = n2;
 	  for (int k = j+1; k < x.size(); k++) 
 	    {
 	      //cout << "A: " << theta[k] << " " << theta[i]+180 << " " << theta[j]+180 << endl;
 	      if (!ThetaInRange(theta[k],theta[i]+180,theta[j]+180)) continue;
 	      //cout << "B" << endl;
-	      Vector3d n3(x[k], y[k], z[k]);
+	      Eigen::Vector3d n3(x[k], y[k], z[k]);
 	      n.col(2) = n3;
 
 	      //cout << n << endl << endl;
 	      if (fabs(n.determinant()) < 1E-8) continue;
 
-	      Vector3d lambda = n.fullPivLu().solve(e);
+	      Eigen::Vector3d lambda = n.fullPivLu().solve(e);
 
 
 	      // cout << (n*lambda).transpose() << endl;

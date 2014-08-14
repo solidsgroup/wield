@@ -194,8 +194,8 @@ Actor drawCrystal(Wield::Series::CosSeries C, Matrix3d R, Matrix3d BoxR,
       for(unsigned int j = 0; j < ny; j++)
 	for(unsigned int i = 0; i < nx; i++)
 	  {
-	    Vector3d X; X << x0 + i*dx, y0+j*dy, z0 + k*dz;
-	    Vector3d x = R*X;
+	    Eigen::Vector3d X; X << x0 + i*dx, y0+j*dy, z0 + k*dz;
+	    Eigen::Vector3d x = R*X;
 	  
 	    //double x=X[0], y=X[1], z=X[2];
 

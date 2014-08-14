@@ -27,7 +27,7 @@
     std::cout << WIELD_COLOR_FG_BLUE <<__LINE__ <<WIELD_COLOR_FG_DEFAULT << endl; \
     std::cout << "\t" << WIELD_COLOR_FG_YELLOW << __func__;		\
     std::cout << WIELD_COLOR_RESET<<endl;					\
-    stringstream ss; ss << MESSAGE; throw std::runtime_error(ss.str());	\
+    std::stringstream ss; ss << MESSAGE; throw std::runtime_error(ss.str()); \
   }
 
 #define WIELD_EXCEPTION_TRY try {

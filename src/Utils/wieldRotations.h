@@ -34,14 +34,14 @@ Matrix3d createMatrixFromZAngle(double theta)
   return Omega;
 }
 
-Matrix3d createMatrixFromXY(Vector3d ex, Vector3d ey)
+Matrix3d createMatrixFromXY(Eigen::Vector3d ex, Eigen::Vector3d ey)
 {
   WIELD_EXCEPTION_TRY;
   if (fabs(ex.dot(ey)) > 1E-8)
     WIELD_EXCEPTION_NEW("ex not orthogonal to ey: ex=[" << ex.transpose() << "]; ey=[" << ey.transpose()<<"]");
   if (ex.norm() < 1E-8) WIELD_EXCEPTION_NEW("ex is a zero vector");
   if (ey.norm() < 1E-8) WIELD_EXCEPTION_NEW("ey is a zero vector");
-  Vector3d ez = ex.cross(ey);
+  Eigen::Vector3d ez = ex.cross(ey);
   Matrix3d Omega;
   Omega.col(0) = ex / ex.norm();
   Omega.col(1) = ey / ey.norm();
@@ -50,14 +50,14 @@ Matrix3d createMatrixFromXY(Vector3d ex, Vector3d ey)
   WIELD_EXCEPTION_CATCH;
 }
 
-Matrix3d createMatrixFromYZ(Vector3d ey, Vector3d ez)
+Matrix3d createMatrixFromYZ(Eigen::Vector3d ey, Eigen::Vector3d ez)
 {
   WIELD_EXCEPTION_TRY;
   if (fabs(ey.dot(ez)) > 1E-8)
     WIELD_EXCEPTION_NEW("ey not orthogonal to ez: ey=[" << ey.transpose() << "]; ez=[" << ez.transpose()<<"]");
   if (ey.norm() < 1E-8) WIELD_EXCEPTION_NEW("ey is a zero vector");
   if (ez.norm() < 1E-8) WIELD_EXCEPTION_NEW("ez is a zero vector");
-  Vector3d ex = ey.cross(ez);
+  Eigen::Vector3d ex = ey.cross(ez);
   Matrix3d Omega;
   Omega.col(0) = ex / ex.norm();
   Omega.col(1) = ey / ey.norm();
@@ -66,14 +66,14 @@ Matrix3d createMatrixFromYZ(Vector3d ey, Vector3d ez)
   WIELD_EXCEPTION_CATCH;
 }
 
-Matrix3d createMatrixFromZX(Vector3d ez, Vector3d ex)
+Matrix3d createMatrixFromZX(Eigen::Vector3d ez, Eigen::Vector3d ex)
 {
   WIELD_EXCEPTION_TRY;
   if (fabs(ez.dot(ex)) > 1E-8)
     WIELD_EXCEPTION_NEW("ez not orthogonal to ex: ez=[" << ez.transpose() << "]; ex=[" << ex.transpose()<<"]");
   if (ez.norm() < 1E-8) WIELD_EXCEPTION_NEW("ez is a zero vector");
   if (ex.norm() < 1E-8) WIELD_EXCEPTION_NEW("ex is a zero vector");
-  Vector3d ey = ez.cross(ex);
+  Eigen::Vector3d ey = ez.cross(ex);
   Matrix3d Omega;
   Omega.col(0) = ex / ex.norm();
   Omega.col(1) = ey / ey.norm();
@@ -82,12 +82,12 @@ Matrix3d createMatrixFromZX(Vector3d ez, Vector3d ex)
   WIELD_EXCEPTION_CATCH;
 }
 
-Matrix3d createMatrixFromNormalVector(Vector3d n)
+Matrix3d createMatrixFromNormalVector(Eigen::Vector3d n)
 {
   WIELD_EXCEPTION_TRY;
   n /= n.norm();
   Matrix3d N;
-  Vector3d nOrth(1,0,0);
+  Eigen::Vector3d nOrth(1,0,0);
   if (nOrth.cross(n).norm() < 1E-4) nOrth << 0, 1, 0; // off chance that n is ex
   N.col(2) = n;    
   N.col(0) = nOrth - (nOrth.dot(n))*n;

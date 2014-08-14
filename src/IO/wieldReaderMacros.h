@@ -23,24 +23,24 @@
     {									\
       omega##NUM =							\
 	createMatrixFromXY						\
-	(reader.Read<Vector3d>(STRUCTNAME,"X"#NUM),			\
-	 reader.Read<Vector3d>(STRUCTNAME,"Y"#NUM));			\
+	(reader.Read<Eigen::Vector3d>(STRUCTNAME,"X"#NUM),		\
+	 reader.Read<Eigen::Vector3d>(STRUCTNAME,"Y"#NUM));		\
     }									\
   else if (reader.Find(STRUCTNAME,"Y"#NUM) &&				\
 	   reader.Find(STRUCTNAME,"Z"#NUM))				\
     {									\
       omega##NUM =							\
 	createMatrixFromYZ						\
-	(reader.Read<Vector3d>(STRUCTNAME,"Y"#NUM),			\
-	 reader.Read<Vector3d>(STRUCTNAME,"Z"#NUM));			\
+	(reader.Read<Eigen::Vector3d>(STRUCTNAME,"Y"#NUM),		\
+	 reader.Read<Eigen::Vector3d>(STRUCTNAME,"Z"#NUM));		\
     }									\
   else if (reader.Find(STRUCTNAME,"Z"#NUM) &&				\
 	   reader.Find(STRUCTNAME,"X"#NUM))				\
     {									\
       omega##NUM =							\
 	createMatrixFromZX						\
-	(reader.Read<Vector3d>(STRUCTNAME,"Z"#NUM),			\
-	 reader.Read<Vector3d>(STRUCTNAME,"X"#NUM));			\
+	(reader.Read<Eigen::Vector3d>(STRUCTNAME,"Z"#NUM),		\
+	 reader.Read<Eigen::Vector3d>(STRUCTNAME,"X"#NUM));		\
     }									\
   else WIELD_EXCEPTION_NEW("Missing two vectors to specify omega"#NUM); 
 

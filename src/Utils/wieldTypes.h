@@ -8,16 +8,19 @@ const double pi = 3.14159265358979323846264338327950288419716939937510582;
 #include "Utils/wieldEigen.h"
 #include "Series/wieldCosSeries.h"
 
-
+namespace Eigen
+{
 typedef Matrix<double,3,1> Vector3d;
+}
+
 namespace Reader
 {
-template<> struct Interpreter<Vector3d >
+template<> struct Interpreter<Eigen::Vector3d >
 {
-  void operator() (const string varUnparsed, Vector3d *varParsed)
+  void operator() (const string varUnparsed, Eigen::Vector3d *varParsed)
   {
     WIELD_EXCEPTION_TRY;
-    istringstream iss(varUnparsed); 
+    std::istringstream iss(varUnparsed); 
     string token;
     for (unsigned int i=0;i<3;i++)
       {
@@ -37,7 +40,7 @@ template<> struct Interpreter<Vector6d >
   void operator() (const string varUnparsed, Vector6d *varParsed)
   {
     WIELD_EXCEPTION_TRY;
-    istringstream iss(varUnparsed); 
+    std::istringstream iss(varUnparsed); 
     string token;
     for (unsigned int i=0;i<6;i++)
       {
@@ -80,7 +83,7 @@ template<> struct Interpreter<Wield::Series::CosSeries>
 {
   void operator() (const string varUnparsed, Wield::Series::CosSeries *varParsed)
   {
-    istringstream iss(varUnparsed); 
+    std::istringstream iss(varUnparsed); 
     string token;
     int order = varParsed->order;
     for (unsigned int i=0;i<order;i++)

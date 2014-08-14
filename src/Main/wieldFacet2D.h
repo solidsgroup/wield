@@ -37,7 +37,7 @@ void Facet2D(Reader::Reader &reader)
 
   //int maxFacetOrder        = reader.Read<int>("Facet2D", "MaxFacetOrder");
   string dataFile          = reader.Read<string>("Facet2D", "DataFile");
-  //Vector3d interfaceNormal = reader.Read<Vector3d>("Facet2D", "InterfaceNormal");
+  //Eigen::Vector3d interfaceNormal = reader.Read<Vector3d>("Facet2D", "InterfaceNormal");
 
   ifstream in(dataFile.c_str());
   if (!in)
@@ -45,7 +45,7 @@ void Facet2D(Reader::Reader &reader)
   string line;
   while (getline(in,line))
     {
-      istringstream iss(line);
+      std::istringstream iss(line);
       string token;
       for (int i=0; iss >> token; i++)
 	{

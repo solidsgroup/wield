@@ -16,14 +16,15 @@
 #include "Utils/wieldColor.h"
 #include "Utils/wieldTypes.h"
 #include "Utils/wieldRotations.h"
-#include "Utils/VTK/wieldVTK.h"
 #include "Utils/wieldProgress.h"
 #include "Utils/wieldEigen.h"
 #include "Series/wieldCosSeries.h"
 #include "Optimization/wieldConvexify1D.h"
 #include "SurfaceIntegrate.h"
 #include "IO/wieldReaderMacros.h"
-
+#ifdef WIELD_USE_VTK
+#include "Utils/VTK/wieldVTK.h"
+#endif
 
 using namespace std;
 
@@ -65,8 +66,10 @@ void GammaInterface1D(Reader::Reader &reader,bool dynamicPlot)
     }
 
   // ROTATE ORIENTATION RELATIONSHIP AND COMPUTE GRAIN BOUNDARY ENERGY
+#ifdef WIELD_USE_VTK
   Wield::Utils::VTK::PlotLine *plotWindow;
   if (dynamicPlot) plotWindow = new Wield::Utils::VTK::PlotLine();
+#endif
   vector<double> X,Y;
   for (double phi = phiMin; phi <= phiMax; phi += dPhi)
     {
@@ -83,12 +86,14 @@ void GammaInterface1D(Reader::Reader &reader,bool dynamicPlot)
       //if (areaNormalization) W /= N(2,2);
       X.push_back(phi);
       Y.push_back(W);
+#ifdef WIELD_USE_VTK
       if (dynamicPlot) 
 	if (X.size() > 1) 
 	  {
 	    plotWindow->clear(); 
 	    plotWindow->SetData(X,Y);
 	  }
+#endif
     }
 
   cout << endl;
@@ -101,13 +106,14 @@ void GammaInterface1D(Reader::Reader &reader,bool dynamicPlot)
       out.close();
     }
 	
+#ifdef WIELD_USE_VTK
   if (dynamicPlot) 
     {
       plotWindow->clear(); 
       plotWindow->SetData(X,Y);
       plotWindow->SetData(X,Yc, true);
     }
-
+#endif
   WIELD_EXCEPTION_CATCH_FINAL;
 }
 }
