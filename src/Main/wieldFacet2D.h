@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include <csignal>
 #include <cstdlib>
+#include <pthread.h>
 
 #include "Reader.h"
 
@@ -29,15 +30,19 @@ namespace Wield
 {
 namespace Main
 {
-void Facet2D(Reader::Reader &reader)
+void Facet2D(Reader::Reader &reader,
+	     int numThreads = 1)
 {
   WIELD_EXCEPTION_TRY;
   
   vector<double> x,y,z,w;
 
-  //int maxFacetOrder        = reader.Read<int>("Facet2D", "MaxFacetOrder");
   string dataFile          = reader.Read<string>("Facet2D", "DataFile");
+<<<<<<< HEAD
   //Eigen::Vector3d interfaceNormal = reader.Read<Vector3d>("Facet2D", "InterfaceNormal");
+=======
+  int maxFacetOrder        = reader.Read<int>("Facet2D", "MaxFacetOrder", 3);
+>>>>>>> 60eacbdc85897d5ff6ac243b8bda154eba82f9db
 
   ifstream in(dataFile.c_str());
   if (!in)
@@ -60,11 +65,60 @@ void Facet2D(Reader::Reader &reader)
        z.size() != w.size())
     WIELD_EXCEPTION_NEW("Error reading input file: different x,y,z,w sizes");
   
+  vector<double> r(x.size()), theta(x.size());
+  for (int i=0; i<x.size(); i++)
+    {
+      r[i] = sqrt(x[i]*x[i] + y[i]*y[i]);
+      theta[i] = atan2(y[i],x[i])*180./pi; // get the range to be [0,360)
+    }
 
-  //Wield::Optimization::Convexify2D(interfaceNormal, x,y,z,w);
-  Wield::Optimization::Convexify2D<3>(x,y,z,w);
+  
+  pthread_t threads[numThreads];
+  int errorCode;
+  Wield::Optimization::ConvexifyData2D<3> *args =
+    (Wield::Optimization::ConvexifyData2D<3> *)malloc(numThreads * sizeof(Wield::Optimization::ConvexifyData2D<3>));
+  for (int i=0; i<numThreads; i++)
+    {
+      args[i].index = i;
+      args[i].numThreads = numThreads;
+      args[i].maxFacetOrder = maxFacetOrder;
+      args[i].x = &x;
+      args[i].y = &y;
+      args[i].z = &z;
+      args[i].w = &w;
+      args[i].r = &r;
+      args[i].theta = &theta;
 
+      errorCode = pthread_create(&threads[i], NULL, Wield::Optimization::Convexify2D<3>, (void*)(&args[i]));
+      if (errorCode)
+	WIELD_EXCEPTION_NEW("Error starting thread #" << i << ": errorCode = " << errorCode);
+    }
 
+  for (int i=0; i<numThreads; i++)
+    {
+      errorCode = pthread_join(threads[i],NULL);
+      if (errorCode)
+	WIELD_EXCEPTION_NEW("Error joining thread #" << i << ": errorCode = " << errorCode);
+    }
+
+  double wMin = INFINITY;
+  Vector3d lambdaMin, n1Min, n2Min, n3Min;
+  Matrix3d nMin;
+  for (int i=0; i<numThreads; i++)
+    {
+      if (args[i].wMin < wMin)
+	{
+	  wMin = args[i].wMin;
+	  lambdaMin = args[i].lambdaMin;
+	  nMin.col(0) = args[i].n1Min;
+	  nMin.col(1) = args[i].n2Min;
+	  nMin.col(2) = args[i].n3Min;
+	}
+    }
+  
+  cout << WIELD_COLOR_FG_YELLOW << wMin << WIELD_COLOR_RESET << endl;
+  cout << WIELD_COLOR_FG_RED << lambdaMin.transpose() << WIELD_COLOR_RESET << endl;
+  cout << WIELD_COLOR_FG_BLUE << nMin << WIELD_COLOR_RESET << endl;
 
   WIELD_EXCEPTION_CATCH_FINAL;
 }

@@ -97,6 +97,7 @@ void *GammaSurfaceSphere_pthread(void *_args )
   // GENERATE GAMMA SURFACE 
   for (int i=0; i<X.size(); i++)
     {
+<<<<<<< HEAD
       if ((index == 0) && (!(i % outputSkip) || i==X.size()-1))
       	{
 #ifdef WIELD_USE_VTK
@@ -105,6 +106,8 @@ void *GammaSurfaceSphere_pthread(void *_args )
 #endif
       	  WIELD_PROGRESS("Computing gamma surface", i, X.size(), 1);
       	}      
+=======
+>>>>>>> 60eacbdc85897d5ff6ac243b8bda154eba82f9db
 
       if ( i%numThreads != index ) continue;
 
@@ -116,6 +119,15 @@ void *GammaSurfaceSphere_pthread(void *_args )
 	createMatrixFromNormalVector(n);
       double W = a - b*SurfaceIntegrate(crystal1, omega1*N, crystal2, omega2*N, stdDev, tolerance, "cauchy");
       vals[i] = (W);
+
+      if ((index == 0) && (!(i % outputSkip) || i==X.size()-1))
+      	{
+#ifdef WIELD_USE_VTK
+	  if (dynamicPlotting)
+	    plotSphere.SetData(vals);
+#endif
+      	  WIELD_PROGRESS("Computing gamma surface", i, X.size(), 1);
+      	}      
     }
   if (index==0) cout << endl;
   pthread_exit(_args);

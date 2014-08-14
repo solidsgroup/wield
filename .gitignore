@@ -3,3 +3,4 @@ old
 tests/OLD*
 obj
 .make.local
+tests/fcc_atgb_112

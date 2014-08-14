@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
   if (reader.Find("GammaSurfaceSphere"))
     Wield::Main::GammaSurfaceSphere(reader, dynamicPlot, numThreads); 
   if (reader.Find("Facet2D"))
-    Wield::Main::Facet2D(reader); 
+    Wield::Main::Facet2D(reader,numThreads); 
 
   // WARN ABOUT UNUSED VARIABLES
   reader.PrintUnusedVariableWarnings();
