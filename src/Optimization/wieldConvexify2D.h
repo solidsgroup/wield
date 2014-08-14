@@ -153,6 +153,7 @@ void *Convexify2D<3>(void *args)
 	      for (int k = j+1; k < x.size(); k++) 
 		{
 		  if (!ThetaInRange(theta[k],theta[i]+180,theta[j]+180)) continue;
+		  if (PolarOpposites(theta[i],theta[k]) || PolarOpposites(theta[j],theta[k])) continue; // 2d faceting, will get caught later
 		  Eigen::Vector3d n3(x[k], y[k], z[k]);
 		  n.col(2) = n3;
 

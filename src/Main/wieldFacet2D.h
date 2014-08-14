@@ -112,10 +112,21 @@ void Facet2D(Reader::Reader &reader,
 	}
     }
   
+  
   cout << WIELD_COLOR_FG_YELLOW << wMin << WIELD_COLOR_RESET << endl;
   cout << WIELD_COLOR_FG_RED << lambdaMin.transpose() << WIELD_COLOR_RESET << endl;
   cout << WIELD_COLOR_FG_BLUE << nMin << WIELD_COLOR_RESET << endl;
 
+  if (reader.Find("Facet2D","OutFile"))
+    {
+      string outFile = reader.Read<string>("Facet2D", "OutFile");
+      ofstream out;
+      out.open(outFile.c_str());
+      out << wMin << endl;
+      out << lambdaMin.transpose() << endl;
+      out << nMin << endl;
+      out.close();
+    }
   WIELD_EXCEPTION_CATCH_FINAL;
 }
 }
