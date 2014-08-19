@@ -1,9 +1,9 @@
 #!/bin/python
 import argparse
 from math import atan2
-from numpy import loadtxt, linspace, meshgrid, arctan2, pi, radians,degrees,concatenate,cos,sin
+from numpy import loadtxt, linspace, meshgrid, arctan2, pi, radians,degrees,concatenate,cos,sin,sqrt
 from scipy.interpolate import griddata
-from pylab import subplots,contourf,pcolor,figure,show,colorbar,pcolormesh
+from pylab import subplots,contourf,pcolor,figure,show,colorbar,pcolormesh,savefig
 from fractional_polar_axes import *
 
 parser = argparse.ArgumentParser(description='Create a polar surface plot');
@@ -16,6 +16,8 @@ parser.add_argument('-m', '--method', default='nearest', help='Interpolation met
 parser.add_argument('-n1','--n1', nargs=2, default=[0,2], help='First Facet vector');
 parser.add_argument('-n2','--n2', nargs=2, default=[0,2], help='Second Facet vector');
 parser.add_argument('-n3','--n3', nargs=2, default=[0,2], help='Third Facet vector');
+parser.add_argument('-f', '--facet-file', default="", help='Facet data input file');
+parser.add_argument('-o', '--output-file', default="", help='Image output file');
 args=parser.parse_args();
 
 data = loadtxt(args.file);
@@ -53,18 +55,55 @@ else:
 
 rr = []; tt = [];
 if float(args.n1[0])**2 + float(args.n1[1])**2 <= 1:
-    rr.append(float(args.n1[0])**2 + float(args.n1[1])**2)
+    rr.append(sqrt(float(args.n1[0])**2 + float(args.n1[1])**2))
     tt.append(atan2(float(args.n1[1]),float(args.n1[0])))
     if float(args.n2[0])**2 + float(args.n2[1])**2 <= 1:
-        rr.append(float(args.n2[0])**2 + float(args.n2[1])**2)
+        rr.append(sqrt(float(args.n2[0])**2 + float(args.n2[1])**2))
         tt.append(atan2(float(args.n2[1]),float(args.n2[0])))
         if float(args.n3[0])**2 + float(args.n3[1])**2 <= 1:
-            rr.append(float(args.n3[0])**2 + float(args.n3[1])**2)
+            rr.append(sqrt(float(args.n3[0])**2 + float(args.n3[1])**2))
             tt.append(atan2(float(args.n3[1]),float(args.n3[0])))
-    rr.append(float(args.n1[0])**2 + float(args.n1[1])**2)
+    rr.append(sqrt(float(args.n1[0])**2 + float(args.n1[1])**2))
     tt.append(atan2(float(args.n1[1]),float(args.n1[0])))
     ax.plot(tt,rr,marker='o');
 
+if args.facet_file != "":
+    rr = []; tt = []; lamb = []
+    n1=[]; n2=[]; n3=[];
+    file=open(args.facet_file,'r');
+    file.readline(); #skip past energy
+    lambStr = file.readline().split(); #skip past lambda
+    lamb.append(float(lambStr[0]));
+    lamb.append(float(lambStr[1]));
+    lamb.append(float(lambStr[2]));
 
-show()
+    xStr = file.readline().split();
+    yStr = file.readline().split();
+    n1.append(float(xStr[0])); n2.append(float(xStr[1])); n3.append(float(xStr[2]))
+    n1.append(float(yStr[0])); n2.append(float(yStr[1])); n3.append(float(yStr[2]))
+
+    if (lamb[0] > 1E-6):
+        rr.append(sqrt(float(n1[0])**2 + float(n1[1])**2))
+        tt.append(atan2(float(n1[1]),float(n1[0])))
+
+    if (lamb[1] > 1E-6):
+        rr.append(sqrt(float(n2[0])**2 + float(n2[1])**2))
+        tt.append(atan2(float(n2[1]),float(n2[0])))
+
+    if (lamb[2] > 1E-6):
+        rr.append(sqrt(float(n3[0])**2 + float(n3[1])**2))
+        tt.append(atan2(float(n3[1]),float(n3[0])))
+
+    if (lamb[0] > 1E-6):
+        rr.append(sqrt(float(n1[0])**2 + float(n1[1])**2))
+        tt.append(atan2(float(n1[1]),float(n1[0])))
+
+    ax.plot(tt,rr,marker='o',color='black');
+
+ax.plot(0,0,color='white',marker='o');
+
+if args.output_file != "":
+    savefig(args.output_file);
+else:
+    show()
 

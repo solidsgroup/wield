@@ -34,6 +34,13 @@ void Facet2D(Reader::Reader &reader,
 	     int numThreads = 1)
 {
   WIELD_EXCEPTION_TRY;
+  // srand(time(NULL));
+  // for (int i=0;i<25;i++)
+  //   ThetaInRange(360.*(double)rand()/(double)RAND_MAX,
+  // 		 360.*(double)rand()/(double)RAND_MAX,
+  // 		 360.*(double)rand()/(double)RAND_MAX);
+  // exit(0);
+
   
   vector<double> x,y,z,w;
 
@@ -61,11 +68,25 @@ void Facet2D(Reader::Reader &reader,
        z.size() != w.size())
     WIELD_EXCEPTION_NEW("Error reading input file: different x,y,z,w sizes");
   
+  double wMin;
+  Vector3d lambdaMin;
+  Vector3d n1Min, n2Min, n3Min;
   vector<double> r(x.size()), theta(x.size());
   for (int i=0; i<x.size(); i++)
     {
       r[i] = sqrt(x[i]*x[i] + y[i]*y[i]);
-      theta[i] = atan2(y[i],x[i])*180./pi; // get the range to be [0,360)
+      theta[i] = atan2(y[i],x[i])*180./pi; 
+      while (theta[i] >= 0.) theta[i] -= 360.;
+      while (theta[i] < 0.)  theta[i] += 360.;
+      if (fabs(theta[i] - 360.) < 1E-8) theta[i] = 0.;
+      if (r[i] < 1E-6) 
+	{
+	  wMin = w[i];
+	  lambdaMin << 1,0,0;
+	  n1Min << 0,0,1;
+	  n2Min << 0,0,0;
+	  n3Min << 0,0,0;
+	}
     }
 
   
@@ -84,7 +105,11 @@ void Facet2D(Reader::Reader &reader,
       args[i].w = &w;
       args[i].r = &r;
       args[i].theta = &theta;
-
+      args[i].wMin = wMin;
+      args[i].lambdaMin = lambdaMin;
+      args[i].n1Min = n1Min;
+      args[i].n1Min = n2Min;
+      args[i].n1Min = n3Min;
       errorCode = pthread_create(&threads[i], NULL, Wield::Optimization::Convexify2D<3>, (void*)(&args[i]));
       if (errorCode)
 	WIELD_EXCEPTION_NEW("Error starting thread #" << i << ": errorCode = " << errorCode);
@@ -97,8 +122,7 @@ void Facet2D(Reader::Reader &reader,
 	WIELD_EXCEPTION_NEW("Error joining thread #" << i << ": errorCode = " << errorCode);
     }
 
-  double wMin = INFINITY;
-  Eigen::Vector3d lambdaMin, n1Min, n2Min, n3Min;
+  wMin = INFINITY;
   Matrix3d nMin;
   for (int i=0; i<numThreads; i++)
     {
