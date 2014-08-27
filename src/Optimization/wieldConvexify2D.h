@@ -127,7 +127,7 @@ void *Convexify2D<3>(void *args)
   //wMin = INFINITY;
   // Vector3d lambdaMin;
   // Vector3d n1Min, n2Min, n3Min;
-
+  Vector3d lambda;
   Matrix3d n;
   for (int i =0; i < x.size(); i++) 
     {
@@ -144,6 +144,15 @@ void *Convexify2D<3>(void *args)
 	    n1Min = n1;
 	    n2Min << 0,0,0;
 	    n3Min << 0,0,0;
+
+	    if (index==0)
+	      {
+		cout << endl << WIELD_COLOR_B_ON << "Facet 1" << WIELD_COLOR_RESET << endl;
+		cout << WIELD_COLOR_FG_YELLOW << wMin << WIELD_COLOR_RESET << endl;
+		cout << WIELD_COLOR_FG_RED << lambdaMin.transpose() << WIELD_COLOR_RESET << endl;
+		cout << WIELD_COLOR_FG_BLUE << n << WIELD_COLOR_RESET << endl;
+	      }
+
 	    continue;
 	  }
 
@@ -170,6 +179,15 @@ void *Convexify2D<3>(void *args)
 		  n1Min = n1;
 		  n2Min = n2;
 		  n3Min << 0,0,0;
+
+		  if (index==0)
+		    {
+		      cout << endl << WIELD_COLOR_B_ON << "Facet 2" << WIELD_COLOR_RESET << endl;
+		      cout << WIELD_COLOR_FG_YELLOW << wMin << WIELD_COLOR_RESET << endl;
+		      cout << WIELD_COLOR_FG_RED << lambdaMin.transpose() << WIELD_COLOR_RESET << endl;
+		      cout << WIELD_COLOR_FG_BLUE << n << WIELD_COLOR_RESET << endl;
+		    }
+
 		  continue;
 		}
 	    }
@@ -224,6 +242,14 @@ void *Convexify2D<3>(void *args)
 		     - e(0)  *n(1,1)*n(2,0))/det;
 		  if (lambda3<0) continue;
 
+
+		  lambda << lambda1 , lambda2 , lambda3;
+		  if ((n*lambda - e).norm() > 1E-8)
+		    WIELD_EXCEPTION_NEW("Linear solve did not work: (n*lambda - e).norm() = " << (n*lambda - e).norm() << endl
+					<< "lambda = " << lambda.transpose() << endl
+					<< "N = " << endl << n.transpose() << endl
+					<< "e = " << e.transpose() << endl)
+
 		  //Eigen::Vector3d lambda(lambda1,lambda2,lambda3);
 
 		  // if ((lambda1*n1 + lambda2*n2 + lambda3*n3 - e).norm() > 1E-5)
@@ -241,6 +267,15 @@ void *Convexify2D<3>(void *args)
 		      n1Min = n1;
 		      n2Min = n2;
 		      n3Min = n3;
+
+		      if (index==0)
+			{
+			  cout << endl << WIELD_COLOR_B_ON << "Facet 3" << WIELD_COLOR_RESET << endl;
+			  cout << WIELD_COLOR_FG_YELLOW << wMin << WIELD_COLOR_RESET << endl;
+			  cout << WIELD_COLOR_FG_RED << lambdaMin.transpose() << WIELD_COLOR_RESET << endl;
+			  cout << WIELD_COLOR_FG_BLUE << n << WIELD_COLOR_RESET << endl;
+			}
+
 		      continue;
 		    }
 
