@@ -42,7 +42,17 @@
 	(reader.Read<Eigen::Vector3d>(STRUCTNAME,"Z"#NUM),		\
 	 reader.Read<Eigen::Vector3d>(STRUCTNAME,"X"#NUM));		\
     }									\
-  else WIELD_EXCEPTION_NEW("Missing two vectors to specify omega"#NUM); 
+  else WIELD_EXCEPTION_NEW("Missing two vectors to specify omega"#NUM); \
+  omega##NUM = omega##NUM *						\
+    createMatrixFromXAngle(reader.Read<double>(STRUCTNAME,		\
+					       "PreThetaRotX"#NUM,	\
+					       0.)) *			\
+    createMatrixFromYAngle(reader.Read<double>(STRUCTNAME,		\
+					       "PreThetaRotY"#NUM,	\
+					       0.)) *			\
+    createMatrixFromZAngle(reader.Read<double>(STRUCTNAME,		\
+					       "PreThetaRotZ"#NUM,	\
+					       0.));			
 
 #define WIELD_IO_READ_PARAMETERS(STRUCTNAME)				\
   double a,b,stdDev;							\
