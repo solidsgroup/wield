@@ -20,6 +20,7 @@
 #include <csignal>
 
 #include "tclap/CmdLine.h"
+#include "TCLAP/IgnoreArg.h"
 #include "Reader.h"
 
 #include "Main/wieldVisualizeOR.h"
@@ -60,7 +61,8 @@ int main(int argc, char* argv[])
   TCLAP::CmdLine cmd("(W)eak approximation of (I)nterface (E)nergy for bicrysta(L) boun(D)aries");
   TCLAP::SwitchArg switchDynamicPlot("p", "dynamic-plot", "Show real-time VTK plot of energy", cmd, false);
   TCLAP::ValueArg<int> valueNumThreads("n", "num-threads", "Number of pthreads to use",false,1,"", cmd);
-  TCLAP::UnlabeledValueArg<string> argFileName("name", "Path to input file", true, "", "inputfile", cmd);
+  TCLAP::IgnoreArg testIgnoreArg("D","User defined variables","",cmd);
+  TCLAP::UnlabeledValueArg<string> argFileName("name", "Path to input file", false, "", "inputfile", cmd);
   cmd.parse(argc, argv);
   bool dynamicPlot = switchDynamicPlot.getValue();
   int numThreads = valueNumThreads.getValue();
@@ -71,21 +73,25 @@ int main(int argc, char* argv[])
   // 
 
   // Create reader
-  Reader::Reader reader(fileName, argc, argv, "$", "#", "...");
+  Reader::Reader *rabbit;
+  if (fileName == "")
+    rabbit = new Reader::Reader(argc,argv,"$","#","...");
+  else 
+    rabbit = new Reader::Reader(fileName, argc, argv, "$", "#", "...");
   
-  if (reader.Find("VisualizeOR"))
-    Wield::Main::VisualizeOR(reader, dynamicPlot);
-  if (reader.Find("GammaOR1D"))
-    Wield::Main::GammaOR1D(reader, dynamicPlot);
-  if (reader.Find("GammaInterface1D"))
-    Wield::Main::GammaInterface1D(reader, dynamicPlot);
-  if (reader.Find("GammaSurfaceSphere"))
-    Wield::Main::GammaSurfaceSphere(reader, dynamicPlot, numThreads); 
-  if (reader.Find("Facet2D"))
-    Wield::Main::Facet2D(reader,numThreads); 
+  if (rabbit->Find("VisualizeOR"))
+    Wield::Main::VisualizeOR(*rabbit, dynamicPlot);
+  if (rabbit->Find("GammaOR1D"))
+    Wield::Main::GammaOR1D(*rabbit, dynamicPlot);
+  if (rabbit->Find("GammaInterface1D"))
+    Wield::Main::GammaInterface1D(*rabbit, dynamicPlot);
+  if (rabbit->Find("GammaSurfaceSphere"))
+    Wield::Main::GammaSurfaceSphere(*rabbit, dynamicPlot, numThreads); 
+  if (rabbit->Find("Facet2D"))
+    Wield::Main::Facet2D(*rabbit,numThreads); 
 
   // WARN ABOUT UNUSED VARIABLES
-  reader.PrintUnusedVariableWarnings();
+  rabbit->PrintUnusedVariableWarnings();
 
   WIELD_EXCEPTION_CATCH_FINAL;
 }

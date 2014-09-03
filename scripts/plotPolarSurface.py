@@ -1,9 +1,9 @@
-#!/bin/python
+#!python
 import argparse
 from math import atan2
 from numpy import loadtxt, linspace, meshgrid, arctan2, pi, radians,degrees,concatenate,cos,sin,sqrt
 from scipy.interpolate import griddata, interp2d
-from pylab import subplots,contourf,pcolor,figure,draw,ginput,show,colorbar,pcolormesh,savefig,plot,ion,pause,clf
+from pylab import subplots,contourf,pcolor,figure,draw,ginput,show,colorbar,pcolormesh,savefig,plot,ion,pause,clf,xlim,tight_layout
 from fractional_polar_axes import *
 import sys
 
@@ -41,10 +41,12 @@ thetagrid = linspace(float(args.theta_limit[0]),float(args.theta_limit[1]),args.
 rgrid, thetagrid = meshgrid(rgrid,thetagrid)
 wgrid   = griddata((x,y),w,(rgrid*cos(radians(thetagrid)),rgrid*sin(radians(thetagrid))),fill_value=0,method=args.method);
 
+
 if float(args.theta_limit[1])-float(args.theta_limit[0]) > 180:
     fig,ax = subplots(ncols=1,subplot_kw=dict(projection='polar'))
     ax.xaxis.set_ticklabels([])
     ax.yaxis.set_ticklabels([])
+    ax.set_xlim(0,1);
     pc = pcolormesh(radians(thetagrid),rgrid,wgrid,shading='gouraud');
     #pc = ax.pcolormesh(radians(thetagrid),rgrid,wgrid);
     colorbar(pc)
@@ -68,6 +70,7 @@ if float(args.n1[0])**2 + float(args.n1[1])**2 <= 1:
     rr.append(sqrt(float(args.n1[0])**2 + float(args.n1[1])**2))
     tt.append(atan2(float(args.n1[1]),float(args.n1[0])))
     plot(tt,rr,marker='o');
+    xlim(0,1);
 
 if args.facet_file != "":
     rr = []; tt = []; lamb = []
@@ -101,6 +104,7 @@ if args.facet_file != "":
         tt.append(atan2(float(n1[1]),float(n1[0])))
 
     plot(tt,rr,marker='o',color='black');
+    xlim(0,1);
 
 plot(0,0,color='white',marker='o');
 
@@ -108,6 +112,7 @@ if args.output_file != "":
     savefig(args.output_file);
 elif args.interactive:
     ion();
+    tight_layout()
     show(); pause(1);
 
     while True:
@@ -138,6 +143,7 @@ elif args.interactive:
             tt = [pts[0][0],pts[1][0],pts[2][0],pts[0][0]];
             rr = [pts[0][1],pts[1][1],pts[2][1],pts[0][1]];
             plot(tt,rr,marker='o');
+            xlim(0,1);
             show(); pause(1);
             #print(griddata((x,y),w,(cos(pts[0][0])*pts[0][1], sin(pts[0][0])*pts[0][1]),fill_value=0,method=args.method));
     show()

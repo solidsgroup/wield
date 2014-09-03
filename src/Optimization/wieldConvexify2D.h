@@ -118,7 +118,6 @@ void *Convexify2D<3>(void *args)
   Eigen::Vector3d &n2Min     =   ((ConvexifyData2D<3> *)(args))->n2Min;
   Eigen::Vector3d &n3Min     =   ((ConvexifyData2D<3> *)(args))->n3Min;
 
-
   if (x.size() != y.size() || y.size() != z.size() || z.size() != w.size())
     WIELD_EXCEPTION_NEW("x, y, z, w not the same size: x.size()=" <<x.size() << ", y.size()="<<y.size() << ", z.size()="<<z.size()<<", w.size() =" << w.size());
 
@@ -258,7 +257,7 @@ void *Convexify2D<3>(void *args)
 		  //if (lambda[0] < 0 || lambda[1] < 0 || lambda[2] < 0) continue;
 
 
-		  double wCurrent = lambda1*w[i] + lambda1*w[j] + lambda2*w[k];
+		  double wCurrent = lambda1*w[i] + lambda2*w[j] + lambda3*w[k];
 
 		  if (wCurrent < wMin)
 		    {
