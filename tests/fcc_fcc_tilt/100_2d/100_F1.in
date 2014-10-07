@@ -1,0 +1,22 @@
+$Crystal1 {
+    include ../fcc.in
+}
+
+$Crystal2 {
+    include ../fcc.in
+}
+
+$GammaOR1D {
+    include ../constants.in
+    $Tolerance 1E-2
+    $X1 0 0 1
+    $Z1 -1 1 0
+    $X2 0 0 1
+    $Z2 -1 1 0
+    $ThetaRotX1 0.5
+    $ThetaRotX2 -0.5
+    $ThetaMin 0
+    $ThetaMax 90
+    $DTheta 1
+    $Distribution cauchy
+}

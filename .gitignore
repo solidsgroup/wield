@@ -1,3 +1,5 @@
+*.dat
+*.png
 bin
 old
 tests/OLD*

@@ -1,0 +1,23 @@
+$Crystal1 {
+    include ../fcc.in
+}
+
+$Crystal2 {
+    include ../fcc.in
+}
+
+$GammaOR1D {
+    include ../constants.in
+    $Tolerance 1E-2
+    $Z1 1 0 0 
+    $Z2 1 0 0
+    $X1 0 1 0
+    $X2 0 1 0
+    $Tolerance 1E-2
+    $ThetaRotZ1 0.5
+    $ThetaRotZ2 -0.5
+    $ThetaMin 0
+    $ThetaMax 90
+    $DTheta 5
+    $OutFile outfiles/F1.dat
+}

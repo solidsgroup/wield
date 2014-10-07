@@ -1,0 +1,21 @@
+$Crystal1 {
+    include ../fcc.in
+}
+
+$Crystal2 {
+    include ../fcc.in
+}
+
+$GammaSurfaceSphere {
+    include ../constants.in
+    $Tolerance 1E-2
+    $Z1 1 1 1
+    $Z2 1 1 1
+    $X1 1 -1 0
+    $X2 1 -1 0
+    $Tolerance 1E-2
+    $RResolution 40
+    $AzimuthMin 0
+    $AzimuthMax 360
+    $AzimuthResolution 120
+}

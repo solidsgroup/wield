@@ -1,0 +1,21 @@
+$Crystal1 {
+    include ../fcc.in
+}
+
+$Crystal2 {
+    include ../fcc.in
+}
+
+$GammaInterface1D {
+    # All modes
+    include ../constants.in
+    $Tolerance 1E-2
+    $X1 1 -1 0
+    $X2 1 -1 0
+    $Z1 1 1 -1
+    $Z2 1 1 1
+    $PhiMin 0
+    $PhiMax 90
+    $DPhi 0.25
+    $PhiRotX 1.
+}
