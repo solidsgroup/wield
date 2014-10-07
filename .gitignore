@@ -6,3 +6,6 @@ tests/OLD*
 obj
 .make.local
 tests/fcc_atgb_112
+scratch
+*.dat
+*.bvox

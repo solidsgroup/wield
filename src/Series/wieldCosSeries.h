@@ -178,6 +178,23 @@ public:
     out.close();
   }
 
+  double EvaluateAt(double x, double y, double z)
+  {
+    WIELD_EXCEPTION_TRY;
+    double phi = 0;
+    for (int l=0; l<order; l++)
+      for (int m=0; m<order; m++)
+	for (int n=0; n<order; n++)
+	  phi += 
+	    (*this)(l,m,n) *
+	    cos(l*pi*x/alpha1) *
+	    cos(m*pi*y/alpha2) *
+	    cos(n*pi*z/alpha3);
+    return phi;
+    WIELD_EXCEPTION_CATCH;
+  }
+
+
   unsigned int order; ///< Number of terms in each direction
   double alpha1;      ///< X Lattice coefficient
   double alpha2;      ///< Y Lattice coefficient

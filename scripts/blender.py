@@ -1,13 +1,19 @@
 import bpy
 from numpy import sqrt,linalg
 
+facet4 = False;
+print("-------------------------");
+
 #
 # USER DEFINED VARIABLE REGION
 #
-b  = 0.125;
-n1 = [.4875,.844];   
-n2 = [-.4875,.844];
-n3 = [.0,-0.25];    
+b  = 0.2;
+facet4 = True;
+#n1 = [0.4993,.1622];
+#n2 = [-0.4993,.1622];
+n1 = [-0.35,0];
+n2 = [.35, 0];
+n3 = [0,-.975]
 rep1 = 10;
 rep2 = 10;
 lenX = 12;
@@ -30,11 +36,43 @@ def subtract(a,b):
     return [a[0]-b[0],a[1]-b[1],a[2]-b[2]];
 def multiply(a,alpha):
     return [alpha*a[0],alpha*a[1],alpha*a[2]];
+def dot(a,b):
+    return a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+def norm(a):
+    return sqrt(dot(a,a));
+def cross(a,b):
+    return (a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]);
 def getIntersectionPoint(n1,n2,b):
     A = [[n1[0],n1[1]],[n2[0],n2[1]]];
     B = [b,b];
     X = linalg.solve(A,B);
     return [X[0],X[1],0];
+def addFacet2(i):
+    verts=[];
+    faces=[];
+    d1 = (0,0,b);
+    d2 = cross(n1,d1); 
+    d2 = multiply(d2, 0.5*sqrt(lenX**2 + lenY**2)/norm(d2));
+    d3 = multiply(cross(d1,d2),norm(cross(d1,d2)));
+    d3 = multiply(d3, dot(d1,n1)/dot(d3,n1));
+    d4 = multiply(cross(d1,d2),norm(cross(d1,d2)));
+    d4 = multiply(d4, dot(d1,n2)/dot(d4,n2));
+    offset = multiply(add(d3,multiply(d4,-1)),i/2);
+    verts.append(add(add(offset,multiply(d2,+1.)), add(offset, d1)));
+    verts.append(add(add(offset,multiply(d2,-1.)), add(offset, d1)));
+    verts.append(add(add(offset,multiply(d2,+1.)), add(offset, d3)));
+    verts.append(add(add(offset,multiply(d2,-1.)), add(offset, d3)));
+    verts.append(add(add(offset,multiply(d2,+1.)), add(offset, d4)));
+    verts.append(add(add(offset,multiply(d2,-1.)), add(offset, d4)));
+    faces.append((2,3,1,0));
+    faces.append((0,1,5,4));
+    mesh = bpy.data.meshes.new("facet");
+    object = bpy.data.objects.new("facet",mesh);
+    object.location=bpy.context.scene.cursor_location;
+    bpy.context.scene.objects.link(object);
+    mesh.from_pydata(verts,[],faces);
+    mesh.update(calc_edges=True);
+
 def addFacet(i,j,k):
     verts=[];
     faces=[];
@@ -65,6 +103,35 @@ def addFacet(i,j,k):
     faces.append((4,5,2));
     faces.append((4,1,5));
     #Use vertices and faces to create blender object
+    mesh = bpy.data.meshes.new("facet");
+    object = bpy.data.objects.new("facet",mesh);
+    object.location=bpy.context.scene.cursor_location;
+    bpy.context.scene.objects.link(object);
+    mesh.from_pydata(verts,[],faces);
+    mesh.update(calc_edges=True);
+
+def addFacet4(i,j):
+    verts=[];
+    faces=[];
+    d0 = (0,0,b);
+    d1 = (n1[0],n1[1],0); d1 = multiply(d1,1./norm(d1));
+    d1 = multiply(d1, dot(d0,n1)/dot(d1,n1));
+    d2 = cross(n1,d1);    d2 = multiply(d2,norm(d1)/norm(d2));
+    d3 = multiply(d1,-1.);
+    d4 = multiply(d2,-1.);
+    
+    offset = add(multiply(add(d1,multiply(d3,-1.)),i),multiply(add(d2,multiply(d4,-1.)),j));
+    print(offset);
+    verts.append(add(offset,d0));
+    verts.append(add(offset,add(d1,d2)));
+    verts.append(add(offset,add(d1,d4)));
+    verts.append(add(offset,add(d3,d2)));
+    verts.append(add(offset,add(d3,d4)));
+
+    faces.append((0,2,1));
+    faces.append((0,3,4));
+    faces.append((0,1,3));
+    faces.append((0,4,2));
     mesh = bpy.data.meshes.new("facet");
     object = bpy.data.objects.new("facet",mesh);
     object.location=bpy.context.scene.cursor_location;
@@ -129,20 +196,32 @@ allSelect(True,type='LAMP');
 bpy.ops.object.delete();    
 
 #Generate facets
-for i in range(-rep1,rep1):
-    for j in range(-rep2,rep2):
-        addFacet(i,j,0);
+if abs(norm(cross((n1[0],n1[1],0),(n2[0],n2[1],0)))) < .01:
+    if facet4 == True:
+        for i in range(-rep1,rep1):
+            for j in range(-rep2,rep2):
+                addFacet4(i,j);
+    else:
+        for i in range(-rep1,rep1):
+            addFacet2(i);
+else:
+    for i in range(-rep1,rep1):
+        for j in range(-rep2,rep2):
+            addFacet(i,j,0);
+
 #Merge facets together
 for ob in scene.objects:
     if ob.name[0:5]=='facet' and ob.type=='MESH':
         ob.select=True;
 bpy.context.scene.objects.active = bpy.data.objects["facet"];
 bpy.ops.object.join();
+
 #Remove excess points
 bpy.context.scene.objects.active = bpy.data.objects["facet"];
 bpy.ops.object.mode_set(mode='EDIT');
 bpy.ops.mesh.remove_doubles();
 bpy.ops.object.mode_set(mode='OBJECT');
+
 #Create Box
 addCube(lenX/2,lenY/2,lenZ/2,"bottom");
 selectActive("bottom");
@@ -172,6 +251,7 @@ bpy.ops.object.mode_set(mode='OBJECT');
 #Render settings
 bpy.context.scene.render.use_freestyle = True;
 bpy.context.scene.render.line_thickness = 2.;
+#bpy.ops.scene.freestyle.crease_angle = 28;
 bpy.context.scene.render.resolution_y = bpy.context.scene.render.resolution_x;
 bpy.context.scene.render.alpha_mode = 'TRANSPARENT';
 

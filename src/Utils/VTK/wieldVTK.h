@@ -144,6 +144,7 @@ class PlotLine
 double computeDensityFunction(double x, double y, double z, Wield::Series::CosSeries C)
 {
   WIELD_EXCEPTION_TRY;
+  WIELD_WARNING("This function is depricated, you should really use the one in CosSeries.")
   int order = C.order;
   double alpha1 = C.alpha1;
   double alpha2 = C.alpha2;

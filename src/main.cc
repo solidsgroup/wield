@@ -23,6 +23,7 @@
 #include "TCLAP/IgnoreArg.h"
 #include "Reader.h"
 
+#include "Main/wieldBlenderVoxelData.h"
 #include "Main/wieldVisualizeOR.h"
 #include "Main/wieldGammaSurfaceSphere.h"
 #include "Main/wieldGammaInterface1D.h"
@@ -79,6 +80,8 @@ int main(int argc, char* argv[])
   else 
     rabbit = new Reader::Reader(fileName, argc, argv, "$", "#", "...");
   
+  if (rabbit->Find("BlenderVoxelData"))
+    Wield::Main::BlenderVoxelData(*rabbit);
   if (rabbit->Find("VisualizeOR"))
     Wield::Main::VisualizeOR(*rabbit, dynamicPlot);
   if (rabbit->Find("GammaOR1D"))
