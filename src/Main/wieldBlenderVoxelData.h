@@ -21,7 +21,6 @@
 #include "Utils/wieldEigen.h"
 #include "Series/wieldCosSeries.h"
 #include "Optimization/wieldConvexify1D.h"
-#include "SurfaceIntegrate.h"
 #include "IO/wieldReaderMacros.h"
 
 

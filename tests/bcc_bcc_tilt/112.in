@@ -6,7 +6,7 @@ $Crystal2 {
     include bcc.in
 }
 
-$GammaOR1D {
+$EnergyOR1D {
     include constants.in
     $X1 1 1 2
     $Z1 1 -1 0

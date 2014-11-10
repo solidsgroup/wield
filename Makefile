@@ -11,7 +11,7 @@ include ~/.make.color
 endif
 
 include .make.local #provides CC, additional defines
-CPP_COMPILER_OPTIONS += -c -g3 -ggdb -Wno-deprecated -Wunused-variable
+CPP_COMPILER_OPTIONS += -c -g3 -ggdb -Wno-deprecated -Wunused-variable -DWIELD_USE_VTK
 CPP_LINKER_OPTIONS   += -g3 -ggdb -lpthread -lX11
 
 ifdef EMACS

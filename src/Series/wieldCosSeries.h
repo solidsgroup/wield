@@ -67,6 +67,33 @@ double ComputeGaussCosIntegral(int n, double x0, double sigma, double alpha)
     return ret.real() / (alpha/2.);
 }
 
+double ComputeGaussSinIntegral(int n, double x0, double sigma, double alpha)
+{
+  complex<double> ret(0,0);
+  complex<double> I(0,1);
+  complex<double>
+    firstErfArg (+x0/sigma, 0.5*sigma*n*pi/alpha), //+
+    secondErfArg(-x0/sigma,0.5*sigma*n*pi/alpha),//+
+    thirdErfArg (+(x0-alpha)/sigma, 0.5*sigma*n*pi/alpha), //-
+    fourthErfArg(-(x0-alpha)/sigma, 0.5*sigma*n*pi/alpha); //-
+  complex<double>
+    firstExpArg (-0.25*n*n*pi*pi*sigma*sigma/(alpha*alpha),+x0*n*pi/alpha),
+    secondExpArg(-0.25*n*n*pi*pi*sigma*sigma/(alpha*alpha),-x0*n*pi/alpha),
+    thirdExpArg  = firstExpArg,
+    fourthExpArg = secondExpArg;
+  ret = -0.25 * I * sqrt(pi) * sigma *
+    (+ Faddeeva::erf(firstErfArg)*exp(firstExpArg)
+     + Faddeeva::erf(secondErfArg)*exp(secondExpArg)
+     - Faddeeva::erf(thirdErfArg)*exp(thirdExpArg)
+     - Faddeeva::erf(fourthErfArg)*exp(fourthExpArg));
+  if (fabs(ret.imag()/ret.real()) > 1E-10)
+    WIELD_EXCEPTION_NEW("Fourier series integral returned imaginary part: ret="<<ret<<", n="<<n<<", x0="<<x0<<", alpha="<<alpha);
+  if (n==0)
+    return 0.;
+  else
+    return ret.real() / (alpha/2.);
+}
+
 class CosSeries
 {
 public:

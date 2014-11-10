@@ -1,16 +1,16 @@
 ///
-/// \file SurfaceIntegrate.h
+/// \file Surface.h
 /// \brief Compute the surface integral of two multiplied Fourier series
 ///
-/// The purpose of the SurfaceIntegrate function is to compute the integral of two functions \f$\phi_1,\phi_2\f$ with a measure function \f$g_\varepsilon\f$
+/// The purpose of the Integrator::Surface function is to compute the integral of two functions \f$\phi_1,\phi_2\f$ with a measure function \f$g_\varepsilon\f$
 /// \f[\int_{-\infty}^\infty\int_{-\infty}^\infty \phi_1(\Omega_1\mathbf{x})\phi_2(\Omega_2\mathbf{x})g_\varepsilon(\mathbf{x})dxdy\bigg|_{z=0}\f]
 /// where the functions \f$\Omega_1,\Omega_2\f$ are given by Fourier Cosine series specified in variables C1 and C2. The rotation matrices \f$\Omega_1,\Omega_2\f$ specify the orientation of the crystals. Specifically,
 /// \f[\Omega = \begin{bmatrix}\mathbb{n}_1,\mathbb{n}_1,\mathbb{n}_1\end{bmatrix}\f]
 /// where \f$\mathbb{n}_3\f$ represents the crystallographic direction which is <i>normal</i> to the interface. The vectors \f$\mathbb{n}_1,\mathbb{n}_2\f$ represent the in-plane crystallographic directions. Orthogonality of these vectors is enforced by ensuring that \f$\Omega_1,\Omega_2\in SO(3)\f$
 ///
 
-#ifndef SURFACEINTEGRATE_D
-#define SURFACEINTEGRATE_D
+#ifndef WIELD_INTEGRATOR_SURFACE_D
+#define WIELD_INTEGRATOR_SURFACE_D
 #include <iostream>
 #include <math.h>
 
@@ -25,13 +25,17 @@ using namespace std;
 
 
 
-double SurfaceIntegrate(Wield::Series::CosSeries C1, 
-			Matrix3d R1,
-			Wield::Series::CosSeries C2, 
-			Matrix3d R2,
-			double epsilon, 
-			double tolerance = 0, 
-			string distribution = "cauchy")
+namespace Wield
+{
+namespace Integrator
+{
+double Surface(Wield::Series::CosSeries C1, 
+	       Matrix3d R1,
+	       Wield::Series::CosSeries C2, 
+	       Matrix3d R2,
+	       double epsilon, 
+	       double tolerance = 0, 
+	       string distribution = "cauchy")
 {
   WIELD_EXCEPTION_TRY;
   int type; 
@@ -101,5 +105,6 @@ double SurfaceIntegrate(Wield::Series::CosSeries C1,
   //return S * (epsilon * sqrt(pi)) * (epsilon * sqrt(pi));
   WIELD_EXCEPTION_CATCH;
 }
-
+}
+}
 #endif //SURFACEINTEGRATE_D

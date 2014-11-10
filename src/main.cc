@@ -25,21 +25,11 @@
 
 #include "Main/wieldBlenderVoxelData.h"
 #include "Main/wieldVisualizeOR.h"
-#include "Main/wieldGammaSurfaceSphere.h"
-#include "Main/wieldGammaInterface1D.h"
-#include "Main/wieldGammaOR1D.h"
+#include "Main/wieldEnergySurfaceSphere.h"
+#include "Main/wieldEnergyInterface1D.h"
+#include "Main/wieldEnergyOR1D.h"
 #include "Main/wieldFacet2D.h"
 #include "Utils/wieldExceptions.h"
-#include "Utils/wieldColor.h"
-#include "Utils/wieldTypes.h"
-#include "Utils/wieldRotations.h"
-#include "Utils/VTK/wieldVTK.h"
-#include "Utils/wieldProgress.h"
-#include "Utils/wieldEigen.h"
-#include "Series/wieldCosSeries.h"
-#include "Optimization/wieldConvexify1D.h"
-#include "SurfaceIntegrate.h"
-//#include "IO/wieldReaderMacros.h"
 
 using namespace std;
 
@@ -84,12 +74,12 @@ int main(int argc, char* argv[])
     Wield::Main::BlenderVoxelData(*rabbit);
   if (rabbit->Find("VisualizeOR"))
     Wield::Main::VisualizeOR(*rabbit, dynamicPlot);
-  if (rabbit->Find("GammaOR1D"))
-    Wield::Main::GammaOR1D(*rabbit, dynamicPlot);
-  if (rabbit->Find("GammaInterface1D"))
-    Wield::Main::GammaInterface1D(*rabbit, dynamicPlot);
-  if (rabbit->Find("GammaSurfaceSphere"))
-    Wield::Main::GammaSurfaceSphere(*rabbit, dynamicPlot, numThreads); 
+  if (rabbit->Find("EnergyOR1D"))
+    Wield::Main::EnergyOR1D(*rabbit, dynamicPlot);
+  if (rabbit->Find("EnergyInterface1D"))
+    Wield::Main::EnergyInterface1D(*rabbit, dynamicPlot);
+  if (rabbit->Find("EnergySurfaceSphere"))
+    Wield::Main::EnergySurfaceSphere(*rabbit, dynamicPlot, numThreads); 
   if (rabbit->Find("Facet2D"))
     Wield::Main::Facet2D(*rabbit,numThreads); 
 

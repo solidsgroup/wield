@@ -1,6 +1,6 @@
 #!/usr/bin/python
 import os
-os.system("../../../bin/main 1-10_F1.in -DGammaInterface1D.OutFile=outfiles/F1.dat")
+os.system("../../../bin/main 1-10_F1.in -DEnergyInterface1D.OutFile=outfiles/F1.dat")
 for theta in range(0,91,5):
     print ("theta="+str(theta));
-    os.system("../../../bin/main 1-10_F2.in -n 8 -- -DGammaSurfaceSphere.PrePhiRotX="+str(theta)+" -DGammaSurfaceSphere.OutFile=outfiles/F2_"+str(theta)+".dat")
+    os.system("../../../bin/main 1-10_F2.in -n 8 -- -DEnergySurfaceSphere.PrePhiRotX="+str(theta)+" -DEnergySurfaceSphere.OutFile=outfiles/F2_"+str(theta)+".dat")

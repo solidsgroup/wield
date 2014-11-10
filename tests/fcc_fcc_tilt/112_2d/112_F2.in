@@ -6,7 +6,7 @@ $Crystal2 {
     include ../fcc.in
 }
 
-$GammaSurfaceSphere {
+$EnergySurfaceSphere {
     include ../constants.in
     $Tolerance 1E-2
     $X1 1 1 2
