@@ -19,7 +19,7 @@
 #include "Utils/wieldEigen.h"
 #include "Series/wieldCosSeries.h"
 #include "Optimization/wieldConvexify1D.h"
-#include "Integrator/Surface.h"
+#include "Integrator/wieldSurface.h"
 #include "IO/wieldReaderMacros.h"
 #ifdef WIELD_USE_VTK
 #include "Utils/VTK/wieldVTK.h"

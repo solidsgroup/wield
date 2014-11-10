@@ -1,5 +1,5 @@
 ///
-/// \file Surface.h
+/// \file wieldSurface.h
 /// \brief Compute the surface integral of two multiplied Fourier series
 ///
 /// The purpose of the Integrator::Surface function is to compute the integral of two functions \f$\phi_1,\phi_2\f$ with a measure function \f$g_\varepsilon\f$

@@ -34,7 +34,7 @@
 #include "Utils/wieldRotations.h"
 #include "Utils/wieldExceptions.h"
 #include "Utils/wieldProgress.h"
-#include "Integrator/Surface.h"
+#include "Integrator/wieldSurface.h"
 #include "IO/wieldReaderMacros.h"
 
 #include "Reader.h"

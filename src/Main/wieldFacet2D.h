@@ -20,7 +20,7 @@
 #include "Utils/wieldEigen.h"
 #include "Series/wieldCosSeries.h"
 #include "Optimization/wieldConvexify2D.h"
-#include "Integrator/Surface.h"
+#include "Integrator/wieldSurface.h"
 #include "IO/wieldReaderMacros.h"
 
 

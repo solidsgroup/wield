@@ -4,7 +4,7 @@
 /// 
 
 ///
-/// \file main.cpp
+/// @file main.cpp
 /// \brief This is the short description for main.cpp
 ///
 /// This is the long description for main.cpp
