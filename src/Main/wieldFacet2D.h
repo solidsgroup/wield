@@ -46,6 +46,9 @@ void Facet2D(Reader::Reader &reader,
 
   string dataFile          = reader.Read<string>("Facet2D", "DataFile");
   int maxFacetOrder        = reader.Read<int>("Facet2D", "MaxFacetOrder", 3);
+  double D1                = reader.Read<double>("Facet2D", "D1",  0.);
+  double D2                = reader.Read<double>("Facet2D", "D2",  1.);
+  double D3                = reader.Read<double>("Facet2D", "D3",  1.);
 
   ifstream in(dataFile.c_str());
   if (!in)
@@ -60,7 +63,7 @@ void Facet2D(Reader::Reader &reader,
 	  if (i==0) x.push_back(atof(token.c_str()));
 	  if (i==1) y.push_back(atof(token.c_str()));
 	  if (i==2) z.push_back(atof(token.c_str()));
-	  if (i==3) w.push_back(atof(token.c_str()));
+	  if (i==3) w.push_back(D2*(D1 + D3*atof(token.c_str())));
 	}
     }
   if ( x.size() != y.size() ||
@@ -68,9 +71,18 @@ void Facet2D(Reader::Reader &reader,
        z.size() != w.size())
     WIELD_EXCEPTION_NEW("Error reading input file: different x,y,z,w sizes");
   
+  //
+  // Containers for global minimum values
+  //
+
   double wMin;
   Vector3d lambdaMin;
   Vector3d n1Min, n2Min, n3Min;
+
+  // 
+  // Compute r, theta arrays and 
+  // Store default minimum value (planar case)
+  //
   vector<double> r(x.size()), theta(x.size());
   for (int i=0; i<x.size(); i++)
     {
@@ -90,12 +102,37 @@ void Facet2D(Reader::Reader &reader,
     }
 
   
+  //
+  // Special case: does the user have "a good guess"?
+  //
+
+  double searchRadius;
+  if (reader.Find("Facet2D","N1Guess"))
+    {
+      n1Min         = reader.Read<Vector3d>("Facet2D","N1Guess");
+      n2Min         = reader.Read<Vector3d>("Facet2D","N2Guess");
+      n3Min         = reader.Read<Vector3d>("Facet2D","N3Guess");
+      searchRadius  = reader.Read<double>("Facet2D", "SearchRadius");
+    }
+  else
+    {
+      n1Min << 0,0,1;
+      n2Min << 0,0,1;
+      n3Min << 0,0,1;
+      searchRadius  = 2.;
+    }
+
+  //
+  // Create threading machinery
+  //
+
   pthread_t threads[numThreads];
   int errorCode;
   Wield::Optimization::ConvexifyData2D<3> *args =
     (Wield::Optimization::ConvexifyData2D<3> *)malloc(numThreads * sizeof(Wield::Optimization::ConvexifyData2D<3>));
   for (int i=0; i<numThreads; i++)
     {
+      // Store values
       args[i].index = i;
       args[i].numThreads = numThreads;
       args[i].maxFacetOrder = maxFacetOrder;
@@ -108,24 +145,25 @@ void Facet2D(Reader::Reader &reader,
       args[i].wMin = wMin;
       args[i].lambdaMin = lambdaMin;
       args[i].n1Min = n1Min;
-      args[i].n1Min = n2Min;
-      args[i].n1Min = n3Min;
+      args[i].n2Min = n2Min;
+      args[i].n3Min = n3Min;
+      args[i].coarsen = 1; 
+      args[i].refining = 1; //boolean
+      args[i].searchRadius = searchRadius;
+
+      // Off to the races
       errorCode = pthread_create(&threads[i], NULL, Wield::Optimization::Convexify2D<3>, (void*)(&args[i]));
       if (errorCode)
 	WIELD_EXCEPTION_NEW("Error starting thread #" << i << ": errorCode = " << errorCode);
-    }
-
-  for (int i=0; i<numThreads; i++)
-    {
-      errorCode = pthread_join(threads[i],NULL);
-      if (errorCode)
-	WIELD_EXCEPTION_NEW("Error joining thread #" << i << ": errorCode = " << errorCode);
-    }
+    }  
 
   wMin = INFINITY;
   Matrix3d nMin;
   for (int i=0; i<numThreads; i++)
     {
+      errorCode = pthread_join(threads[i],NULL);
+      if (errorCode)
+	WIELD_EXCEPTION_NEW("Error joinng thread #" << i << ": errorCode = " << errorCode);
       if (args[i].wMin < wMin)
 	{
 	  wMin = args[i].wMin;
@@ -135,12 +173,6 @@ void Facet2D(Reader::Reader &reader,
 	  nMin.col(2) = args[i].n3Min;
 	}
     }
-  
-  
-  cout << WIELD_COLOR_FG_YELLOW << wMin << WIELD_COLOR_RESET << endl;
-  cout << WIELD_COLOR_FG_RED << lambdaMin.transpose() << WIELD_COLOR_RESET << endl;
-  cout << WIELD_COLOR_FG_BLUE << nMin << WIELD_COLOR_RESET << endl;
-
   if (reader.Find("Facet2D","OutFile"))
     {
       string outFile = reader.Read<string>("Facet2D", "OutFile");
@@ -151,9 +183,11 @@ void Facet2D(Reader::Reader &reader,
       out << nMin << endl;
       out.close();
     }
+
   WIELD_EXCEPTION_CATCH_FINAL;
 }
 }
 }
+
 
 #endif

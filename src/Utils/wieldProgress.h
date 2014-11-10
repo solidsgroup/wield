@@ -24,7 +24,7 @@
     cout.width(5);							\
     cout << right;							\
     if ((int)(100*p) >= 100) cout << 100;				\
-    else cout << (int)(100*(float)(CURRENT+DD)/(float)(TOTAL));		\
+    else cout << (int)(100*p);						\
     cout << "% " << flush;						\
     cout << WIELD_COLOR_RESET;						\
   }

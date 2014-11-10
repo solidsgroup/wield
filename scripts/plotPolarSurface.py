@@ -3,7 +3,7 @@ import argparse
 from math import atan2
 from numpy import loadtxt, linspace, meshgrid, arctan2, pi, radians,degrees,concatenate,cos,sin,sqrt
 from scipy.interpolate import griddata, interp2d
-from pylab import subplots,contourf,pcolor,figure,draw,ginput,show,colorbar,pcolormesh,savefig,plot,ion,pause,clf,xlim,tight_layout,xticks,yticks
+from pylab import subplots,contourf,pcolor,figure,draw,ginput,show,colorbar,pcolormesh,savefig,plot,ion,pause,clf,xlim,tight_layout,xticks,yticks,set_cmap,get_cmap
 from fractional_polar_axes import *
 import sys
 
@@ -31,6 +31,7 @@ parser.add_argument('--tick-labels',nargs='*',default=[]);
 parser.add_argument('--center-tick-label',default='');
 parser.add_argument('-cmin', '--cmin', default=0,help='Colorbar minimum value');
 parser.add_argument('-cmax','--cmax', default=0,help='Colorbar maximum value');
+parser.add_argument('-cmap','--cmap', default='jet',help='(jet,gray,binary) See http://wiki.scipy.org/Cookbook/Matplotlib/Show_colormaps for other values');
 args=parser.parse_args();
 
 if (len(args.tick_locs) != len(args.tick_labels)):
@@ -61,7 +62,7 @@ fig,ax = subplots(ncols=1,subplot_kw=dict(projection='polar'))
 ax.xaxis.set_ticklabels([])
 ax.yaxis.set_ticklabels([])
 ax.set_xlim(0,1);
-pc = pcolormesh(radians(thetagrid),rgrid,wgrid,shading='gouraud');
+pc = pcolormesh(radians(thetagrid),rgrid,wgrid,shading='gouraud',cmap=get_cmap(args.cmap));
 if (len(args.tick_locs) > 0):
     cb = colorbar(pc,pad=0.2,shrink=.8);
 else:

@@ -33,25 +33,23 @@ bool ThetaInRange(double theta, double theta1, double theta2)
   if (theta1 < 0 || theta1 >= 360.) WIELD_EXCEPTION_NEW("Invalid theta1 = " << theta1);
   if (theta2 < 0 || theta2 >= 360.) WIELD_EXCEPTION_NEW("Invalid theta2 = " << theta2);
  
-  //cout << "theta1=" << theta1 << "\ttheta2=" << theta2 << "\ttheta=" << theta << endl;
   if (theta1 > 180) theta1 -= 180.;
   else theta1 += 180.;
   if (theta2 > 180) theta2 -= 180.;
   else theta2 += 180.;
 
-  //cout << "theta1=" << theta1 << "\ttheta2=" << theta2 << "\ttheta=" << theta << endl;
   if (fabs(theta2-theta1) < 180)
     {
       
-      if (theta2 >= theta && theta >= theta1) return true;//{cout << " ---> yes" << endl; return true;}
-      if (theta1 >= theta && theta >= theta2) return true;//{cout << " ---> yes" << endl; return true;}
+      if (theta2 >= theta && theta >= theta1) return true;
+      if (theta1 >= theta && theta >= theta2) return true;
     }
   else
     {
-      if (theta < theta1 && theta < theta2) return true;//{cout << " ---> yes" << endl; return true;}
-      if (theta > theta1 && theta > theta2) return true;//{cout << " ---> yes" << endl; return true;}
+      if (theta < theta1 && theta < theta2) return true;
+      if (theta > theta1 && theta > theta2) return true;
     }
-  //cout << " ---> no" << endl;
+
   return false;
   WIELD_EXCEPTION_CATCH;
 }
@@ -92,6 +90,9 @@ struct ConvexifyData2D<3>
   Eigen::Vector3d n1Min;
   Eigen::Vector3d n2Min;
   Eigen::Vector3d n3Min;
+  int coarsen;
+  double searchRadius;
+  int refining;
 };
 
 
@@ -117,22 +118,28 @@ void *Convexify2D<3>(void *args)
   Eigen::Vector3d &n1Min     =   ((ConvexifyData2D<3> *)(args))->n1Min;
   Eigen::Vector3d &n2Min     =   ((ConvexifyData2D<3> *)(args))->n2Min;
   Eigen::Vector3d &n3Min     =   ((ConvexifyData2D<3> *)(args))->n3Min;
+  int coarsen                =   ((ConvexifyData2D<3> *)(args))->coarsen;
+  double searchRadius        =   ((ConvexifyData2D<3> *)(args))->searchRadius;
+  int refining               =   ((ConvexifyData2D<3> *)(args))->refining;
+  
+  Eigen::Vector3d n1MinOld=n1Min, n2MinOld=n2Min, n3MinOld=n3Min;
 
   if (x.size() != y.size() || y.size() != z.size() || z.size() != w.size())
     WIELD_EXCEPTION_NEW("x, y, z, w not the same size: x.size()=" <<x.size() << ", y.size()="<<y.size() << ", z.size()="<<z.size()<<", w.size() =" << w.size());
 
   Eigen::Vector3d e; e << 0, 0, 1; 
 
-  //wMin = INFINITY;
-  // Vector3d lambdaMin;
-  // Vector3d n1Min, n2Min, n3Min;
   Vector3d lambda;
   Matrix3d n;
   for (int i =0; i < x.size(); i++) 
     {
-      if ( i%numThreads != index ) continue;
-      
       Eigen::Vector3d n1(x[i], y[i], z[i]);
+
+      if ( i%coarsen != 0 ) continue;
+      if ( i%numThreads != index ) continue;
+      if (refining) if (sqrt((n1MinOld[0]-n1[0])*(n1MinOld[0]-n1[0]) + (n1MinOld[1]-n1[1])*(n1MinOld[1]-n1[1])) > searchRadius) continue;
+		      //{cout << "n1MinOld = " << n1MinOld.transpose() << endl;cout << "n1 = " << n1.transpose() << endl;exit(0);}
+
       n.col(0) = n1;
 
       if (fabs(r[i])<1E-5)
@@ -144,22 +151,19 @@ void *Convexify2D<3>(void *args)
 	    n2Min << 0,0,0;
 	    n3Min << 0,0,0;
 
-	    if (index==0)
-	      {
-		cout << endl << WIELD_COLOR_B_ON << "Facet 1" << WIELD_COLOR_RESET << endl;
-		cout << WIELD_COLOR_FG_YELLOW << wMin << WIELD_COLOR_RESET << endl;
-		cout << WIELD_COLOR_FG_RED << lambdaMin.transpose() << WIELD_COLOR_RESET << endl;
-		cout << WIELD_COLOR_FG_BLUE << n << WIELD_COLOR_RESET << endl;
-	      }
-
 	    continue;
 	  }
 
       for (int j =i+1; j < x.size(); j++) 
 	{
-	  if (r[j] < 1E-8) continue;
-
 	  Eigen::Vector3d n2(x[j], y[j], z[j]);
+
+	  if ( j%coarsen != 0 ) continue;
+	  if (r[j] < 1E-8) continue;
+	  if (refining) if (sqrt((n2MinOld[0]-n2[0])*(n2MinOld[0]-n2[0]) + (n2MinOld[1]-n2[1])*(n2MinOld[1]-n2[1])) > searchRadius) continue;
+			  //{ cout << "n2MinOld = " << n2MinOld.transpose() << endl;cout << "n2 = " << n2.transpose() << endl;exit(0);}
+
+
 	  n.col(1) = n2;
 	  
 	  if (PolarOpposites(theta[i],theta[j]))
@@ -179,14 +183,6 @@ void *Convexify2D<3>(void *args)
 		  n2Min = n2;
 		  n3Min << 0,0,0;
 
-		  if (index==0)
-		    {
-		      cout << endl << WIELD_COLOR_B_ON << "Facet 2" << WIELD_COLOR_RESET << endl;
-		      cout << WIELD_COLOR_FG_YELLOW << wMin << WIELD_COLOR_RESET << endl;
-		      cout << WIELD_COLOR_FG_RED << lambdaMin.transpose() << WIELD_COLOR_RESET << endl;
-		      cout << WIELD_COLOR_FG_BLUE << n << WIELD_COLOR_RESET << endl;
-		    }
-
 		  continue;
 		}
 	    }
@@ -194,14 +190,16 @@ void *Convexify2D<3>(void *args)
 	    {
 	      for (int k = j+1; k < x.size(); k++) 
 		{
-		  //if (!ThetaInRange(theta[k],theta[i]+180,theta[j]+180)) continue;
+		  Eigen::Vector3d n3(x[k], y[k], z[k]);
+		  if ( k%coarsen != 0 ) continue;
 		  if (r[k] < 1E-8) continue;
+		  if (refining) if (sqrt((n3MinOld[0]-n3[0])*(n3MinOld[0]-n3[0]) + (n3MinOld[1]-n3[1])*(n3MinOld[1]-n3[1])) > searchRadius) continue;
+				  //{cout << "n3MinOld = " << n3MinOld.transpose() << endl;cout << "n3 = " << n3.transpose() << endl;exit(0);}
+
+		  //if (refining) if ((n3-n3MinOld).norm() > searchRadius) {cout << "norm3" << endl;continue;}
 		  if (!ThetaInRange(theta[k],theta[i],theta[j])) continue;
 		  if (PolarOpposites(theta[i],theta[k]) || PolarOpposites(theta[j],theta[k])) continue; // 2d faceting, will get caught later
 		  if (w[i]>wMin && w[j]>wMin && w[k]>wMin) continue;
-
-
-		  Eigen::Vector3d n3(x[k], y[k], z[k]);
 		  
 		  n.col(2) = n3;
 
@@ -249,14 +247,6 @@ void *Convexify2D<3>(void *args)
 					<< "N = " << endl << n.transpose() << endl
 					<< "e = " << e.transpose() << endl)
 
-		  //Eigen::Vector3d lambda(lambda1,lambda2,lambda3);
-
-		  // if ((lambda1*n1 + lambda2*n2 + lambda3*n3 - e).norm() > 1E-5)
-		  //   cout << "Error in matrix solve" << endl;
-
-		  //if (lambda[0] < 0 || lambda[1] < 0 || lambda[2] < 0) continue;
-
-
 		  double wCurrent = lambda1*w[i] + lambda2*w[j] + lambda3*w[k];
 
 		  if (wCurrent < wMin)
@@ -267,14 +257,6 @@ void *Convexify2D<3>(void *args)
 		      n2Min = n2;
 		      n3Min = n3;
 
-		      if (index==0)
-			{
-			  cout << endl << WIELD_COLOR_B_ON << "Facet 3" << WIELD_COLOR_RESET << endl;
-			  cout << WIELD_COLOR_FG_YELLOW << wMin << WIELD_COLOR_RESET << endl;
-			  cout << WIELD_COLOR_FG_RED << lambdaMin.transpose() << WIELD_COLOR_RESET << endl;
-			  cout << WIELD_COLOR_FG_BLUE << n << WIELD_COLOR_RESET << endl;
-			}
-
 		      continue;
 		    }
 
@@ -283,8 +265,7 @@ void *Convexify2D<3>(void *args)
 	}
       if (index == 0) WIELD_PROGRESS("Faceting", i, x.size(), 1);
     }
-  if (index == 0) cout << endl;
-
+  if (index == 0) {WIELD_PROGRESS("Faceting", x.size(), x.size(), 1); cout << endl;}
   pthread_exit(args);
   return NULL;
   WIELD_EXCEPTION_CATCH;
