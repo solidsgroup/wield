@@ -1,3 +1,33 @@
+///
+/// \page MainInterface1D EnergyInterface1D
+///
+/// Description
+/// -----------
+/// An interface with an orientation relationship is considered.
+/// A free variable, phi, is given a range and resolution, and parameterizes a rotation of the interface about a specified axis.
+/// The resultant energy plot is convexified and the result, if desired, is printed to a file.
+///
+/// Input file options
+/// ------------------
+///   - \b *Crystal1: Parameters for the upper crystal
+///   - \b *Crystal2: Parameters for the lower crystal
+///   - \b EnergySurfaceSphere: 
+///     - *(\b X1,\b Y1,\b Z1): Crystollographic axes corresponding to X,Y,Z axes. Two must be specified.
+///     - *(\b X2,\b Y2,\b Z2): Crystollographic axes corresponding to X,Y,Z axes. Two must be specified.
+///     - \b PhiRotX [0]: How much phi affects the rotation of the interface about the X axis
+///     - \b PhiRotY [0]: How much phi affects the rotation of the interface about the Y axis
+///     - \b PhiRotZ [0]: How much phi affects the rotation of the interface about the Z axis
+///     - \b PhiMin [0]: Minimum value of phi
+///     - \b PhiMax [0]: Maximum value of phi
+///     - \b DPhi [0]: Increment of phi
+///     - \b Distribution [cauchy]: choice of thermal smoothing function
+///     - \b Tolerance [0]: Tolerance for throwing out small terms
+///     - \b FullConvexify: If specified, convexify using the full range of data. Otherwise use a smaller range.
+///     - \b OutFile: If specified, the location of the output data.
+///
+/// *=Required
+///
+
 #ifndef WIELD_MAIN_ENERGYINTERFACE1D_H
 #define WIELD_MAIN_ENERGYINTERFACE1D_H
 

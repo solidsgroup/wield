@@ -1,16 +1,22 @@
 ///
-/// \file wieldEnergySurfaceSphere.h
-/// \brief Wield::Main::EnergySurfaceSphere
+/// \page MainESS EnergySurfaceSphere
+///
+/// Description
+/// -----------
+/// An interface with a fixed orientation relationship is specified.
+/// The interface is varied and the energy evaluated to generate a plot.
+/// The output is printed to a file.
 ///
 /// Input file options
-///   - \b Crystal1: Parameters for the upper crystal
-///   - \b Crystal2: Parameters for the lower crystal
+/// ------------------
+///   - \b *Crystal1: Parameters for the upper crystal
+///   - \b *Crystal2: Parameters for the lower crystal
 ///   - \b EnergySurfaceSphere: 
-///     - (\b X1,\b Y1,\b Z1): Crystollographic axes corresponding to X,Y,Z axes. Two must be specified.
-///     - (\b X2,\b Y2,\b Z2): Crystollographic axes corresponding to X,Y,Z axes. Two must be specified.
-///     - \b PrePhiRotX: Additional rotation to apply about the X axis
-///     - \b PrePhiRotY: Additional rotation to apply about the Y axis
-///     - \b PrePhiRotZ: Additional rotation to apply about the Z axis
+///     - *(\b X1,\b Y1,\b Z1): Crystollographic axes corresponding to X,Y,Z axes. Two must be specified.
+///     - *(\b X2,\b Y2,\b Z2): Crystollographic axes corresponding to X,Y,Z axes. Two must be specified.
+///     - \b PrePhiRotX [0]: Additional rotation to apply about the X axis
+///     - \b PrePhiRotY [0]: Additional rotation to apply about the Y axis
+///     - \b PrePhiRotZ [0]: Additional rotation to apply about the Z axis
 ///     - \b AzimuthMin [0]: Minimum azimuthal angle (angle between orthogonal projection and X axis)
 ///     - \b AzimuthMin [360]: Maximum azimuthal angle
 ///     - \b AzimuthResolution [20]: Number of azimuthal points
@@ -19,6 +25,8 @@
 ///     - \b PolarResolution [20]: Number of theta points
 ///     - \b Tolerance [0]: Threshold for throwing out terms from the SurfaceIntegral calculation
 ///     - \b OutputSkip [1]: Number of calculations between showing output visualization
+///
+/// *=required
 ///
 
 #ifndef WIELD_MAIN_ENERGYSURFACESPHERE_H

@@ -1,3 +1,35 @@
+///
+/// \page MainOR1D EnergyOR1D
+///
+/// Description
+/// -----------
+/// An interface with an orientation relationship is considered.
+/// A free paramater (theta) is given a specified range and resolution, and the parameter is used to rotate one or both of the crystals about an axis.
+/// The result is printed to a file.
+///
+/// Input file options
+/// ------------------
+///   - \b *Crystal1: Parameters for the upper crystal
+///   - \b *Crystal2: Parameters for the lower crystal
+///   - \b EnergySurfaceSphere: 
+///     - *(\b X1,\b Y1,\b Z1): Crystollographic axes corresponding to X,Y,Z axes. Two must be specified.
+///     - *(\b X2,\b Y2,\b Z2): Crystollographic axes corresponding to X,Y,Z axes. Two must be specified.
+///     - \b ThetaRotX1 [0]: How much theta affects the rotation of Crystal 1 about the X axis
+///     - \b ThetaRotY1 [0]: How much theta affects the rotation of Crystal 1 about the Y axis
+///     - \b ThetaRotZ1 [0]: How much theta affects the rotation of Crystal 1 about the Z axis
+///     - \b ThetaRotX2 [0]: How much theta affects the rotation of Crystal 2 about the X axis
+///     - \b ThetaRotY2 [0]: How much theta affects the rotation of Crystal 2 about the Y axis
+///     - \b ThetaRotZ2 [0]: How much theta affects the rotation of Crystal 2 about the Z axis
+///     - \b ThetaMin [0]: Minimum value of theta
+///     - \b ThetaMax [0]: Maximum value of theta
+///     - \b DTheta [0]: Increment of theta
+///     - \b Distribution [cauchy]: choice of thermal smoothing function
+///     - \b Tolerance [0]: Tolerance for throwing out small terms
+///     - \b OutFile: Location of output data
+///
+/// *=Required
+///
+
 #ifndef WIELD_MAIN_ENERGYOR1D_H
 #define WIELD_MAIN_ENERGYOR1D_H
 
@@ -63,7 +95,9 @@ void EnergyOR1D(Reader::Reader &reader,bool dynamicPlot)
   string outFile      = reader.Read<string>("EnergyOR1D","OutFile"); 
   ofstream out(outFile.c_str());       
 
+  //
   // ROTATE ORIENTATION RELATIONSHIP AND COMPUTE GRAIN BOUNDARY ENERGY
+  // 
 #ifdef WIELD_USE_VTK
   Wield::Utils::VTK::PlotLine *plotWindow;
   if (dynamicPlot) plotWindow = new Wield::Utils::VTK::PlotLine();
@@ -71,6 +105,7 @@ void EnergyOR1D(Reader::Reader &reader,bool dynamicPlot)
   vector<double> X,Y;
   for (double theta = thetaMin; theta <= thetaMax; theta += dTheta)
     {
+      // Generate rotation matrices
       Matrix3d Rot1 = 
 	omega1 *
 	createMatrixFromXAngle(theta*thetaRotX1) *
@@ -82,7 +117,10 @@ void EnergyOR1D(Reader::Reader &reader,bool dynamicPlot)
 	createMatrixFromYAngle(theta*thetaRotY2) *
 	createMatrixFromZAngle(theta*thetaRotZ2);
       
+      // Compute the energy
       double W = a - b*Wield::Integrator::Surface(crystal1, Rot1, crystal2, Rot2, stdDev, tolerance, distribution);
+
+      // Store results
       out << theta << " " << W << endl;
       X.push_back(theta);
       Y.push_back(W);
@@ -93,6 +131,10 @@ void EnergyOR1D(Reader::Reader &reader,bool dynamicPlot)
     }
   cout << endl;
 
+  //
+  // CLEAN UP
+  //
+  
 #ifdef WIELD_USE_VTK
   if (dynamicPlot) 
     {
@@ -100,7 +142,6 @@ void EnergyOR1D(Reader::Reader &reader,bool dynamicPlot)
       plotWindow->SetData(X,Y, true);
     }
 #endif
-
   WIELD_EXCEPTION_CATCH_FINAL;
 }
 }

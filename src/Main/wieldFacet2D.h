@@ -1,3 +1,23 @@
+///
+/// \page MainFacet2D Facet2D
+///
+/// Description
+/// -----------
+/// Given a precomputed energy surface, determine the facet configuration that minimizes the energy and print to a file.
+///
+/// Input file options
+/// ------------------
+///   - \b Facet2D: 
+///     - \b *DataFile: Location of a file containing energy surface data
+///     - \b MaxFacetOrder [3]: The highest facet order to allow
+///     - \b D1 [0], \b D2 [1], \b D3 [1]: Affine scaling constants
+///     - \b N1Guess, \b N2Guess, \b N3Guess: A guess of the minimizing facet pattern
+///     - \b SearchRadius: If NnGuess specified, how far from each NnGuess to search
+///     - \b OutFile: If specified, the location of the output data.
+///
+/// *=Required
+///
+
 #ifndef WIELD_MAIN_FACET2D_H
 #define WIELD_MAIN_FACET2D_H
 

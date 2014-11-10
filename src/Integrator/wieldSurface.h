@@ -56,21 +56,22 @@ double Surface(Wield::Series::CosSeries C1,
 
   Eigen::Vector3d na2 = na3.cross(na1); Eigen::Vector3d nb2 = nb3.cross(nb1);
   double S=0;
-  for (int i=0;i<C1.order;i++)
-    for (int j=0;j<C1.order;j++) 
-      for (int k=0;k<C1.order;k++) 
-	for (int l=0;l<C2.order;l++)
-	  for (int m=0;m<C2.order;m++)
-	    for (int n=0;n<C2.order;n++)
+  for (int i=0;i<C1.order;i++)      // |
+    for (int j=0;j<C1.order;j++)    // | sum over crystal 1 fourier coefficients
+      for (int k=0;k<C1.order;k++)  // |
+	for (int l=0;l<C2.order;l++)     // | 
+	  for (int m=0;m<C2.order;m++)   // | sum over crystal 2 fourier coefficients
+	    for (int n=0;n<C2.order;n++) // |  
 	      if (fabs(C1(i,j,k)*C2(l,m,n)) > tolerance) // skip terms with low coefficients
-		for (int p=0;p<2;p++)
-		  for (int q=0;q<2;q++)
-		    for (int r=0;r<2;r++)
-		      for (int s=0;s<2;s++)
-			for (int t=0;t<2;t++)
-			  for (int u=0;u<2;u++)
+		for (int p=0;p<2;p++)         // |
+		  for (int q=0;q<2;q++)       // | sum over expanded sin/cos terms for crystal 1
+		    for (int r=0;r<2;r++)     // |
+		      for (int s=0;s<2;s++)        // |
+			for (int t=0;t<2;t++)      // | sum over expanded sin/cos terms for crystal 2
+			  for (int u=0;u<2;u++)    // |
 			    if ( (p+q+r+s+t+u)%2 == 0 ) // only do if p+q+r+s+t+u is even
 			      {
+				// Compute the arguments of each of the 12 fourier terms
 				double Ia1_1 = (double)i*pi*na1[0]/C1.alpha1; double Ia2_1 = (double)i*pi*na2[0]/C1.alpha1;
 				double Ja1_2 = (double)j*pi*na1[1]/C1.alpha2; double Ja2_2 = (double)j*pi*na2[1]/C1.alpha2;
 				double Ka1_3 = (double)k*pi*na1[2]/C1.alpha3; double Ka2_3 = (double)k*pi*na2[2]/C1.alpha3;
@@ -78,12 +79,15 @@ double Surface(Wield::Series::CosSeries C1,
 				double Mb1_2 = (double)m*pi*nb1[1]/C2.alpha2; double Mb2_2 = (double)m*pi*nb2[1]/C2.alpha2;
 				double Nb1_3 = (double)n*pi*nb1[2]/C2.alpha3; double Nb2_3 = (double)n*pi*nb2[2]/C2.alpha3;
 
+				// Store sin/cos and argument information
 				int F[6] = {p, q, r, s, t, u};
 				double a1[6] = {Ia1_1, Ja1_2, Ka1_3, Lb1_1, Mb1_2, Nb1_3};
 				double a2[6] = {Ia2_1, Ja2_2, Ka2_3, Lb2_1, Mb2_2, Nb2_3};
 
+				// Throw out the first constant terms
 				if ((i+j+k == 0) || (l+m+n == 0)) continue;
-				
+
+				// Evaluate the infinite integral
 				if (type==0) // Gaussian
 				  S += 
 				    C1(i,j,k)*C2(l,m,n)

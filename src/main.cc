@@ -1,14 +1,54 @@
 /// 
 /// \mainpage WIELD: (W)eak approximation of (I)nterface (E)nergy for bicrysta(L) boun(D)aries 
 /// This is a small research program to compute the energy of a bicrystal interface. 
+///
+/// Usage
+/// =====
 /// 
+/// Running the program:
+/// 
+///     ./main [input file] [-D<StructName>.<VarName>=<VarValue> ... ] [-p --dynamic-plot] [-n --num-threads <num>] [-h --help]
+/// 
+/// Runtime variables
+/// -----------------
+/// 
+/// All runtime variables can be specified in one of two ways:
+/// - In the input file
+/// 
+///       $VarName varvalue
+///       $StructName {
+///           $VarName varvalue
+///       }
+/// 
+/// - In the command line
+///
+///       ./main -DVarName=varvalue -DStructName.VarName=varvalue
+///
+/// Command line options
+/// --------------------
+///
+/// Some routines support additional command line options:
+/// - -p --dynamic-plot: for some supported functions, a VTK window will be displayed that shows the results of the computation real-time.
+/// - -n --num-threads <num>: for some supported functions, use pthread parallelism
+///
+/// Methods
+/// =======
+/// 
+/// This program is a collection of other methods that can be run seperately or simultaneously.
+/// Please see the following pages for descriptions of each individual routine.
+/// - \ref MainOR1D Compute the interface energy as a function of an orientation relationship, parameterized by one angle
+/// - \ref MainInterface1D Compute the interface energy as a function of interface orientation, parameterized by one angle
+/// - \ref MainESS This routine computes the full 2D energy sphere projection
+/// - \ref MainFacet2D Use the relaxation algorithm to compute the facet pattern and relaxed energy, given an energy surface
+///
+
+
 
 ///
-/// @file main.cpp
+/// \file main.cpp
 /// \brief This is the short description for main.cpp
 ///
 /// This is the long description for main.cpp
-/// \f[\int_{\Omega}\nabla\cdot\mathbb{V}dV = \int_{\partial\Omega}\mathbb{V}\cdot\mathbb{n}dA\f]
 ///
 
 
@@ -33,15 +73,23 @@
 
 using namespace std;
 
+///
+/// \fn signalHandler
+/// \brief In case of kill signal, clean up the terminal.
+///
 void signalHandler(int signum)
 {
+  /// Hello world
   cout << endl;
   cout << WIELD_COLOR_RESET << "Program terminated" << endl;
   exit(signum);
 }
 
-int main(int argc, char* argv[])
+int main(int argc,     ///< Number of arguments
+	 char* argv[]) ///< Argument values
 {
+  /// This function parses command line options and opens the file reader.
+
   WIELD_EXCEPTION_TRY;
 
   signal(SIGINT, signalHandler);
