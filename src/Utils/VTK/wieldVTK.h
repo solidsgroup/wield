@@ -93,6 +93,7 @@ class PlotLine
 
     if (X.size() != Y.size())
       WIELD_EXCEPTION_NEW("X.size()=" << X.size() << " but " << "Y.size()=" << Y.size());
+    if (X.size() < 2) return;
 
     vtkSmartPointer<vtkTable> table =
       vtkSmartPointer<vtkTable>::New();
@@ -162,9 +163,15 @@ double computeDensityFunction(double x, double y, double z, Wield::Series::CosSe
   WIELD_EXCEPTION_CATCH;
 }
 
+double computeDensityFunction(double x, double y, double z, Wield::Series::FourierSeries C)
+{
+  WIELD_EXCEPTION_TRY;
+  return C(x,y,z).real();
+  WIELD_EXCEPTION_CATCH;
+}
 
-
-Actor drawCrystal(Wield::Series::CosSeries C, Matrix3d R, Matrix3d BoxR,
+template <class T>
+Actor drawCrystal(T C, Matrix3d R, Matrix3d BoxR,
 		    double xmin, double ymin, double zmin,
 		    double xmax, double ymax, double zmax,
 		    int resolution,

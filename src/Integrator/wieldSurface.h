@@ -18,17 +18,46 @@
 #include "Integrator/wieldTrig6.h"
 #include "Utils/wieldEigen.h"
 #include "Series/wieldCosSeries.h"
+#include "Series/wieldFourierSeries.h"
 
 using namespace Eigen;
 using namespace std;
-
-
 
 
 namespace Wield
 {
 namespace Integrator
 {
+double Surface(Wield::Series::FourierSeries C1,
+	       Matrix3d R1,
+	       Wield::Series::FourierSeries C2,
+	       Matrix3d R2,
+	       double epsilon,
+	       double tolerance=0)
+{
+  double w = 0;
+  for (int l=1-C1.order; l < C1.order; l++)
+    for (int m=1-C1.order; m < C1.order; m++)
+      for (int n=1-C1.order; n < C1.order; n++)
+	for (int p=1-C2.order; p < C2.order; p++)
+	  for (int q=1-C2.order; q < C2.order; q++)
+	    for (int r=1-C2.order; r < C2.order; r++)
+	      {
+		complex<double> C1C2 = C1(l,m,n)*C2(p,q,r);
+		if (fabs(real(C1C2))<tolerance && fabs(imag(C1C2))<tolerance) continue;
+		if ((l==0 && m==0 && n==0) || (p==0 && q==0 && r==0)) continue;
+		Vector3d a1((double)l * 2.* pi / C1.alphaX,
+			    (double)m * 2.* pi / C1.alphaY,
+			    (double)n * 2.* pi / C1.alphaZ);
+		Vector3d a2((double)p * 2.* pi / C2.alphaX,
+			    (double)q * 2.* pi / C2.alphaY,
+			    (double)r * 2.* pi / C2.alphaZ);
+		Vector3d arg= R1*a1 + R2*a2;
+		w += real(C1C2)*2*pi*exp(- sqrt(arg[0]*arg[0]+arg[1]*arg[1])/epsilon);
+	      }
+  return w;
+}
+
 double Surface(Wield::Series::CosSeries C1, 
 	       Matrix3d R1,
 	       Wield::Series::CosSeries C2, 

@@ -41,6 +41,13 @@ namespace Wield
 {
 namespace Series
 {
+///
+/// \fn double ComputeGaussCosIntegral(int n, double x0, double sigma, double alpha)
+///
+/// This function evaluates the following integral
+/// \f[ \int_0^\alpha \exp\left(-\frac{(x-x_0)^2}{\sigma^2}\right)\cos(n\pi x/\alpha) dx\f]
+/// where \f$n,x_0,\sigma,\alpha\f$ are given in the function arguments.
+///
 double ComputeGaussCosIntegral(int n, double x0, double sigma, double alpha)
 {
   complex<double> ret(0,0);
@@ -67,6 +74,13 @@ double ComputeGaussCosIntegral(int n, double x0, double sigma, double alpha)
     return ret.real() / (alpha/2.);
 }
 
+///
+/// \fn double ComputeGaussSinIntegral(int n, double x0, double sigma, double alpha)
+///
+/// This function evaluates the following integral
+/// \f[ \int_0^\alpha \exp\left(-\frac{(x-x_0)^2}{\sigma^2}\right)\sin(n\pi x/\alpha) dx\f]
+/// where \f$n,x_0,\sigma,\alpha\f$ are given in the function arguments.
+///
 double ComputeGaussSinIntegral(int n, double x0, double sigma, double alpha)
 {
   complex<double> ret(0,0);

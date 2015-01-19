@@ -9,3 +9,6 @@ tests/fcc_atgb_112
 scratch
 *.dat
 *.bvox
+*.pdf
+html
+latex

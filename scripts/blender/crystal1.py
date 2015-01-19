@@ -6,7 +6,7 @@ max = 0.5; # Maximum value for color shading
 
 crystal1Tex = bpy.data.textures.new("crystal1Tex",type="VOXEL_DATA");
 crystal1Tex.voxel_data.file_format = "BLENDER_VOXEL";
-crystal1Tex.voxel_data.filepath = "/home/brandon/LANL_2013/Wield/voxels.bvox"
+crystal1Tex.voxel_data.filepath = "/home/brandon/LANL_2013/Wield/scripts/blender/voxels.bvox"
 crystal1Tex.voxel_data.extension = "REPEAT"
 crystal1Tex.use_color_ramp = True;
 crystal1Tex.color_ramp.elements.new(0.00*max).color=(0,0,1,0.2);

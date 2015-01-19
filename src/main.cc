@@ -63,6 +63,8 @@
 #include "TCLAP/IgnoreArg.h"
 #include "Reader.h"
 
+#include "Main/wieldEnergy1D.h"
+#include "Main/wieldEnergy2D.h"
 #include "Main/wieldBlenderVoxelData.h"
 #include "Main/wieldVisualizeOR.h"
 #include "Main/wieldEnergySurfaceSphere.h"
@@ -118,6 +120,10 @@ int main(int argc,     ///< Number of arguments
   else 
     rabbit = new Reader::Reader(fileName, argc, argv, "$", "#", "...");
   
+  if (rabbit->Find("Energy1D"))
+    Wield::Main::Energy1D(*rabbit);
+  if (rabbit->Find("Energy2D"))
+    Wield::Main::Energy2D(*rabbit,numThreads);
   if (rabbit->Find("BlenderVoxelData"))
     Wield::Main::BlenderVoxelData(*rabbit);
   if (rabbit->Find("VisualizeOR"))

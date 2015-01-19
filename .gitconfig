@@ -1,0 +1,5 @@
+[sendemail]
+	smtpencryption=tls
+	smtpserver = smtp.gmail.com
+	smtpuser=bsrunnels@gmail.com
+	smtpserverport=587

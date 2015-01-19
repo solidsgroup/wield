@@ -1,0 +1,36 @@
+$Energy1D
+
+$a 0.3209
+$c 0.5209
+$Sigma1 0.2
+$Sigma2 $Sigma1
+$Epsilon 0.5
+
+$AlphaX1 $a/2.
+$AlphaX2 $AlphaX1
+$AlphaY1 $a*sqrt(3.)/2.
+$AlphaY2 $AlphaY1
+$AlphaZ1 $c/2.
+$AlphaZ2 $AlphaZ1
+$l1 $a*sqrt(3.)/3.
+$l2 $a*sqrt(3.)/6.
+
+$Order1 4
+#   ------------------------------------------ | ----------------------------------------- | ----------------------------------------- |
+$X1 0. $AlphaX1  $AlphaX1 -$AlphaX1 -$AlphaX1     0.  $AlphaX1  -$AlphaX1              0.      0.  $AlphaX1  -$AlphaX1              0.  
+$Y1 0. $AlphaY1 -$AlphaY1  $AlphaY1 -$AlphaY1    $l1      -$l2    -$l2     $l1-2*$AlphaY1     $l1      -$l2    -$l2     $l1-2*$AlphaY1  
+$Z1 0.       0.        0.        0.        0.    -$c       -$c     -$c                -$c      $c        $c      $c                 $c  
+$Order2 $Order1
+$X2 $X1
+$Y2 $Y1
+$Z2 $Z1
+
+
+$ThetaMin 0
+$ThetaMax 90
+$DTheta 0.25
+
+$ThetaRotX1 1
+$ThetaRotX2 -1
+
+$OutFile test.out

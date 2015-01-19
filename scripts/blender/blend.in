@@ -1,0 +1,5 @@
+$Crystal {
+    include fcc.in
+}
+$BlenderVoxelData{
+}
