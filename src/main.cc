@@ -65,12 +65,12 @@
 
 #include "Main/wieldEnergy1D.h"
 #include "Main/wieldEnergy2D.h"
-#include "Main/wieldBlenderVoxelData.h"
-#include "Main/wieldVisualizeOR.h"
-#include "Main/wieldEnergySurfaceSphere.h"
-#include "Main/wieldEnergyInterface1D.h"
-#include "Main/wieldEnergyOR1D.h"
-#include "Main/wieldFacet2D.h"
+// #include "Main/wieldBlenderVoxelData.h"
+// #include "Main/wieldVisualizeOR.h"
+// #include "Main/wieldEnergySurfaceSphere.h"
+// #include "Main/wieldEnergyInterface1D.h"
+// #include "Main/wieldEnergyOR1D.h"
+// #include "Main/wieldFacet2D.h"
 #include "Utils/wieldExceptions.h"
 
 using namespace std;
@@ -105,7 +105,7 @@ int main(int argc,     ///< Number of arguments
   TCLAP::IgnoreArg testIgnoreArg("D","User defined variables","",cmd);
   TCLAP::UnlabeledValueArg<string> argFileName("name", "Path to input file", false, "", "inputfile", cmd);
   cmd.parse(argc, argv);
-  bool dynamicPlot = switchDynamicPlot.getValue();
+  bool dynamicPlot; dynamicPlot = switchDynamicPlot.getValue();
   int numThreads = valueNumThreads.getValue();
   string fileName = argFileName.getValue();
 
@@ -124,18 +124,18 @@ int main(int argc,     ///< Number of arguments
     Wield::Main::Energy1D(*rabbit);
   if (rabbit->Find("Energy2D"))
     Wield::Main::Energy2D(*rabbit,numThreads);
-  if (rabbit->Find("BlenderVoxelData"))
-    Wield::Main::BlenderVoxelData(*rabbit);
-  if (rabbit->Find("VisualizeOR"))
-    Wield::Main::VisualizeOR(*rabbit, dynamicPlot);
-  if (rabbit->Find("EnergyOR1D"))
-    Wield::Main::EnergyOR1D(*rabbit, dynamicPlot);
-  if (rabbit->Find("EnergyInterface1D"))
-    Wield::Main::EnergyInterface1D(*rabbit, dynamicPlot);
-  if (rabbit->Find("EnergySurfaceSphere"))
-    Wield::Main::EnergySurfaceSphere(*rabbit, dynamicPlot, numThreads); 
-  if (rabbit->Find("Facet2D"))
-    Wield::Main::Facet2D(*rabbit,numThreads); 
+  // if (rabbit->Find("BlenderVoxelData"))
+  //   Wield::Main::BlenderVoxelData(*rabbit);
+  // if (rabbit->Find("VisualizeOR"))
+  //   Wield::Main::VisualizeOR(*rabbit, dynamicPlot);
+  // if (rabbit->Find("EnergyOR1D"))
+  //   Wield::Main::EnergyOR1D(*rabbit, dynamicPlot);
+  // if (rabbit->Find("EnergyInterface1D"))
+  //   Wield::Main::EnergyInterface1D(*rabbit, dynamicPlot);
+  // if (rabbit->Find("EnergySurfaceSphere"))
+  //   Wield::Main::EnergySurfaceSphere(*rabbit, dynamicPlot, numThreads); 
+  // if (rabbit->Find("Facet2D"))
+  //   Wield::Main::Facet2D(*rabbit,numThreads); 
 
   // WARN ABOUT UNUSED VARIABLES
   rabbit->PrintUnusedVariableWarnings();

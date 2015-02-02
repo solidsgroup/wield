@@ -12,6 +12,7 @@
 #include "Reader.h"
 
 #include "Utils/wieldExceptions.h"
+#include "Utils/wieldDebug.h"
 #include "Series/wieldFourierSeries.h"
 #include "Utils/VTK/wieldVTK.h"
 #include "Integrator/wieldSurface.h"
@@ -34,7 +35,7 @@ void *Energy2D(void *args);
 void Energy2D(Reader::Reader &reader, int numThreads=1)
 {
   WIELD_EXCEPTION_TRY;
-  
+
   Wield::Series::FourierSeries
     C1(reader.Read<int>("Order1"),
        reader.Read<double>("AlphaX1"),
@@ -45,16 +46,13 @@ void Energy2D(Reader::Reader &reader, int numThreads=1)
        reader.Read<vector<double> >("Y1"),
        reader.Read<vector<double> >("Z1"));
 
-  Wield::Utils::VTK::renderCrystal
-    (Wield::Utils::VTK::drawCrystal
-     (C1,Matrix3d::Identity(),Matrix3d::Identity(),
-      -C1.alphaX,-C1.alphaY,-C1.alphaZ,
-      +C1.alphaX,+C1.alphaY,+C1.alphaZ,
-      reader.Read<double>("Resolution",100.)));
+  // Wield::Utils::VTK::renderCrystal
+  //   (Wield::Utils::VTK::drawCrystal
+  //    (C1,Matrix3d::Identity(),Matrix3d::Identity(),
+  //     -C1.alphaX,-C1.alphaY,-C1.alphaZ,
+  //     +C1.alphaX,+C1.alphaY,+C1.alphaZ,
+  //     reader.Read<double>("Resolution",100.)));
       
-				   
-				   
-
   Wield::Series::FourierSeries
     C2(reader.Read<int>("Order2"),
        reader.Read<double>("AlphaX2"),
@@ -147,8 +145,8 @@ void *Energy2D(void *args)
       Eigen::Vector3d n(X[i],Y[i],Z[i]);
       Matrix3d N = 
 	createMatrixFromNormalVector(n);
-      W[i] = - Wield::Integrator::Surface(C1,N.transpose()*rot1,
-					  C2,N.transpose()*rot2,
+      W[i] = - Wield::Integrator::Surface(C1,N.transpose()*rot1.transpose(),
+					  C2,N.transpose()*rot2.transpose(),
 					  epsilon, tolerance);
       if (index==0) WIELD_PROGRESS("Energy surface",i,X.size(),1);
     }

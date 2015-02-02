@@ -33,7 +33,13 @@ Matrix3d createMatrixFromZAngle(double theta)
     0,                   0, 1;
   return Omega;
 }
-
+Matrix3d createMatrixFromAngle(double theta, char axis)
+{
+  if (axis=='x' || axis=='X') return createMatrixFromXAngle(theta);
+  if (axis=='y' || axis=='Y') return createMatrixFromYAngle(theta);
+  if (axis=='z' || axis=='Z') return createMatrixFromZAngle(theta);
+  else return Matrix3d::Identity();
+}
 Matrix3d createMatrixFromXY(Eigen::Vector3d ex, Eigen::Vector3d ey)
 {
   WIELD_EXCEPTION_TRY;
