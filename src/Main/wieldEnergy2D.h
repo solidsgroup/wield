@@ -36,6 +36,16 @@ void Energy2D(Reader::Reader &reader, int numThreads=1)
 {
   WIELD_EXCEPTION_TRY;
 
+  double 
+    thetaMin  = reader.Read<double>("ThetaMin",0.),
+    thetaMax  = reader.Read<double>("ThetaMax",360.),
+    dTheta    = reader.Read<double>("DTheta",1.),
+    rMin      = reader.Read<double>("RMin",0.),
+    rMax      = reader.Read<double>("RMax",1.),
+    dR        = reader.Read<double>("DR",.05),
+    epsilon   = reader.Read<double>("Epsilon",1.),
+    tolerance = reader.Read<double>("Tolerance",1.);
+
   Wield::Series::FourierSeries
     C1(reader.Read<int>("Order1"),
        reader.Read<double>("AlphaX1"),
@@ -46,13 +56,6 @@ void Energy2D(Reader::Reader &reader, int numThreads=1)
        reader.Read<vector<double> >("Y1"),
        reader.Read<vector<double> >("Z1"));
 
-  // Wield::Utils::VTK::renderCrystal
-  //   (Wield::Utils::VTK::drawCrystal
-  //    (C1,Matrix3d::Identity(),Matrix3d::Identity(),
-  //     -C1.alphaX,-C1.alphaY,-C1.alphaZ,
-  //     +C1.alphaX,+C1.alphaY,+C1.alphaZ,
-  //     reader.Read<double>("Resolution",100.)));
-      
   Wield::Series::FourierSeries
     C2(reader.Read<int>("Order2"),
        reader.Read<double>("AlphaX2"),
@@ -63,22 +66,31 @@ void Energy2D(Reader::Reader &reader, int numThreads=1)
        reader.Read<vector<double> >("Y2"),
        reader.Read<vector<double> >("Z2"));
 
-  Matrix3d
-    rot1 =
-    createMatrixFromZAngle(reader.Read<double>("RotZ1",0.))*
-    createMatrixFromYAngle(reader.Read<double>("RotY1",0.))*
-    createMatrixFromXAngle(reader.Read<double>("RotX1",0.)),
-    rot2 = 
-    createMatrixFromZAngle(reader.Read<double>("RotZ2",0.))*
-    createMatrixFromYAngle(reader.Read<double>("RotY2",0.))*
-    createMatrixFromXAngle(reader.Read<double>("RotX2",0.));
+  ofstream out(reader.Read<string>("OutFile").c_str());
 
-  double thetaMin = reader.Read<double>("ThetaMin",0.);
-  double thetaMax = reader.Read<double>("ThetaMax",360.);
-  double dTheta   = reader.Read<double>("DTheta",1.);
-  double rMin = reader.Read<double>("RMin",0.);
-  double rMax = reader.Read<double>("RMax",1.);
-  double dR   = reader.Read<double>("DR",.05);
+  // Rotation matrix
+  Matrix3d rot1 = Matrix3d::Identity();
+  if (reader.Find("AxisY1") && reader.Find("AxisZ1")) rot1 = createMatrixFromYZ(reader.Read<Eigen::Vector3d>("AxisY1"),reader.Read<Eigen::Vector3d>("AxisZ1")) * rot1;
+  if (reader.Find("AxisZ1") && reader.Find("AxisX1")) rot1 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("AxisZ1"),reader.Read<Eigen::Vector3d>("AxisX1")) * rot1;
+  if (reader.Find("AxisX1") && reader.Find("AxisY1")) rot1 = createMatrixFromXY(reader.Read<Eigen::Vector3d>("AxisX1"),reader.Read<Eigen::Vector3d>("AxisY1")) * rot1;
+  if (reader.Find("RotAxes1"))
+    {
+      vector<char> rotAxes1 = reader.Read<vector<char> >("RotAxes1");
+      vector<double>  rots1 = reader.Read<vector<double> >("Rots1");
+      for (int i=0; i<rotAxes1.size(); i++) rot1 = createMatrixFromAngle(rots1[i],rotAxes1[i]) * rot1;
+    }
+
+  Matrix3d rot2 = Matrix3d::Identity();
+  if (reader.Find("AxisY2") && reader.Find("AxisZ2")) rot2 = createMatrixFromYZ(reader.Read<Eigen::Vector3d>("AxisY2"),reader.Read<Eigen::Vector3d>("AxisZ2")) * rot2;
+  if (reader.Find("AxisZ2") && reader.Find("AxisX2")) rot2 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("AxisZ2"),reader.Read<Eigen::Vector3d>("AxisX2")) * rot2;
+  if (reader.Find("AxisX2") && reader.Find("AxisY2")) rot2 = createMatrixFromXY(reader.Read<Eigen::Vector3d>("AxisX2"),reader.Read<Eigen::Vector3d>("AxisY2")) * rot2;
+  if (reader.Find("RotAxes2"))
+    {
+      vector<char> rotAxes2 = reader.Read<vector<char> >("RotAxes2");
+      vector<double>  rots2 = reader.Read<vector<double> >("Rots2");
+      for (int i=0; i<rotAxes2.size(); i++) rot2 = createMatrixFromAngle(rots2[i],rotAxes2[i]) * rot2;
+    }
+
   vector<double> X,Y,Z;
   for (double theta = thetaMin; theta <= thetaMax; theta += dTheta) 
     for (double r = rMin; r <= rMax; r += dR) 
@@ -95,8 +107,8 @@ void Energy2D(Reader::Reader &reader, int numThreads=1)
     {
       data[i].index     = i;
       data[i].numThreads= numThreads;
-      data[i].epsilon   = reader.Read<double>("Epsilon",1.);
-      data[i].tolerance = reader.Read<double>("Tolerance",1.);
+      data[i].epsilon   = epsilon;
+      data[i].tolerance = tolerance;
       data[i].rot1      = rot1;
       data[i].rot2      = rot2;
       data[i].C1        = &C1;
@@ -117,7 +129,6 @@ void Energy2D(Reader::Reader &reader, int numThreads=1)
 	WIELD_EXCEPTION_NEW("Error starting thread #" << i << ": errorCode = " << errorCode);
     }
 
-  ofstream out(reader.Read<string>("OutFile").c_str());
   for (int i=0; i<X.size(); i++)
     out << X[i] << " " << Y[i] << " " << Z[i] << " " << W[i] << endl;
   out.close();
@@ -145,8 +156,8 @@ void *Energy2D(void *args)
       Eigen::Vector3d n(X[i],Y[i],Z[i]);
       Matrix3d N = 
 	createMatrixFromNormalVector(n);
-      W[i] = - Wield::Integrator::Surface(C1,N.transpose()*rot1.transpose(),
-					  C2,N.transpose()*rot2.transpose(),
+      W[i] = - Wield::Integrator::Surface(C1,N*rot1,
+					  C2,N*rot2,
 					  epsilon, tolerance);
       if (index==0) WIELD_PROGRESS("Energy surface",i,X.size(),1);
     }
