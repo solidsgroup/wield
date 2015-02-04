@@ -10,7 +10,7 @@ import numpy
 #A = 3.4234 # 2.9799  #140*0.0384929
 #B = 64.2913 # 61.7148 #140
 A = 0
-B = 70
+B = 2.5
 
 
 Tilt_001_Model  = numpy.loadtxt("100_2d/outfiles/F1.dat", delimiter=" ");
@@ -34,9 +34,9 @@ pylab.figure(figsize=(14*16/14,7*16/14));
 pylab.subplot(221)
 pylab.xlim(0,90)
 pylab.ylim(0,2.0)
-pylab.plot(Tilt_001_Model[:,0],
+pylab.plot(90-Tilt_001_Model[:,0],
            A + B*Tilt_001_Model[:,1],color="black",linewidth=2,linestyle=':',label='100 Model')
-pylab.plot(Tilt_001_Model_Relaxed[:,0],
+pylab.plot(90-Tilt_001_Model_Relaxed[:,0],
            A + B*Tilt_001_Model_Relaxed[:,1],color="black",linewidth=2,linestyle='-',label='100 Model (Relaxed)')
 pylab.plot(Tilt_001_Shibuta[:,0],Tilt_001_Shibuta[:,1],color="black",linewidth=2,marker='o',linestyle='--',label='100 MD')
 pylab.xlabel("Tilt angle (degrees)");

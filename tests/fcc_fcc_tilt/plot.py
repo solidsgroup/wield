@@ -11,7 +11,8 @@ import numpy
 #B = 64.2913 # 61.7148 #140
 A = 5.6468#2*3.0234 - 0.4
 B = 128.5826#2*64.2913
-
+# --> D1 = A/B = 
+# --> D2 = B   = 128.5
 
 Tilt_001_Model  = numpy.loadtxt("outfiles/100.dat", delimiter=" ");
 Tilt_110_Model  = numpy.loadtxt("outfiles/110.dat", delimiter=" ");

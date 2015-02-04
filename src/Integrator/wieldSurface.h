@@ -57,7 +57,6 @@ double Surface(Wield::Series::FourierSeries C1,
 		    Vector3d arg= R1*a1 - R2*a2;
 		    w12 += C1(l,m,n)*conj(C2(p,q,r))*2.*pi*exp(- sqrt(arg[0]*arg[0]+arg[1]*arg[1])/epsilon);
 		  }
-
   return real(w12);
 }
 

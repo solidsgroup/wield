@@ -1,21 +1,12 @@
-$Crystal1 {
-    include ../fcc.in
-}
+$Energy2D
+include ../fcc.in
+$Tolerance 1E-8
+$AxisX1 1 0 0
+$AxisZ1 0 0 1
+$AxisX2 1 0 0
+$AxisZ2 0 0 1
+$DR 0.01
+$ThetaMin 0
+$ThetaMax 360
+$DTheta 1
 
-$Crystal2 {
-    include ../fcc.in
-}
-
-$EnergySurfaceSphere {
-    include ../constants.in
-    $Tolerance 1E-2
-    $X1 0 0 1
-    $Z1 -1 1 0
-    $X2 0 0 1
-    $Z2 -1 1 0
-    $Tolerance 1E-2
-    $RResolution 40
-    $AzimuthMin 0
-    $AzimuthMax 360
-    $AzimuthResolution 120
-}

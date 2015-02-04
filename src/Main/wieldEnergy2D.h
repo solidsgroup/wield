@@ -46,6 +46,10 @@ void Energy2D(Reader::Reader &reader, int numThreads=1)
     epsilon   = reader.Read<double>("Epsilon",1.),
     tolerance = reader.Read<double>("Tolerance",1.);
 
+  bool normalize = reader.Find("Ground");
+  double ground = 0.;
+  if (normalize) ground = reader.Read<double>("Ground");
+
   Wield::Series::FourierSeries
     C1(reader.Read<int>("Order1"),
        reader.Read<double>("AlphaX1"),
@@ -70,9 +74,9 @@ void Energy2D(Reader::Reader &reader, int numThreads=1)
 
   // Rotation matrix
   Matrix3d rot1 = Matrix3d::Identity();
-  if (reader.Find("AxisY1") && reader.Find("AxisZ1")) rot1 = createMatrixFromYZ(reader.Read<Eigen::Vector3d>("AxisY1"),reader.Read<Eigen::Vector3d>("AxisZ1")) * rot1;
-  if (reader.Find("AxisZ1") && reader.Find("AxisX1")) rot1 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("AxisZ1"),reader.Read<Eigen::Vector3d>("AxisX1")) * rot1;
-  if (reader.Find("AxisX1") && reader.Find("AxisY1")) rot1 = createMatrixFromXY(reader.Read<Eigen::Vector3d>("AxisX1"),reader.Read<Eigen::Vector3d>("AxisY1")) * rot1;
+  if (reader.Find("AxisY1") && reader.Find("AxisZ1")) rot1 = createMatrixFromYZ(reader.Read<Eigen::Vector3d>("AxisY1"),reader.Read<Eigen::Vector3d>("AxisZ1")).transpose() * rot1;
+  if (reader.Find("AxisZ1") && reader.Find("AxisX1")) rot1 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("AxisZ1"),reader.Read<Eigen::Vector3d>("AxisX1")).transpose() * rot1;
+  if (reader.Find("AxisX1") && reader.Find("AxisY1")) rot1 = createMatrixFromXY(reader.Read<Eigen::Vector3d>("AxisX1"),reader.Read<Eigen::Vector3d>("AxisY1")).transpose() * rot1;
   if (reader.Find("RotAxes1"))
     {
       vector<char> rotAxes1 = reader.Read<vector<char> >("RotAxes1");
@@ -81,9 +85,9 @@ void Energy2D(Reader::Reader &reader, int numThreads=1)
     }
 
   Matrix3d rot2 = Matrix3d::Identity();
-  if (reader.Find("AxisY2") && reader.Find("AxisZ2")) rot2 = createMatrixFromYZ(reader.Read<Eigen::Vector3d>("AxisY2"),reader.Read<Eigen::Vector3d>("AxisZ2")) * rot2;
-  if (reader.Find("AxisZ2") && reader.Find("AxisX2")) rot2 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("AxisZ2"),reader.Read<Eigen::Vector3d>("AxisX2")) * rot2;
-  if (reader.Find("AxisX2") && reader.Find("AxisY2")) rot2 = createMatrixFromXY(reader.Read<Eigen::Vector3d>("AxisX2"),reader.Read<Eigen::Vector3d>("AxisY2")) * rot2;
+  if (reader.Find("AxisY2") && reader.Find("AxisZ2")) rot2 = createMatrixFromYZ(reader.Read<Eigen::Vector3d>("AxisY2"),reader.Read<Eigen::Vector3d>("AxisZ2")).transpose() * rot2;
+  if (reader.Find("AxisZ2") && reader.Find("AxisX2")) rot2 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("AxisZ2"),reader.Read<Eigen::Vector3d>("AxisX2")).transpose() * rot2;
+  if (reader.Find("AxisX2") && reader.Find("AxisY2")) rot2 = createMatrixFromXY(reader.Read<Eigen::Vector3d>("AxisX2"),reader.Read<Eigen::Vector3d>("AxisY2")).transpose() * rot2;
   if (reader.Find("RotAxes2"))
     {
       vector<char> rotAxes2 = reader.Read<vector<char> >("RotAxes2");
@@ -93,11 +97,12 @@ void Energy2D(Reader::Reader &reader, int numThreads=1)
 
   vector<double> X,Y,Z;
   for (double theta = thetaMin; theta <= thetaMax; theta += dTheta) 
-    for (double r = rMin; r <= rMax; r += dR) 
+    for (double r = rMin; r <= (rMax+tolerance); r += dR) 
       {
 	X.push_back(r*cos(theta*pi/180.));
 	Y.push_back(r*sin(theta*pi/180.));
-	Z.push_back(sqrt(1.-(r*r)));
+	if (1.-(r*r) > 0) Z.push_back(sqrt(1.-(r*r)));
+	else Z.push_back(0.);
       }
   vector<double> W(X.size());
   
@@ -130,7 +135,10 @@ void Energy2D(Reader::Reader &reader, int numThreads=1)
     }
 
   for (int i=0; i<X.size(); i++)
-    out << X[i] << " " << Y[i] << " " << Z[i] << " " << W[i] << endl;
+    if (normalize) 
+      out << X[i] << " " << Y[i] << " " << Z[i] << " " << 1-(W[i]/ground) << endl;
+    else
+      out << X[i] << " " << Y[i] << " " << Z[i] << " " << -W[i] << endl;
   out.close();
   
   WIELD_EXCEPTION_CATCH;
@@ -156,9 +164,10 @@ void *Energy2D(void *args)
       Eigen::Vector3d n(X[i],Y[i],Z[i]);
       Matrix3d N = 
 	createMatrixFromNormalVector(n);
-      W[i] = - Wield::Integrator::Surface(C1,N*rot1,
-					  C2,N*rot2,
-					  epsilon, tolerance);
+      
+      W[i] = Wield::Integrator::Surface(C1,N.transpose()*rot1,
+					C2,N.transpose()*rot2,
+					epsilon, tolerance);
       if (index==0) WIELD_PROGRESS("Energy surface",i,X.size(),1);
     }
   if (index==0) cout << endl;

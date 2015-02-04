@@ -70,7 +70,7 @@
 // #include "Main/wieldEnergySurfaceSphere.h"
 // #include "Main/wieldEnergyInterface1D.h"
 // #include "Main/wieldEnergyOR1D.h"
-// #include "Main/wieldFacet2D.h"
+#include "Main/wieldFacet2D.h"
 #include "Utils/wieldExceptions.h"
 
 using namespace std;
@@ -134,8 +134,8 @@ int main(int argc,     ///< Number of arguments
   //   Wield::Main::EnergyInterface1D(*rabbit, dynamicPlot);
   // if (rabbit->Find("EnergySurfaceSphere"))
   //   Wield::Main::EnergySurfaceSphere(*rabbit, dynamicPlot, numThreads); 
-  // if (rabbit->Find("Facet2D"))
-  //   Wield::Main::Facet2D(*rabbit,numThreads); 
+  if (rabbit->Find("Facet2D"))
+    Wield::Main::Facet2D(*rabbit,numThreads); 
 
   // WARN ABOUT UNUSED VARIABLES
   rabbit->PrintUnusedVariableWarnings();

@@ -1,24 +1,16 @@
-$Crystal1 {
-    include ../fcc.in
-}
+$Energy1D
+include ../fcc.in
+$Tolerance 1E-8
+$AxisX1 1 1 0
+$AxisZ1 -1 1 0
+$AxisX2 1 1 0
+$AxisZ2 -1 1 0
+$ThetaRotX1 0.5
+$ThetaRotX2 -0.5
+$ThetaMin 0
+$ThetaMax 180
+$DTheta 0.5
 
-$Crystal2 {
-    include ../fcc.in
-}
 
-$EnergyOR1D {
-    include ../constants.in
-    $Tolerance 1E-2
-    $X1 1 1 0
-    $Z1 -1 1 0
-    $X2 1 1 0
-    $Z2 -1 1 0
-    $ThetaRotX1 0.5
-    $ThetaRotX2 -0.5
-    $ThetaMin 0
-    $ThetaMax 180
-    $DTheta 1.
-    $Tolerance 1E-2
-    $Distribution cauchy
-}
+
 
