@@ -1,0 +1,11 @@
+$Energy1D
+include ../fcc.in
+$AxisX1 1 -1  0
+$AxisZ1 5  5  7
+$AxisX2 1 -1  0
+$AxisZ2 1  1  3
+$ThetaRotZ1 0.5
+$ThetaRotZ2 -0.5
+$ThetaMin 0
+$ThetaMax 180
+$DTheta 0.5

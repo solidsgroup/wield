@@ -1,0 +1,16 @@
+$Energy2D
+include ../bcc.in
+$Tolerance 1E-8
+$AxisX1 1 0 0
+$AxisZ1 0 0 1
+$AxisX2 1 0 0
+$AxisZ2 0 0 1
+#$DR 0.01
+$ThetaMin 0
+$ThetaMax 360
+#$DTheta 1
+$OutFile 100_F2.dat
+
+
+
+

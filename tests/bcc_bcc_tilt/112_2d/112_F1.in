@@ -1,0 +1,12 @@
+$Energy1D
+include ../bcc.in
+$AxisX1 1 1 2
+$AxisZ1 1 -1 0
+$AxisX2 1 1 2
+$AxisZ2 1 -1 0
+$ThetaRotX1 0.5
+$ThetaRotX2 -0.5
+$ThetaMin 0
+$ThetaMax 110
+$DTheta 0.5
+

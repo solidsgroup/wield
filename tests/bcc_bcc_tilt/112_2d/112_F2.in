@@ -1,0 +1,15 @@
+$Energy2D
+include ../bcc.in
+$AxisX1 1 1 2
+$AxisZ1 1 -1 0
+$AxisX2 1 1 2
+$AxisZ2 1 -1 0
+#$DR 0.01
+$ThetaMin 0
+$ThetaMax 360
+#$DTheta 1
+
+
+
+
+

@@ -1,5 +1,6 @@
 *.dat
 *.png
+*.out
 bin
 old
 tests/OLD*

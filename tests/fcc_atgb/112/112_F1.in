@@ -1,22 +1,12 @@
-$Crystal1 {
-    include ../fcc.in
-}
+$Energy1D
+include ../fcc.in
+$AxisZ1 1 1 -1
+$AxisZ2 -1 -1 1 
+$AxisX1 1 1 2
+$AxisX2 1 1 2
+$ThetaRotX1 1
+$ThetaRotX2 1
+$ThetaMin 0
+$ThetaMax 90
+$DTheta 0.25
 
-$Crystal2 {
-    include ../fcc.in
-}
-
-$EnergyInterface1D {
-    # All modes
-    include ../constants.in
-    $Tolerance 1E-2
-    $Z1 1 1 -1
-    $Z2 -1 -1 1 
-    $X1 1 1 2
-    $X2 1 1 2
-    $PhiMin 0
-    $PhiMax 120
-    $DPhi 0.25
-    $PhiRotX 1.
-    $OutFile outfiles/F1.dat
-}

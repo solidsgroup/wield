@@ -1,0 +1,8 @@
+$Energy2D
+include ../fcc.in
+$AxisX1 1 -1  0
+$AxisZ1 1  1  5
+$AxisX2 1 -1  0
+$AxisZ2 1  1  1 
+$DTheta 1
+$DR 0.01
