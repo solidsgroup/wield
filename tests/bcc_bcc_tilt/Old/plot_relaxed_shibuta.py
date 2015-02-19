@@ -10,7 +10,7 @@ import numpy
 #A = 3.4234 # 2.9799  #140*0.0384929
 #B = 64.2913 # 61.7148 #140
 A = 0
-B = 2.5
+B = 3
 
 
 Tilt_001_Model  = numpy.loadtxt("100_2d/outfiles/F1.dat", delimiter=" ");
