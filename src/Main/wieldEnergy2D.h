@@ -44,11 +44,7 @@ void Energy2D(Reader::Reader &reader, int numThreads=1)
     rMax      = reader.Read<double>("RMax",1.),
     dR        = reader.Read<double>("DR",.05),
     epsilon   = reader.Read<double>("Epsilon",1.),
-    tolerance = reader.Read<double>("Tolerance",1.);
-
-  bool normalize = reader.Find("Ground");
-  double ground = 0.;
-  if (normalize) ground = reader.Read<double>("Ground");
+    tolerance = reader.Read<double>("Tolerance",1E-16);
 
   Wield::Series::FourierSeries
     C1(reader.Read<int>("Order1"),
@@ -69,6 +65,37 @@ void Energy2D(Reader::Reader &reader, int numThreads=1)
        reader.Read<vector<double> >("X2"),
        reader.Read<vector<double> >("Y2"),
        reader.Read<vector<double> >("Z2"));
+
+  bool normalize = false;
+  double ground  = 0.;
+  if (reader.Find("GroundZ1"))
+    {
+      normalize = true;
+
+      Matrix3d groundRot1 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("GroundZ1"),
+					       reader.Read<Eigen::Vector3d>("GroundX1")).transpose();
+      Matrix3d groundRot2 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("GroundZ2"),
+					       reader.Read<Eigen::Vector3d>("GroundX2")).transpose();
+      double g1 = Wield::Integrator::Surface(C1,groundRot1,C1,groundRot1,epsilon,tolerance);
+      double g2 = Wield::Integrator::Surface(C2,groundRot2,C2,groundRot2,epsilon,tolerance);
+      ground = sqrt(g1*g2);
+
+      if (ground != ground) 
+	WIELD_EXCEPTION_NEW("Computed ground state energy invalid: g1=" << g1 << ", g2=" << g2);
+
+      if (fabs(ground) < 1E-32)
+	WIELD_WARNING("Ground very small (" << ground << "). Maybe increase tolerance?")
+
+      ground *= (1 + tolerance);
+    }
+  if (reader.Find("Ground"))
+    {
+      if (normalize) WIELD_WARNING("Ground value being overwritten!");
+      
+      normalize = true;
+
+      ground = reader.Read<double>("Ground");
+    }
 
   ofstream out(reader.Read<string>("OutFile").c_str());
 

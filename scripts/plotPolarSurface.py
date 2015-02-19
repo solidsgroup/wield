@@ -3,7 +3,7 @@ import argparse
 from math import atan2
 from numpy import loadtxt, linspace, meshgrid, arctan2, pi, radians,degrees,concatenate,cos,sin,sqrt
 from scipy.interpolate import griddata, interp2d
-from pylab import subplots,contourf,pcolor,figure,draw,ginput,show,colorbar,pcolormesh,savefig,plot,ion,pause,clf,xlim,tight_layout,xticks,yticks,set_cmap,get_cmap
+from pylab import subplots,contourf,pcolor,figure,draw,ginput,show,colorbar,pcolormesh,savefig,plot,ion,pause,clf,xlim,tight_layout,xticks,yticks,set_cmap,get_cmap,title
 from fractional_polar_axes import *
 import sys
 
@@ -25,22 +25,35 @@ parser.add_argument('-f3', '--facet3-file', default="", help='Facet3 data input 
 parser.add_argument('-f4', '--facet4-file', default="", help='Facet4 data input file');
 parser.add_argument('-f8', '--facet8-file', default="", help='Facet8 data input file');
 parser.add_argument('-o', '--output-file', default="", help='Image output file');
-parser.add_argument('-a', '--multiplier', nargs=1, default=[1], help='Multiplier')
+parser.add_argument('-a1', '--multiplier', nargs=1, default=[1], help='Multiplicatve constant');
+parser.add_argument('-a2', '--adder', nargs=1, default=[0], help='Additive constant');
 parser.add_argument('--tick-locs',nargs='*',default=[]);
 parser.add_argument('--tick-labels',nargs='*',default=[]);
 parser.add_argument('--center-tick-label',default='');
 parser.add_argument('-cmin', '--cmin', default=0,help='Colorbar minimum value');
 parser.add_argument('-cmax','--cmax', default=0,help='Colorbar maximum value');
 parser.add_argument('-cmap','--cmap', default='jet',help='(jet,gray,binary) See http://wiki.scipy.org/Cookbook/Matplotlib/Show_colormaps for other values');
+parser.add_argument('-t', '--title', default="", help='Optional plot title');
 args=parser.parse_args();
+
+# def format_coord(x, y):
+#     #col = int(x+0.5)
+#     #row = int(y+0.5)
+#     #if col>=0 and col<numcols and row>=0 and row<numrows:
+#     return 'x=%1.4f, y=%1.4f, z=%1.4f'%(x, y, z(x,y))
+#     #else:
+#     #    return 'x=%1.4f, y=%1.4f'%(x, y)
 
 if (len(args.tick_locs) != len(args.tick_labels)):
     raise Exception("Different number of tick locs than tick labels");
     
+multiplier = float(args.multiplier[0]);
+adder = float(args.adder[0]);
 data = loadtxt(args.file);
 x = data[:,0];
 y = data[:,1];
-w = float(args.multiplier[0])*data[:,3];
+w = multiplier*data[:,3] + adder;
+print("minimum=" + str(min(w)));
 
 if args.xsim:
     x = concatenate([x,x])
@@ -51,7 +64,7 @@ if args.ysim:
     y = concatenate([y,y])
     w = concatenate([w,w])
 
-rgrid = linspace(0.0,1,args.resolution[0])
+rgrid = linspace(0.0,1.0,args.resolution[0])
 thetagrid = linspace(float(args.theta_limit[0]),float(args.theta_limit[1]),args.resolution[1])
 rgrid, thetagrid = meshgrid(rgrid,thetagrid)
 wgrid   = griddata((x,y),w,(rgrid*cos(radians(thetagrid)),rgrid*sin(radians(thetagrid))),fill_value=0,method=args.method);
@@ -59,6 +72,7 @@ wgrid   = griddata((x,y),w,(rgrid*cos(radians(thetagrid)),rgrid*sin(radians(thet
 
 #if float(args.theta_limit[1])-float(args.theta_limit[0]) > 180:
 fig,ax = subplots(ncols=1,subplot_kw=dict(projection='polar'))
+#ax.format_coord = format_coord
 ax.xaxis.set_ticklabels([])
 ax.yaxis.set_ticklabels([])
 ax.set_xlim(0,1);
@@ -104,7 +118,7 @@ if float(args.n1[0])**2 + float(args.n1[1])**2 <= 1:
     rr.append(sqrt(float(args.n1[0])**2 + float(args.n1[1])**2))
     tt.append(atan2(float(args.n1[1]),float(args.n1[0])))
     plot(tt,rr,marker='o');
-    xlim(0,1);
+    xlim(0,1.0);
 
 if args.facet_file != "":
     rr = []; tt = []; lamb = []
@@ -234,6 +248,9 @@ if args.facet8_file != "":
 
 if args.center_point:
     plot(0,0,color='white',marker='o');
+
+if args.title != "":
+    title(args.title);
 
 if args.output_file != "":
     savefig(args.output_file);

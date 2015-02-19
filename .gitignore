@@ -12,3 +12,4 @@ scratch
 *.pdf
 html
 latex
+__pycache__

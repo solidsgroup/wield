@@ -66,6 +66,7 @@ void Facet2D(Reader::Reader &reader,
 
   string dataFile          = reader.Read<string>("Facet2D", "DataFile");
   int maxFacetOrder        = reader.Read<int>("Facet2D", "MaxFacetOrder", 3);
+  bool symmetricY          = reader.Find("Facet2D.SymmetricY");
   double D1                = reader.Read<double>("Facet2D", "D1",  0.);
   double D2                = reader.Read<double>("Facet2D", "D2",  1.);
   double D3                = reader.Read<double>("Facet2D", "D3",  1.);
@@ -90,12 +91,15 @@ void Facet2D(Reader::Reader &reader,
        y.size() != z.size() ||
        z.size() != w.size())
     WIELD_EXCEPTION_NEW("Error reading input file: different x,y,z,w sizes");
+
+  if ( x.size() == 0)
+    WIELD_EXCEPTION_NEW("Error: data file appears to be empty");
   
   //
   // Containers for global minimum values
   //
 
-  double wMin;
+  double wMin = INFINITY;
   Vector3d lambdaMin;
   Vector3d n1Min, n2Min, n3Min;
 
@@ -133,6 +137,10 @@ void Facet2D(Reader::Reader &reader,
       n2Min         = reader.Read<Vector3d>("Facet2D","N2Guess");
       n3Min         = reader.Read<Vector3d>("Facet2D","N3Guess");
       searchRadius  = reader.Read<double>("Facet2D", "SearchRadius");
+      cout << n1Min.transpose() << endl;
+      cout << n2Min.transpose() << endl;
+      cout << n3Min.transpose() << endl;
+      cout << searchRadius << endl;
     }
   else
     {
@@ -170,6 +178,7 @@ void Facet2D(Reader::Reader &reader,
       args[i].coarsen = 1; 
       args[i].refining = 1; //boolean
       args[i].searchRadius = searchRadius;
+      args[i].symmetricY = symmetricY;
 
       // Off to the races
       errorCode = pthread_create(&threads[i], NULL, Wield::Optimization::Convexify2D<3>, (void*)(&args[i]));

@@ -33,6 +33,7 @@ bool ThetaInRange(double theta, double theta1, double theta2)
   if (theta1 < 0 || theta1 >= 360.) WIELD_EXCEPTION_NEW("Invalid theta1 = " << theta1);
   if (theta2 < 0 || theta2 >= 360.) WIELD_EXCEPTION_NEW("Invalid theta2 = " << theta2);
  
+
   if (theta1 > 180) theta1 -= 180.;
   else theta1 += 180.;
   if (theta2 > 180) theta2 -= 180.;
@@ -70,6 +71,7 @@ namespace Wield
 {
 namespace Optimization
 {
+
 template<int facetOrder>
 struct ConvexifyData2D;
 
@@ -93,16 +95,67 @@ struct ConvexifyData2D<3>
   int coarsen;
   double searchRadius;
   int refining;
+  bool symmetricY;
 };
 
 
 template<int facetOrder>
 void *Convexify2D(void *args);
 
+static inline
+Vector2d ConvexCoefficients(Eigen::Vector3d n1, Eigen::Vector3d n2, Eigen::Vector3d e)
+{
+  Vector2d lambda(0,0);
+  double theta1 = asin(sqrt(n1(0)*n1(0) + n1(1)*n1(1))); double theta2 = -asin(sqrt(n2(0)*n2(0) + n2(1)*n2(1)));
+  double det = sin(theta1-theta2);
+  if (fabs(det)<1E-5) {lambda[0]=0; lambda[1]=0; return lambda;}
+  lambda(0) = -sin(theta2)/det;
+  lambda(1) = sin(theta1)/det;
+  return lambda;
+}
+static inline
+Vector3d ConvexCoefficients(Eigen::Vector3d n1, Eigen::Vector3d n2, Eigen::Vector3d n3, Eigen::Vector3d e)
+{
+  Vector3d lambda(0,0,0);
+  double det = 
+    + n1[0]*n2[1]*n3[2] 
+    + n1[1]*n2[2]*n3[0]
+    + n1[2]*n2[0]*n3[1]
+    - n1[0]*n2[2]*n3[1]
+    - n1[1]*n2[0]*n3[2]
+    - n1[2]*n2[1]*n3[0];
+  if (fabs(det) < 1E-8) return lambda;
+  lambda(0) = 
+    (+  e[0]*n2[1]*n3[2] 
+     + n2[0]*n3[1]* e[2]
+     + n3[0]* e[1]*n2[2]
+     -  e[0]*n3[1]*n2[2]
+     - n2[0]* e[1]*n3[2]
+     - n3[0]*n2[1]* e[2] )/det;
+  lambda(1) = 
+    (+ n1[0]* e[1]*n3[2]
+     +  e[0]*n3[1]*n1[2]
+     + n3[0]*n1[1]* e[2]
+     - n1[0]*n3[1]* e[2]
+     -  e[0]*n1[1]*n3[2]
+     - n3[0]* e[1]*n1[2] )/det;
+  lambda(2) = 
+    (+ n1[0]*n2[1]* e[2]
+     + n2[0]* e[1]*n1[2]
+     +  e[0]*n1[1]*n2[2]
+     - n1[0]* e[1]*n2[2]
+     - n2[0]*n1[1]* e[2]
+     -  e[0]*n2[1]*n1[2])/det;
+  return lambda;
+}
+
+
+
 template<>
 void *Convexify2D<3>(void *args) 
 {
   WIELD_EXCEPTION_TRY;
+
 
   int index                  =   ((ConvexifyData2D<3> *)(args))->index;
   int numThreads             =   ((ConvexifyData2D<3> *)(args))->numThreads;
@@ -121,7 +174,9 @@ void *Convexify2D<3>(void *args)
   int coarsen                =   ((ConvexifyData2D<3> *)(args))->coarsen;
   double searchRadius        =   ((ConvexifyData2D<3> *)(args))->searchRadius;
   int refining               =   ((ConvexifyData2D<3> *)(args))->refining;
+  bool symmetricY            =   ((ConvexifyData2D<3> *)(args))->symmetricY;
   
+
   Eigen::Vector3d n1MinOld=n1Min, n2MinOld=n2Min, n3MinOld=n3Min;
 
   if (x.size() != y.size() || y.size() != z.size() || z.size() != w.size())
@@ -134,132 +189,114 @@ void *Convexify2D<3>(void *args)
   for (int i =0; i < x.size(); i++) 
     {
       Eigen::Vector3d n1(x[i], y[i], z[i]);
-
-      if ( i%coarsen != 0 ) continue;
+      if (symmetricY) if (fabs(x[i]) > 1E-8) continue;
+      //if ( i%coarsen != 0 ) continue;
       if ( i%numThreads != index ) continue;
-      if (refining) if (sqrt((n1MinOld[0]-n1[0])*(n1MinOld[0]-n1[0]) + (n1MinOld[1]-n1[1])*(n1MinOld[1]-n1[1])) > searchRadius) continue;
-		      //{cout << "n1MinOld = " << n1MinOld.transpose() << endl;cout << "n1 = " << n1.transpose() << endl;exit(0);}
-
-      n.col(0) = n1;
-
-      if (fabs(r[i])<1E-5)
-	if (w[i] < wMin)
-	  {
-	    wMin = w[i];
-	    lambdaMin << 1, 0, 0;
-	    n1Min = n1;
-	    n2Min << 0,0,0;
-	    n3Min << 0,0,0;
-
-	    continue;
-	  }
-
-      for (int j =i+1; j < x.size(); j++) 
+      //if (refining) if (sqrt((n1MinOld[0]-n1[0])*(n1MinOld[0]-n1[0]) + (n1MinOld[1]-n1[1])*(n1MinOld[1]-n1[1])) > searchRadius) continue;
+      
+      if (fabs(r[i])<1E-8)
 	{
+	  if (w[i] < wMin)
+	    {
+	      //cout << __LINE__ << ": " << w[i] << " --> " << wMin << endl;
+	      wMin = w[i];
+	      lambdaMin << 1, 0, 0;
+	      n1Min = n1;
+	      n2Min << 0,0,0;
+	      n3Min << 0,0,0;
+	    }
+	  continue;
+	}
+      // cout << "min=" << wMin << endl;
+      //for (int j =i+1; j < x.size(); j++) 
+      for (int j = 0; j < x.size(); j++) 
+	{
+	  if (j==i) continue;
+	  if (symmetricY) if (x[j] > 1E-8) continue; // only consider x<0
 	  Eigen::Vector3d n2(x[j], y[j], z[j]);
-
-	  if ( j%coarsen != 0 ) continue;
-	  if (r[j] < 1E-8) continue;
-	  if (refining) if (sqrt((n2MinOld[0]-n2[0])*(n2MinOld[0]-n2[0]) + (n2MinOld[1]-n2[1])*(n2MinOld[1]-n2[1])) > searchRadius) continue;
-			  //{ cout << "n2MinOld = " << n2MinOld.transpose() << endl;cout << "n2 = " << n2.transpose() << endl;exit(0);}
-
-
-	  n.col(1) = n2;
 	  
+	  //if ( j%coarsen != 0 ) continue;
+	  //if (r[j] < 1E-8) continue;
+	  //if (refining) if (fabs(n2MinOld[0]-n2[0]) > searchRadius || fabs(n2MinOld[1]-n2[1]) > searchRadius ) continue; // taxicab norm
+
+
 	  if (PolarOpposites(theta[i],theta[j]))
 	    {
 	      if (w[i] > wMin && w[j] > wMin) continue;
-	      double theta1 = asin(r[i]); double theta2 = -asin(r[j]);
-	      double det = sin(theta1-theta2);
-	      if (fabs(det)<1E-5) continue;
-	      double lambda1 = -sin(theta2)/det;
-	      double lambda2 = sin(theta1)/det;
-	      double wCurrent = fabs(lambda1)*w[i] + fabs(lambda2)*w[j];
+
+	      Eigen::Vector2d lambda = ConvexCoefficients(n1,n2,e);
+	      double wCurrent = fabs(lambda[0])*w[i] + fabs(lambda[1])*w[j];
+	      if (lambda[0] + lambda[1] < 1.) continue;
 	      if (wCurrent < wMin)
 		{
+		  //cout << __LINE__ << ": " << wCurrent << " --> " << wMin << endl;
+
 		  wMin = wCurrent;
-		  lambdaMin << lambda1, lambda2, 0;
+		  // if (index==0) cout << lambda.transpose() << endl;
+		  lambdaMin << lambda[0], lambda[1], 0;
 		  n1Min = n1;
 		  n2Min = n2;
 		  n3Min << 0,0,0;
-
 		  continue;
 		}
 	    }
 	  else if (maxFacetOrder >= 3)
 	    {
-	      for (int k = j+1; k < x.size(); k++) 
+	      if (symmetricY)
 		{
-		  Eigen::Vector3d n3(x[k], y[k], z[k]);
-		  if ( k%coarsen != 0 ) continue;
-		  if (r[k] < 1E-8) continue;
-		  if (refining) if (sqrt((n3MinOld[0]-n3[0])*(n3MinOld[0]-n3[0]) + (n3MinOld[1]-n3[1])*(n3MinOld[1]-n3[1])) > searchRadius) continue;
-				  //{cout << "n3MinOld = " << n3MinOld.transpose() << endl;cout << "n3 = " << n3.transpose() << endl;exit(0);}
-
-		  //if (refining) if ((n3-n3MinOld).norm() > searchRadius) {cout << "norm3" << endl;continue;}
-		  if (!ThetaInRange(theta[k],theta[i],theta[j])) continue;
-		  if (PolarOpposites(theta[i],theta[k]) || PolarOpposites(theta[j],theta[k])) continue; // 2d faceting, will get caught later
-		  if (w[i]>wMin && w[j]>wMin && w[k]>wMin) continue;
-		  
-		  n.col(2) = n3;
-
-		  double det = 
-		    + n(0,0)*n(1,1)*n(2,2) 
-		    + n(0,1)*n(1,2)*n(2,0)
-		    + n(0,2)*n(1,0)*n(2,1)
-		    - n(0,0)*n(1,2)*n(2,1)
-		    - n(0,1)*n(1,0)*n(2,2)
-		    - n(0,2)*n(1,1)*n(2,0);
-		  if (fabs(det)<1E-8) continue;
-
-		  double lambda1 =
-		    (+ e(0)  *n(1,1)*n(2,2) 
-		     + n(0,1)*n(1,2)*e(2)
-		     + n(0,2)*e(1)  *n(2,1)
-		     - e(0)  *n(1,2)*n(2,1)
-		     - n(0,1)*e(1)  *n(2,2)
-		     - n(0,2)*n(1,1)*e(2)  )/det;
-		  if (lambda1<0) continue;
-
-		  double lambda2 = 
-		    (+ n(0,0)*e(1)  *n(2,2) 
-		     + e(0)  *n(1,2)*n(2,0)
-		     + n(0,2)*n(1,0)*e(2)
-		     - n(0,0)*n(1,2)*e(2)
-		     - e(0)  *n(1,0)*n(2,2)
-		     - n(0,2)*e(1)  *n(2,0))/det;
-		  if (lambda2<0) continue;
-
-		  double lambda3 = 
-		    (+ n(0,0)*n(1,1)*e(2) 
-		     + n(0,1)*e(1)  *n(2,0)
-		     + e(0)  *n(1,0)*n(2,1)
-		     - n(0,0)*e(1)  *n(2,1)
-		     - n(0,1)*n(1,0)*e(2)
-		     - e(0)  *n(1,1)*n(2,0))/det;
-		  if (lambda3<0) continue;
-
-
-		  lambda << lambda1 , lambda2 , lambda3;
-		  if ((n*lambda - e).norm() > 1E-8)
-		    WIELD_EXCEPTION_NEW("Linear solve did not work: (n*lambda - e).norm() = " << (n*lambda - e).norm() << endl
-					<< "lambda = " << lambda.transpose() << endl
-					<< "N = " << endl << n.transpose() << endl
-					<< "e = " << e.transpose() << endl)
-
-		  double wCurrent = lambda1*w[i] + lambda2*w[j] + lambda3*w[k];
-
+		  //if (index==0) cout << lambda.transpose() << endl;
+		  //if ((y[i]>0 && y[j] > 0) || (y[i] < 0 && y[j] < 0)) {cout << __LINE__<< endl;continue;}
+		  Eigen::Vector3d n3(-x[j], y[j], z[j]);
+		  // double theta3 = 0.; 
+		  // if (y[j] > 0) theta3 = 180 - theta[j];
+		  // else theta3 = 
+		  Eigen::Vector3d lambda = ConvexCoefficients(n1, n2, n3, e); 
+		  //cout << lambda.transpose() << endl;
+		  //cout << (lambda[0]*n1 + lambda[1]*n2 + lambda[2]*n3).transpose() << endl;
+		  double wCurrent = lambda[0]*w[i] + lambda[1]*w[j] + lambda[2]*w[j]; 
+		  //cout << "(" << n1.transpose() << ") (" << n2.transpose() << ") (" << n3.transpose() << ") : " << lambda.transpose() << endl; 
+		  if (lambda[0] < 0 || lambda[1] < 0 || lambda[2] < 0) {continue;}  
+		  if (lambda[0] + lambda[1] + lambda[2] < 1.) continue;
 		  if (wCurrent < wMin)
 		    {
+		      //cout << __LINE__ << ": " << wCurrent << " --> " << wMin << ",   " << lambda << endl;
 		      wMin = wCurrent;
-		      lambdaMin << lambda1,lambda2,lambda3;
+		      lambdaMin << lambda[0],lambda[1],lambda[2];
 		      n1Min = n1;
 		      n2Min = n2;
 		      n3Min = n3;
-
 		      continue;
 		    }
+		}
+	      else
+		{
 
+		  for (int k = j+1; k < x.size(); k++) 
+		    {
+		      Eigen::Vector3d n3(x[k], y[k], z[k]);
+		  
+		      if (symmetricY) if (fabs(x[k]+x[j]) > 1E-8 || fabs(y[k]-y[j]) > 1E-8) continue;
+		      if (k%coarsen != 0 ) continue; 
+		      if (r[k] < 1E-8) continue; // if this point is the origin, this case has already been considered
+		      if (refining) if (sqrt((n3MinOld[0]-n3[0])*(n3MinOld[0]-n3[0]) + (n3MinOld[1]-n3[1])*(n3MinOld[1]-n3[1])) > searchRadius) continue; // small radius
+		      if (!ThetaInRange(theta[k],theta[i],theta[j])) continue; // is the origin in the feasible set?
+		      if (PolarOpposites(theta[i],theta[k]) || PolarOpposites(theta[j],theta[k])) continue; // 2d faceting, will get caught later
+		      if (w[i]>wMin && w[j]>wMin && w[k]>wMin) continue; // pointless! this will definitely be greater than wMin
+		  
+		      Eigen::Vector3d lambda = ConvexCoefficients(n1, n2, n3, e);
+		      double wCurrent = lambda[0]*w[i] + lambda[1]*w[j] + lambda[2]*w[k];
+
+		      if (wCurrent < wMin)
+			{
+			  //cout << __LINE__ << ": " << w[i] << " --> " << wMin << endl;
+			  wMin = wCurrent;
+			  lambdaMin << lambda[0],lambda[1],lambda[2];
+			  n1Min = n1;
+			  n2Min = n2;
+			  n3Min = n3;
+			  continue;
+			}
+		    }
 		}
 	    }
 	}
