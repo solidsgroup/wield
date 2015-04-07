@@ -1,0 +1,18 @@
+$Energy1D
+include fcc_cu.in
+include bcc_nb.in
+$Tolerance 1E-2
+$AxisZ1  1  1  1
+$AxisX1 -1  1  0
+$AxisZ2  1  1 -2
+$AxisX2  1  1  1
+$RotAxes1 x
+$Rots1 -18
+$ThetaRotX1 1
+$ThetaRotX2 1
+$ThetaMin -30
+$ThetaMax 30
+$DTheta .25
+$Convexify
+$OutFile KS_F1.out
+

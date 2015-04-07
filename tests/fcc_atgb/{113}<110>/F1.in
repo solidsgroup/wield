@@ -1,0 +1,16 @@
+$Energy1D
+include fcc.in
+$AxisZ1 0 0 2
+$AxisZ2 6 -6 7
+$AxisX1 1 1 0
+$AxisX2 1 1 0
+$ThetaRotX1 1
+$ThetaRotX2 1
+$ThetaMin -90
+$ThetaMax 90
+$DTheta 0.25
+$FullConvexify
+$Sigma1 0.10
+$Sigma2 $Sigma1
+
+$OutFile outfiles/F1_sigma_$Sigma1.dat

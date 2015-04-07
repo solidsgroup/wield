@@ -1,0 +1,13 @@
+font.size : 6
+mathtext.fontset: cm
+mathtext.default: sf
+figure.figsize : 3, 2.25
+axes.labelsize : 6
+axes.titlesize : 6
+xtick.labelsize : 6
+ytick.labelsize : 6
+lines.linewidth   : 1
+lines.markersize  : 3
+legend.fontsize : 6
+backend      : qt4agg
+svg.fonttype : none

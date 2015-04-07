@@ -1,0 +1,11 @@
+$Energy2D
+include ../bcc.in
+$AxisX1 1 0 0
+$AxisZ1 0 1 1
+$AxisX2 1 0 0
+$AxisZ2 0 1 1
+
+
+
+
+

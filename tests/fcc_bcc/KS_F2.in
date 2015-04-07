@@ -1,0 +1,12 @@
+$Energy2D
+include fcc_cu.in
+include bcc_nb.in
+$Tolerance 1E-2
+$AxisZ1  1  1 -2
+$AxisX1 -1  1  0
+$AxisZ2  1 -1  2
+$AxisX2  1 -1 -1
+$DR 0.01
+$DTheta 1
+#$OutFile KS.out
+

@@ -2,6 +2,7 @@ $a 3.615
 $Sigma1 $a*0.175
 $Sigma2 $Sigma1
 $Epsilon 0.5
+$Tolerance 1E-8
 
 $Ground 2.33603e-8
 

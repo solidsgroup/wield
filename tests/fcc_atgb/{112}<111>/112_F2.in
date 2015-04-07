@@ -1,0 +1,19 @@
+$Energy2D
+include fcc.in
+$Tolerance 1E-8
+$AxisZ1 1 -1 0
+$AxisZ2 -1 1 -0
+$AxisX1 1 1 -1
+$AxisX2 1 1 -1
+$DR 0.005
+$ThetaMin 0
+$ThetaMax 360
+$DTheta 0.5
+$Sigma1 0.3
+$Sigma2 $Sigma1
+$OutFile outfiles/F2_sigma_$Sigma1.dat
+
+
+
+
+

@@ -1,0 +1,23 @@
+$Crystal1 {
+    $InFile bcc.in
+}
+
+$Crystal2 {
+    $InFile bcc.in
+}
+
+$EnergyOR1D {
+    include constants.in
+    $X1 1 -1 0
+    $Z1 1 1 2
+    $X2 1 -1 0
+    $Z2 1 1 2
+    $ThetaRotZ1 0.5
+    $ThetaRotZ2 -0.5
+    $ThetaMin 0
+    $ThetaMax 180
+    $DTheta 5
+    $Tolerance 1E-2
+    $Distribution cauchy
+    $OutFile outfiles/112.dat
+}

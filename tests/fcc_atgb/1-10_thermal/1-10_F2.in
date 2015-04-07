@@ -1,0 +1,11 @@
+$Energy2D
+include fcc.in
+$Tolerance 1E-8
+$AxisX1 1 -1 0
+$AxisX2 1 -1 0
+$AxisZ1 1 1 -1
+$AxisZ2 1 1 1
+$DR 0.005
+$ThetaMin 0
+$ThetaMax 360
+$DTheta 0.5
