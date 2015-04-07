@@ -15,6 +15,7 @@
 #include "Series/wieldFourierSeries.h"
 #include "Utils/VTK/wieldVTK.h"
 #include "Integrator/wieldSurface.h"
+#include "Optimization/wieldConvexify1D.h"
 
 using namespace std;
 
@@ -33,6 +34,10 @@ void Energy1D(Reader::Reader &reader)
     epsilon = reader.Read<double>("Epsilon",0.2),
     tolerance = reader.Read<double>("Tolerance",1E-16);
   
+  bool 
+    convexify     = reader.Find("Convexify"),
+    fullConvexify = reader.Find("FullConvexify");
+
   Wield::Series::FourierSeries
     C1(reader.Read<int>("Order1"),
        reader.Read<double>("AlphaX1"),
@@ -118,6 +123,8 @@ void Energy1D(Reader::Reader &reader)
     thetaRotZ2 = reader.Read<double>("ThetaRotZ2",0.);
 
   double w = 0;
+  vector<double> thetas, ws;
+
   for (double theta = thetaMin; theta <= thetaMax ; theta += dTheta)
     {
       Matrix3d
@@ -134,15 +141,29 @@ void Energy1D(Reader::Reader &reader)
       w = Wield::Integrator::Surface(C1,omega1,
 				     C2,omega2,
 				     epsilon, tolerance);
-
       if (normalize)
-	out << theta << " " << 1-(w/ground) << endl;
+	w = 1-(w/ground);
       else
-	out << theta << " " << -w << endl;
+	w = -w;
 
+      thetas.push_back(theta);
+      ws.push_back(w);
       WIELD_PROGRESS("Computing energy", theta-thetaMin, thetaMax-thetaMin, dTheta)
     }
   cout << endl;
+
+  if (convexify || fullConvexify)
+    {
+      vector<double> wulff;
+      vector<double> wcs = Wield::Optimization::Convexify1DAngles(thetas,ws,wulff,fullConvexify);
+      for (int i=0; i<thetas.size(); i++)
+	out << thetas[i] << " " << ws[i] << " " << wcs[i] << " " << wulff[i] << endl;
+    }
+  else
+    for (int i=0; i<thetas.size(); i++)
+      out << thetas[i] << " " << ws[i] << endl;
+
+
   out.close();
 
 

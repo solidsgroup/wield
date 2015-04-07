@@ -62,7 +62,10 @@ void Facet2D(Reader::Reader &reader,
   // exit(0);
 
   
-  vector<double> x,y,z,w;
+
+  //
+  // Open input deck
+  // 
 
   string dataFile          = reader.Read<string>("Facet2D", "DataFile");
   int maxFacetOrder        = reader.Read<int>("Facet2D", "MaxFacetOrder", 3);
@@ -70,10 +73,15 @@ void Facet2D(Reader::Reader &reader,
   double D1                = reader.Read<double>("Facet2D", "D1",  0.);
   double D2                = reader.Read<double>("Facet2D", "D2",  1.);
   double D3                = reader.Read<double>("Facet2D", "D3",  1.);
-
   ifstream in(dataFile.c_str());
   if (!in)
     WIELD_EXCEPTION_NEW("Could not open input file " << dataFile); 
+
+  //
+  // Read in the raw data from the datafile
+  //
+
+  vector<double> x,y,z,w;
   string line;
   while (getline(in,line))
     {
@@ -107,6 +115,7 @@ void Facet2D(Reader::Reader &reader,
   // Compute r, theta arrays and 
   // Store default minimum value (planar case)
   //
+
   vector<double> r(x.size()), theta(x.size());
   for (int i=0; i<x.size(); i++)
     {
@@ -125,7 +134,6 @@ void Facet2D(Reader::Reader &reader,
 	}
     }
 
-  
   //
   // Special case: does the user have "a good guess"?
   //

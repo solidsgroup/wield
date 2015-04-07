@@ -44,7 +44,7 @@ Convexify1D(vector<double> X, vector<double> Y)
 }
 
 vector<double>
-Convexify1DAngles(vector<double> X, vector<double> Y,bool full=false)
+Convexify1DAngles(vector<double> X, vector<double> Y, vector<double> &wulff, bool full=false)
 {
   WIELD_EXCEPTION_TRY;
   if (X.size() != Y.size())
@@ -54,7 +54,7 @@ Convexify1DAngles(vector<double> X, vector<double> Y,bool full=false)
   for (int i=0; i<X.size(); i++)  // With the simpler for loops, this has O(n^2) scaling
     {
       double inf = Y[i];
-      
+      double wulff_inf = inf;
       int jmin, jmax, kmin, kmax;
 
       // These for loop parameters gives an accurate
@@ -70,14 +70,20 @@ Convexify1DAngles(vector<double> X, vector<double> Y,bool full=false)
 	  {
 	    if (j==k) continue;
 	    double theta1 = X[j]*pi/180, theta = X[i]*pi/180, theta2= X[k]*pi/180;
+	    while (theta1 > theta) theta1 -= pi;
+	    while (theta2 < theta) theta2 += pi;
 	    double det = sin(theta1-theta2);
 	    double lambda1 = sin(theta - theta2)/det;
 	    double lambda2 = sin(theta1 - theta)/det;
 	    double w = fabs(lambda1)*Y[j] + fabs(lambda2)*Y[k];
-	    if (w < inf)
-	      inf = w;
+	    double wulff1 = fabs(Y[j]/cos(theta-theta1)), wulff2 = fabs(Y[k]/cos(theta-theta2));
+	    double wulff_tmp; if (wulff1<wulff2) wulff_tmp = wulff1; else wulff_tmp = wulff2;
+
+	    if (w < inf) inf = w;
+	    if (wulff_tmp < wulff_inf) wulff_inf = wulff_tmp;
 	  }
       Yc.push_back(inf);
+      wulff.push_back(wulff_inf);
       WIELD_PROGRESS("Convexifying", i,X.size(),1);
     }
   cout << endl;
