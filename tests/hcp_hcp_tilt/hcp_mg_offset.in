@@ -1,0 +1,22 @@
+$EnergyOffset
+
+include hcp_mg.in
+
+$AxisX1 0 1 0
+$AxisX2 0 1 0
+$AxisZ1 0 0 1
+$AxisZ2 0 0 1
+ 
+
+$ThetaRotX1 1
+$ThetaRotX2 -1
+$Theta 50
+
+$TY1Min -($a)/2.
+$TY1Max  ($a)/2. + 0.05*($a)
+$DTY1    0.05*($a)
+$TX1Min -($a*sqrt(3.))/2. 
+$TX1Max  ($a*sqrt(3.))/2. + 0.05*($a*sqrt(3.))
+$DTX1    0.05*($a*sqrt(3.))
+
+$OutFile offset.dat

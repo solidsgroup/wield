@@ -65,6 +65,7 @@
 
 #include "Main/wieldEnergy1D.h"
 #include "Main/wieldEnergy2D.h"
+#include "Main/wieldEnergyOffset.h"
 // #include "Main/wieldBlenderVoxelData.h"
 // #include "Main/wieldVisualizeOR.h"
 // #include "Main/wieldEnergySurfaceSphere.h"
@@ -124,6 +125,8 @@ int main(int argc,     ///< Number of arguments
     Wield::Main::Energy1D(*rabbit);
   if (rabbit->Find("Energy2D"))
     Wield::Main::Energy2D(*rabbit,numThreads);
+  if (rabbit->Find("EnergyOffset"))
+    Wield::Main::EnergyOffset(*rabbit);
   // if (rabbit->Find("BlenderVoxelData"))
   //   Wield::Main::BlenderVoxelData(*rabbit);
   // if (rabbit->Find("VisualizeOR"))

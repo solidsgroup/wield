@@ -30,8 +30,16 @@ A_Au = 950
 #texing
 if args.tex_off:
     def tex(a): return "\$"+a+"\$"
+    def xlabel(a) : return "\\xlabel{"+a+"}"
+    def ylabel(a) : return "\\ylabel{"+a+"}"
+    def legend(a) : return "\\legend{"+a+"}"
+    def annotate(a) : return "\\annotate{"+a+"}"
 else:
     def tex(a): return "$"+a+"$"
+    def xlabel(a) : return a
+    def ylabel(a) : return a
+    def legend(a) : return a
+    def annotate(a) : return a
 
 
 Tilt_001_Model  = numpy.loadtxt("100_2d/outfiles/F1.dat", delimiter=" ");
@@ -66,49 +74,49 @@ pylab.subplot(221)
 pylab.xlim(0,90)
 pylab.ylim(0,1.)
 if unrelaxed:
-    pylab.plot(Tilt_001_Model[:,0],        1E-3*A_Cu*Tilt_001_Model[:,1],color="blue",linestyle='-',label='Cu(Cov)')
-    pylab.plot(Tilt_001_Model[:,0],        1E-3*A_Au*Tilt_001_Model[:,1],color="green",linestyle='-',label='Au(Cov)')
+    pylab.plot(Tilt_001_Model[:,0],        1E-3*A_Cu*Tilt_001_Model[:,1],color="blue",linestyle='-',label=legend('Cu(Cov)'))
+    pylab.plot(Tilt_001_Model[:,0],        1E-3*A_Au*Tilt_001_Model[:,1],color="green",linestyle='-',label=legend('Au(Cov)'))
 else:
-    pylab.plot(Tilt_001_Model[:,0],        1E-3*A_Cu*Tilt_001_Model[:,1],color="blue",linestyle=':',label='Cu(Cov)')
-    pylab.plot(Tilt_001_Model_Relaxed[:,0],1E-3*A_Cu*Tilt_001_Model_Relaxed[:,1],color="blue",linestyle='-',label='Cu(RCov)')
-    pylab.plot(Tilt_001_Model[:,0],        1E-3*A_Au*Tilt_001_Model[:,1],color="green",linestyle=':',label='Au(Cov)')
-    pylab.plot(Tilt_001_Model_Relaxed[:,0],1E-3*A_Au*Tilt_001_Model_Relaxed[:,1],color="green",linestyle='-',label='Au(RCov)')
-pylab.plot(Tilt_001_Wolf_Cu_LJ[:,0],   1E-3*Tilt_001_Wolf_Cu_LJ[:,1],color="blue",marker='^',linestyle='',label='Cu(LJ)')
-pylab.plot(Tilt_001_Wolf_Cu_EAM[:,0],1E-3*Tilt_001_Wolf_Cu_EAM[:,1],color="green",marker='o',linestyle='',label='Cu(EAM)')
-pylab.plot(Tilt_001_Wolf_Au_EAM[:,0],1E-3*Tilt_001_Wolf_Au_EAM[:,1],color="green",marker='o',linestyle='',label='Au(EAM)')
+    pylab.plot(Tilt_001_Model[:,0],        1E-3*A_Cu*Tilt_001_Model[:,1],color="blue",linestyle=':',label=legend('Cu(Cov)'))
+    pylab.plot(Tilt_001_Model_Relaxed[:,0],1E-3*A_Cu*Tilt_001_Model_Relaxed[:,1],color="blue",linestyle='-',label=legend('Cu(RCov)'))
+    pylab.plot(Tilt_001_Model[:,0],        1E-3*A_Au*Tilt_001_Model[:,1],color="green",linestyle=':',label=legend('Au(Cov)'))
+    pylab.plot(Tilt_001_Model_Relaxed[:,0],1E-3*A_Au*Tilt_001_Model_Relaxed[:,1],color="green",linestyle='-',label=legend('Au(RCov)'))
+pylab.plot(Tilt_001_Wolf_Cu_LJ[:,0],   1E-3*Tilt_001_Wolf_Cu_LJ[:,1],color="blue",marker='^',linestyle='',label=legend('Cu(LJ)'))
+pylab.plot(Tilt_001_Wolf_Cu_EAM[:,0],1E-3*Tilt_001_Wolf_Cu_EAM[:,1],color="blue",marker='o',linestyle='',label=legend('Cu(EAM)'))
+pylab.plot(Tilt_001_Wolf_Au_EAM[:,0],1E-3*Tilt_001_Wolf_Au_EAM[:,1],color="green",marker='o',linestyle='',label=legend('Au(EAM)'))
 if not args.labels_off:
-    pylab.xlabel(tex(r'[100]')+' tilt angle '+tex(r'\theta'),labelpad=xlabelpad);
-    pylab.ylabel("Energy "+tex("(J/m^2)"),labelpad=ylabelpad);
+    pylab.xlabel(xlabel(tex(r'[100]')+' tilt angle '+tex(r'\theta')),labelpad=xlabelpad);
+    pylab.ylabel(ylabel("Energy "+tex("(J/m^2)")),labelpad=ylabelpad);
 offset=0.5
 if args.annotate:
-    pylab.annotate(tex(r'(001)(001)'), xycoords=('data','axes fraction'), xy=(0+offset,1.05),va="bottom", ha="center",rotation=90)
-    pylab.annotate(tex(r'(0\bar{1}3)(013)'), xycoords=('data','axes fraction'), xy=(36.41+offset,1.05),va="bottom", ha="center",rotation=90)
-    pylab.annotate(tex(r'(0\bar{1}1)(011)'), xycoords=('data','axes fraction'), xy=(90+offset,1.05),va="bottom", ha="center",rotation=90)
+    pylab.annotate(annotate(tex(r'(001)(001)')), xycoords=('data','axes fraction'), xy=(0+offset,1.05),va="bottom", ha="center",rotation=90)
+    pylab.annotate(annotate(tex(r'(0\bar{1}3)(013)')), xycoords=('data','axes fraction'), xy=(36.41+offset,1.05),va="bottom", ha="center",rotation=90)
+    pylab.annotate(annotate(tex(r'(0\bar{1}1)(011)')), xycoords=('data','axes fraction'), xy=(90+offset,1.05),va="bottom", ha="center",rotation=90)
 
 pylab.subplot(222)
 pylab.xlim(0,180)
 pylab.ylim(0,1.)
 if unrelaxed:
-    pylab.plot(Tilt_110_Model[:,0],        1E-3*A_Cu*Tilt_110_Model[:,1],color="blue",linestyle='-',label='Cu(Cov)')
-    pylab.plot(Tilt_110_Model[:,0],        1E-3*A_Au*Tilt_110_Model[:,1],color="green",linestyle='-',label='Cu(Cov)')
+    pylab.plot(Tilt_110_Model[:,0],        1E-3*A_Cu*Tilt_110_Model[:,1],color="blue",linestyle='-',label=legend('Cu(Cov)'))
+    pylab.plot(Tilt_110_Model[:,0],        1E-3*A_Au*Tilt_110_Model[:,1],color="green",linestyle='-',label=legend('Cu(Cov)'))
 else:
-    pylab.plot(Tilt_110_Model[:,0],        1E-3*A_Cu*Tilt_110_Model[:,1],color="blue",linestyle=':',label='Cu(Cov)')
-    pylab.plot(Tilt_110_Model_Relaxed[:,0],1E-3*A_Cu*Tilt_110_Model_Relaxed[:,1],color="blue",linestyle='-',label='Cu(RCov)')
-    pylab.plot(Tilt_110_Model[:,0],        1E-3*A_Au*Tilt_110_Model[:,1],color="green",linestyle=':',label='Cu(Cov)')
-    pylab.plot(Tilt_110_Model_Relaxed[:,0],1E-3*A_Au*Tilt_110_Model_Relaxed[:,1],color="green",linestyle='-',label='Au(RCov)')
-pylab.plot(Tilt_110_Wolf_Cu_LJ[:,0],1E-3*Tilt_110_Wolf_Cu_LJ[:,1],color="blue",marker='^',linestyle='',label='Cu(EAM)')
-pylab.plot(Tilt_110_Wolf_Cu_EAM[:,0],1E-3*Tilt_110_Wolf_Cu_EAM[:,1],color="blue",marker='o',linestyle='',label='Cu(EAM)')
-pylab.plot(Tilt_110_Wolf_Au_EAM[:,0],1E-3*Tilt_110_Wolf_Au_EAM[:,1],color="green",marker='o',linestyle='',label='Au(EAM)')
+    pylab.plot(Tilt_110_Model[:,0],        1E-3*A_Cu*Tilt_110_Model[:,1],color="blue",linestyle=':',label=legend('Cu(Cov)'))
+    pylab.plot(Tilt_110_Model_Relaxed[:,0],1E-3*A_Cu*Tilt_110_Model_Relaxed[:,1],color="blue",linestyle='-',label=legend('Cu(RCov)'))
+    pylab.plot(Tilt_110_Model[:,0],        1E-3*A_Au*Tilt_110_Model[:,1],color="green",linestyle=':',label=legend('Cu(Cov)'))
+    pylab.plot(Tilt_110_Model_Relaxed[:,0],1E-3*A_Au*Tilt_110_Model_Relaxed[:,1],color="green",linestyle='-',label=legend('Au(RCov)'))
+pylab.plot(Tilt_110_Wolf_Cu_LJ[:,0],1E-3*Tilt_110_Wolf_Cu_LJ[:,1],color="blue",marker='^',linestyle='',label=legend('Cu(EAM)'))
+pylab.plot(Tilt_110_Wolf_Cu_EAM[:,0],1E-3*Tilt_110_Wolf_Cu_EAM[:,1],color="blue",marker='o',linestyle='',label=legend('Cu(EAM)'))
+pylab.plot(Tilt_110_Wolf_Au_EAM[:,0],1E-3*Tilt_110_Wolf_Au_EAM[:,1],color="green",marker='o',linestyle='',label=legend('Au(EAM)'))
 if not args.labels_off:
-    pylab.xlabel(tex(r'[110]')+' tilt angle '+tex(r'\theta'),labelpad=xlabelpad);
-    pylab.ylabel("Energy "+tex("(J/m^2)"),labelpad=ylabelpad);
+    pylab.xlabel(xlabel(tex(r'[110]')+' tilt angle '+tex(r'\theta')),labelpad=xlabelpad);
+    pylab.ylabel(ylabel("Energy "+tex("(J/m^2)")),labelpad=ylabelpad);
 offset=1
 if args.annotate:
-    pylab.annotate(tex(r'(\bar{1}10)(\bar{1}10)'), xycoords=('data','axes fraction'), xy=(0+offset,1.05),va="bottom", ha="center",rotation=90)
-    pylab.annotate(tex(r'(\bar{3}31)(\bar{3}3\bar{1})'), xycoords=('data','axes fraction'), xy=(25.77+offset,1.05),va="bottom", ha="center",rotation=90)
-    pylab.annotate(tex(r'(\bar{1}11)(\bar{1}1\bar{1})'), xycoords=('data','axes fraction'), xy=(70.6+offset,1.05),va="bottom", ha="center",rotation=90)
-    pylab.annotate(tex(r'(\bar{1}13)(\bar{1}1\bar{3})'), xycoords=('data','axes fraction'), xy=(129.4+offset,1.05),va="bottom", ha="center",rotation=90)
-    pylab.annotate(tex(r'(001)(00\bar{1})'), xycoords=('data','axes fraction'), xy=(180+offset,1.05),va="bottom", ha="center",rotation=90)
+    pylab.annotate(annotate(tex(r'(\bar{1}10)(\bar{1}10)')), xycoords=('data','axes fraction'), xy=(0+offset,1.05),va="bottom", ha="center",rotation=90)
+    pylab.annotate(annotate(tex(r'(\bar{3}31)(\bar{3}3\bar{1})')), xycoords=('data','axes fraction'), xy=(25.77+offset,1.05),va="bottom", ha="center",rotation=90)
+    pylab.annotate(annotate(tex(r'(\bar{1}11)(\bar{1}1\bar{1})')), xycoords=('data','axes fraction'), xy=(70.6+offset,1.05),va="bottom", ha="center",rotation=90)
+    pylab.annotate(annotate(tex(r'(\bar{1}13)(\bar{1}1\bar{3})')), xycoords=('data','axes fraction'), xy=(129.4+offset,1.05),va="bottom", ha="center",rotation=90)
+    pylab.annotate(annotate(tex(r'(001)(00\bar{1})')), xycoords=('data','axes fraction'), xy=(180+offset,1.05),va="bottom", ha="center",rotation=90)
 
 pylab.subplot(223)
 pylab.xlim(0,60)
@@ -125,35 +133,35 @@ pylab.plot(Tilt_111_Wolf_Cu_LJ[:,0],1E-3*Tilt_111_Wolf_Cu_LJ[:,1],color="blue",m
 pylab.plot(Tilt_111_Wolf_Cu_EAM[:,0],1E-3*Tilt_111_Wolf_Cu_EAM[:,1],color="blue",marker='o',linestyle='')
 pylab.plot(Tilt_111_Wolf_Au_EAM[:,0],1E-3*Tilt_111_Wolf_Au_EAM[:,1],color="green",marker='o',linestyle='')
 if not args.labels_off:
-    pylab.xlabel(tex(r'[111]')+' tilt angle '+tex(r'\theta'),labelpad=xlabelpad);
-    pylab.ylabel("Energy "+tex("(J/m^2)"),labelpad=ylabelpad);
+    pylab.xlabel(xlabel(tex(r'[111]')+' tilt angle '+tex(r'\theta')),labelpad=xlabelpad);
+    pylab.ylabel(ylabel("Energy "+tex("(J/m^2)")),labelpad=ylabelpad);
 offset = 0.5
 if args.annotate:
-    pylab.annotate(tex(r'(10\bar{1})(10\bar{1})'), xycoords=('data','axes fraction'), xy=(0+offset,1.05),va="bottom", ha="center",rotation=90)
-    pylab.annotate(tex(r'(11\bar{2})(2\bar{1}\bar{1})'), xycoords=('data','axes fraction'), xy=(60+offset,1.05),va="bottom", ha="center",rotation=90)
+    pylab.annotate(annotate(tex(r'(10\bar{1})(10\bar{1})')), xycoords=('data','axes fraction'), xy=(0+offset,1.05),va="bottom", ha="center",rotation=90)
+    pylab.annotate(annotate(tex(r'(11\bar{2})(2\bar{1}\bar{1})')), xycoords=('data','axes fraction'), xy=(60+offset,1.05),va="bottom", ha="center",rotation=90)
 
 ax = pylab.subplot(224)
 pylab.xlim(0,110)
 pylab.ylim(0,1.)
 if unrelaxed:
-    pylab.plot(Tilt_112_Model[:,0],        1E-3*A_Cu*Tilt_112_Model[:,1],color="blue",linestyle='-',label='Cu (Model)'.ljust(50))
-    pylab.plot(Tilt_112_Model[:,0],        1E-3*A_Au*Tilt_112_Model[:,1],color="green",linestyle='-',label='Au (Model)'.ljust(50))
+    pylab.plot(Tilt_112_Model[:,0],        1E-3*A_Cu*Tilt_112_Model[:,1],color="blue",linestyle='-',label=legend('Cu (Model)').ljust(50))
+    pylab.plot(Tilt_112_Model[:,0],        1E-3*A_Au*Tilt_112_Model[:,1],color="green",linestyle='-',label=legend('Au (Model)').ljust(50))
 else:
-    pylab.plot(Tilt_112_Model[:,0],        1E-3*A_Cu*Tilt_112_Model[:,1],color="blue",linestyle=':',label='Cu (Unrelaxed model)'.ljust(60))
-    pylab.plot(Tilt_112_Model_Relaxed[:,0],1E-3*A_Cu*Tilt_112_Model_Relaxed[:,1],color="blue",linestyle='-',label='Cu (Relaxed model)'.ljust(60))
-    pylab.plot(Tilt_112_Model[:,0],        1E-3*A_Au*Tilt_112_Model[:,1],color="green",linestyle=':',label='Au (Unrelaxed model)'.ljust(60))
-    pylab.plot(Tilt_112_Model_Relaxed[:,0],1E-3*A_Au*Tilt_112_Model_Relaxed[:,1],color="green",linestyle='-',label='Au (Relaxed model)'.ljust(60))
-pylab.plot(Tilt_112_Wolf_Cu_LJ[:,0],1E-3*Tilt_112_Wolf_Cu_LJ[:,1],color="blue",marker='o',linestyle='',label='Cu (MD-LJ)'.ljust(50))
-pylab.plot(Tilt_112_Wolf_Cu_EAM[:,0],1E-3*Tilt_112_Wolf_Cu_EAM[:,1],color="blue",marker='o',linestyle='',label='Cu (MD-EAM)'.ljust(50))
-pylab.plot(Tilt_112_Wolf_Au_EAM[:,0],1E-3*Tilt_112_Wolf_Au_EAM[:,1],color="green",marker='o',linestyle='',label='Au (MD-EAM)'.ljust(50))
+    pylab.plot(Tilt_112_Model[:,0],        1E-3*A_Cu*Tilt_112_Model[:,1],color="blue",linestyle=':',label=legend('Cu (Unrelaxed model)').ljust(60))
+    pylab.plot(Tilt_112_Model_Relaxed[:,0],1E-3*A_Cu*Tilt_112_Model_Relaxed[:,1],color="blue",linestyle='-',label=legend('Cu (Relaxed model)').ljust(60))
+    pylab.plot(Tilt_112_Model[:,0],        1E-3*A_Au*Tilt_112_Model[:,1],color="green",linestyle=':',label=legend('Au (Unrelaxed model)').ljust(60))
+    pylab.plot(Tilt_112_Model_Relaxed[:,0],1E-3*A_Au*Tilt_112_Model_Relaxed[:,1],color="green",linestyle='-',label=legend('Au (Relaxed model)').ljust(60))
+pylab.plot(Tilt_112_Wolf_Cu_LJ[:,0],1E-3*Tilt_112_Wolf_Cu_LJ[:,1],color="blue",marker='^',linestyle='',label=legend('Cu (MD-LJ)').ljust(50))
+pylab.plot(Tilt_112_Wolf_Cu_EAM[:,0],1E-3*Tilt_112_Wolf_Cu_EAM[:,1],color="blue",marker='o',linestyle='',label=legend('Cu (MD-EAM)').ljust(50))
+pylab.plot(Tilt_112_Wolf_Au_EAM[:,0],1E-3*Tilt_112_Wolf_Au_EAM[:,1],color="green",marker='o',linestyle='',label=legend('Au (MD-EAM)').ljust(50))
 if not args.labels_off:
-    pylab.xlabel(tex(r'[112]')+' tilt angle '+tex(r'\theta'),labelpad=xlabelpad);
-    pylab.ylabel("Energy "+tex("(J/m^2)"),labelpad=ylabelpad);
+    pylab.xlabel(xlabel(tex(r'[112]')+' tilt angle '+tex(r'\theta')),labelpad=xlabelpad);
+    pylab.ylabel(ylabel("Energy "+tex("(J/m^2)")),labelpad=ylabelpad);
 offset=0.9
 if args.annotate:
-    pylab.annotate(tex(r'(1\bar{1}0)(1\bar{1}0)'), xycoords=('data','axes fraction'), xy=(0+offset,1.05),va="bottom", ha="center",rotation=90)
-    pylab.annotate(tex(r'(3\bar{1}\bar{1})(3\bar{1}1)'), xycoords=('data','axes fraction'), xy=(62.8+offset,1.05),va="bottom", ha="center",rotation=90)
-    pylab.annotate(tex(r'(20\bar{1})(201)'), xycoords=('data','axes fraction'), xy=(101.7+offset,1.05),va="bottom", ha="center",rotation=90)
+    pylab.annotate(annotate(tex(r'(1\bar{1}0)(1\bar{1}0)')), xycoords=('data','axes fraction'), xy=(0+offset,1.05),va="bottom", ha="center",rotation=90)
+    pylab.annotate(annotate(tex(r'(3\bar{1}\bar{1})(3\bar{1}1)')), xycoords=('data','axes fraction'), xy=(62.8+offset,1.05),va="bottom", ha="center",rotation=90)
+    pylab.annotate(annotate(tex(r'(20\bar{1})(201)')), xycoords=('data','axes fraction'), xy=(101.7+offset,1.05),va="bottom", ha="center",rotation=90)
 
 handles, labels = ax.get_legend_handles_labels()
 if not args.labels_off:

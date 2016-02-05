@@ -19,7 +19,7 @@ unrelaxed=args.unrelaxed
 fig_height_in = 4.5
 fig_width_in  = 6.5
 xlabelpad = 4
-ylabelpad = 3
+ylabelpad = 0
 if args.right: legend_loc = 'lower right'
 else: legend_loc = 'lower center'
 #data parameters
@@ -28,8 +28,16 @@ A_Au = 950
 #texing
 if args.tex_off:
     def tex(a): return "\$"+a+"\$"
+    def xlabel(a) : return "\\xlabel{"+a+"}"
+    def ylabel(a) : return "\\ylabel{"+a+"}"
+    def legend(a) : return "\\legend{"+a+"}"
+    def annotate(a) : return "\\annotate{"+a+"}"
 else:
     def tex(a): return "$"+a+"$"
+    def xlabel(a) : return a
+    def ylabel(a) : return a
+    def legend(a) : return a
+    def annotate(a) : return a
 
 
 Tilt_100_100_Model  = numpy.loadtxt("100_100/outfiles/F1.dat", delimiter=" ");
@@ -64,7 +72,7 @@ fig = pylab.figure(figsize=(fig_width_in,fig_height_in)); #inches
 pylab.subplot(231)
 pylab.xlim(0,90)
 if not args.labels_off:
-    pylab.title(tex("(100)(100)"))
+    pylab.title(annotate(tex("(100)(100)")))
 pylab.ylim(0,1.)
 if unrelaxed:
     pylab.plot(Tilt_100_100_Model[:,0],        1E-3*A_Cu*Tilt_100_100_Model[:,1],color="blue",linestyle='-')
@@ -73,15 +81,15 @@ else:
     pylab.plot(Tilt_100_100_Model_Relaxed[:,0],1E-3*A_Cu*Tilt_100_100_Model_Relaxed[:,1],color="blue",linestyle='-')
 pylab.plot(Tilt_100_100_Wolf_Cu[:,0],      1E-3*Tilt_100_100_Wolf_Cu[:,1],color="blue",marker='o',linestyle='',label='MD')
 if not args.labels_off:
-    pylab.xlabel("Twist angle (degrees)",labelpad=xlabelpad);
-    pylab.ylabel("Energy "+tex("(J/m^2)"),labelpad=ylabelpad);
+    pylab.xlabel(xlabel("Twist angle (degrees)"),labelpad=xlabelpad);
+    pylab.ylabel(ylabel("Energy "+tex("(J/m^2)")),labelpad=ylabelpad);
 pylab.tick_params(axis='both', which='major')
 
 pylab.subplot(232)
 pylab.xlim(0,90)
 pylab.ylim(0,1.)
 if not args.labels_off:
-    pylab.title(tex("(111)(111)"))
+    pylab.title(annotate(tex("(111)(111)")))
 if unrelaxed:
     pylab.plot(Tilt_111_111_Model[:,0],        1E-3*A_Cu*Tilt_111_111_Model[:,1],color="blue",linestyle='-')
 else:
@@ -89,8 +97,8 @@ else:
     pylab.plot(Tilt_111_111_Model_Relaxed[:,0],1E-3*A_Cu*Tilt_111_111_Model_Relaxed[:,1],color="blue",linestyle='-')
 pylab.plot(Tilt_111_111_Wolf_Cu[:,0],1E-3*Tilt_111_111_Wolf_Cu[:,1],color="blue",marker='o',linestyle='',label='MD')
 if not args.labels_off:
-    pylab.xlabel("Twist angle (degrees)",labelpad=xlabelpad);
-    pylab.ylabel("Energy "+tex("(J/m^2)"),labelpad=ylabelpad);
+    pylab.xlabel(xlabel("Twist angle (degrees)"),labelpad=xlabelpad);
+    pylab.ylabel(ylabel("Energy "+tex("(J/m^2)")),labelpad=ylabelpad);
 pylab.tick_params(axis='both', which='major')
 
 pylab.subplot(233)
@@ -98,7 +106,7 @@ pylab.xlim(0,180)
 pylab.xticks(numpy.arange(0,180,40)) 
 pylab.ylim(0,1.300)
 if not args.labels_off:
-    pylab.title(tex("(114)(011)"))
+    pylab.title(annotate(tex("(114)(011)")))
 if unrelaxed:
     pylab.plot(Tilt_114_011_Model[:,0],            1E-3*A_Cu*Tilt_114_011_Model[:,1],color="blue",linestyle='-')
     pylab.plot(Tilt_114_011_Model[:,0],            1E-3*A_Au*Tilt_114_011_Model[:,1],color="green",linestyle='-')
@@ -112,15 +120,15 @@ else:
 pylab.plot(Tilt_114_011_Wolf_Cu[:,0],1E-3*Tilt_114_011_Wolf_Cu[:,1],color="blue",marker='o',linestyle='')
 pylab.plot(Tilt_114_011_Wolf_Au[:,0],1E-3*Tilt_114_011_Wolf_Au[:,1],color="green",marker='o',linestyle='')
 if not args.labels_off:
-    pylab.xlabel("Twist angle (degrees)",labelpad=xlabelpad);
-    pylab.ylabel("Energy "+tex("(J/m^2)"),labelpad=ylabelpad);
+    pylab.xlabel(xlabel("Twist angle (degrees)"),labelpad=xlabelpad);
+    pylab.ylabel(ylabel("Energy "+tex("(J/m^2)")),labelpad=ylabelpad);
 pylab.tick_params(axis='both', which='major')
 
 pylab.subplot(234)
 pylab.xlim(0,60)
 pylab.ylim(0,1.00)
 if not args.labels_off:
-    pylab.title(tex("(115)(111)"))
+    pylab.title(annotate(tex("(115)(111)")))
 if unrelaxed:
     pylab.plot(Tilt_115_111_Model[:,0],        1E-3*A_Cu*Tilt_115_111_Model[:,1],color="blue",linestyle='-')
     pylab.plot(Tilt_115_111_Model[:,0],        1E-3*A_Au*Tilt_115_111_Model[:,1],color="green",linestyle='-')
@@ -132,15 +140,15 @@ else:
 pylab.plot(Tilt_115_111_Wolf_Cu[:,0],1E-3*Tilt_115_111_Wolf_Cu[:,1],color="blue",marker='o',linestyle='')
 pylab.plot(Tilt_115_111_Wolf_Au[:,0],1E-3*Tilt_115_111_Wolf_Au[:,1],color="green",marker='o',linestyle='')
 if not args.labels_off:
-    pylab.xlabel("Twist angle (degrees)",labelpad=xlabelpad);
-    pylab.ylabel("Energy "+tex("(J/m^2)"),labelpad=ylabelpad);
+    pylab.xlabel(xlabel("Twist angle (degrees)"),labelpad=xlabelpad);
+    pylab.ylabel(ylabel("Energy "+tex("(J/m^2)")),labelpad=ylabelpad);
 pylab.tick_params(axis='both', which='major')
 
 pylab.subplot(235)
 pylab.xlim(0,90)
 pylab.ylim(0,1.00)
 if not args.labels_off:
-    pylab.title(tex("(221)(001)"))
+    pylab.title(annotate(tex("(221)(001)")))
 if unrelaxed:
     pylab.plot(Tilt_221_001_Model[:,0],           1E-3*A_Cu*Tilt_221_001_Model[:,1],color="blue",linestyle='-')
     pylab.plot(Tilt_221_001_Model[:,0],           1E-3*A_Au*Tilt_221_001_Model[:,1],color="green",linestyle='-')
@@ -154,8 +162,8 @@ else:
 pylab.plot(Tilt_221_001_Wolf_Cu[:,0],1E-3*Tilt_221_001_Wolf_Cu[:,1],color="blue",marker='o',linestyle='')
 pylab.plot(Tilt_221_001_Wolf_Au[:,0],1E-3*Tilt_221_001_Wolf_Au[:,1],color="green",marker='o',linestyle='')
 if not args.labels_off:
-    pylab.xlabel("Twist angle (degrees)",labelpad=xlabelpad);
-    pylab.ylabel("Energy "+tex("(J/m^2)"),labelpad=ylabelpad);
+    pylab.xlabel(xlabel("Twist angle (degrees)"),labelpad=xlabelpad);
+    pylab.ylabel(ylabel("Energy "+tex("(J/m^2)")),labelpad=ylabelpad);
 pylab.tick_params(axis='both', which='major')
 
 ax = pylab.subplot(236)
@@ -163,20 +171,20 @@ pylab.xlim(0,180)
 pylab.xticks(numpy.arange(0,180,40)) 
 pylab.ylim(0,1.300)
 if not args.labels_off:
-    pylab.title(tex("(557)(113)"))
+    pylab.title(annotate(tex("(557)(113)")))
 if unrelaxed:
-    pylab.plot(Tilt_557_113_Model[:,0],        1E-3*A_Cu*Tilt_557_113_Model[:,1],color="blue",linestyle='-',label='Cu (Model)'.ljust(50))
-    pylab.plot(Tilt_557_113_Model[:,0],        1E-3*A_Au*Tilt_557_113_Model[:,1],color="green",linestyle='-',label='Au (Model)'.ljust(50))
+    pylab.plot(Tilt_557_113_Model[:,0],        1E-3*A_Cu*Tilt_557_113_Model[:,1],color="blue",linestyle='-',label=legend('Cu (Model)').ljust(50))
+    pylab.plot(Tilt_557_113_Model[:,0],        1E-3*A_Au*Tilt_557_113_Model[:,1],color="green",linestyle='-',label=legend('Au (Model)').ljust(50))
 else:
-    pylab.plot(Tilt_557_113_Model[:,0],        1E-3*A_Cu*Tilt_557_113_Model[:,1],color="blue",linestyle=':',label='Cu (Unrelaxed model)'.ljust(60))
-    pylab.plot(Tilt_557_113_Model_Relaxed[:,0],1E-3*A_Cu*Tilt_557_113_Model_Relaxed[:,1],color="blue",linestyle='-',label='Cu(Relaxed model)'.ljust(60))
-    pylab.plot(Tilt_557_113_Model[:,0],        1E-3*A_Au*Tilt_557_113_Model[:,1],color="green",linestyle=':',label='Au(Unrelaxed model)'.ljust(60))
-    pylab.plot(Tilt_557_113_Model_Relaxed[:,0],1E-3*A_Au*Tilt_557_113_Model_Relaxed[:,1],color="green",linestyle='-',label='Au(Relaxed model)'.ljust(60))
-pylab.plot(Tilt_557_113_Wolf_Cu[:,0],1E-3*Tilt_557_113_Wolf_Cu[:,1],color="blue",marker='o',linestyle='',label='Cu (MD-LJ)'.ljust(50))
-pylab.plot(Tilt_557_113_Wolf_Au[:,0],1E-3*Tilt_557_113_Wolf_Au[:,1],color="green",marker='o',linestyle='',label='Au (MD-EAM)'.ljust(50))
+    pylab.plot(Tilt_557_113_Model[:,0],        1E-3*A_Cu*Tilt_557_113_Model[:,1],color="blue",linestyle=':',label=legend('Cu (Unrelaxed model)').ljust(60))
+    pylab.plot(Tilt_557_113_Model_Relaxed[:,0],1E-3*A_Cu*Tilt_557_113_Model_Relaxed[:,1],color="blue",linestyle='-',label=legend('Cu(Relaxed model)').ljust(60))
+    pylab.plot(Tilt_557_113_Model[:,0],        1E-3*A_Au*Tilt_557_113_Model[:,1],color="green",linestyle=':',label=legend('Au(Unrelaxed model)').ljust(60))
+    pylab.plot(Tilt_557_113_Model_Relaxed[:,0],1E-3*A_Au*Tilt_557_113_Model_Relaxed[:,1],color="green",linestyle='-',label=legend('Au(Relaxed model)').ljust(60))
+pylab.plot(Tilt_557_113_Wolf_Cu[:,0],1E-3*Tilt_557_113_Wolf_Cu[:,1],color="blue",marker='o',linestyle='',label=legend('Cu (MD-LJ)').ljust(50))
+pylab.plot(Tilt_557_113_Wolf_Au[:,0],1E-3*Tilt_557_113_Wolf_Au[:,1],color="green",marker='o',linestyle='',label=legend('Au (MD-EAM)').ljust(50))
 if not args.labels_off:
-    pylab.xlabel("Twist angle (degrees)",labelpad=xlabelpad);
-    pylab.ylabel("Energy "+tex("(J/m^2)"),labelpad=ylabelpad);
+    pylab.xlabel(xlabel("Twist angle (degrees)"),labelpad=xlabelpad);
+    pylab.ylabel(ylabel("Energy "+tex("(J/m^2)")),labelpad=ylabelpad);
 pylab.tick_params(axis='both', which='major')
 
 handles, labels = ax.get_legend_handles_labels()

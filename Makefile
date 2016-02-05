@@ -10,9 +10,10 @@ ifndef EMACS
 include ~/.make.color
 endif
 
-include .make.local #provides CC, additional defines
+#include .make.local #provides CC, additional defines
+CC                    = g++	
 CPP_COMPILER_OPTIONS += -c -g3 -ggdb -Wno-deprecated -Wunused-variable 
-CPP_LINKER_OPTIONS   += -g3 -ggdb -lpthread -lX11
+CPP_LINKER_OPTIONS   += -g3 -ggdb -pthread -lX11
 
 ifdef EMACS
 PREFIX                = $(shell pwd)/
@@ -32,28 +33,28 @@ LIB		      = $(LIB_EXT)
 .SECONDARY: $(OBJ) $(OBJ_MAIN)
 
 all: make_directories $(EXE)
-	@echo -e $(B_ON)$(FG_GREEN)"###"
+	@echo $(B_ON)$(FG_GREEN)"###"
 	@echo "### DONE" 
-	@echo -e "###"$(RESET)	
+	@echo "###"$(RESET)	
 
 $(PREFIX)bin/%: ./obj/%.o $(OBJ) 
-	@echo -e $(B_ON)$(FG_BLUE)"###"
+	@echo $(B_ON)$(FG_BLUE)"###"
 	@echo "### LINKING $@" 
-	@echo -e "###"$(RESET)
+	@echo "###"$(RESET)
 	@mkdir -p $(dir $@)
 	$(CC) ${CPP_LINKER_OPTIONS} -o $@ $^ $(LIB)
 
 ./obj/%.o: ./src/%.cpp 
-	@echo -e $(B_ON)$(FG_YELLOW)"###"
+	@echo $(B_ON)$(FG_YELLOW)"###"
 	@echo "### COMPILING $<" 
-	@echo -e "###"$(RESET)
+	@echo "###"$(RESET)
 	@mkdir -p $(dir $@)
 	$(CC) $(CPP_COMPILER_OPTIONS) $(INC) -o $@ $(PREFIX)$<
 
 ./obj/%.o: ./src/%.cc $(HDR)
-	@echo -e $(B_ON)$(FG_YELLOW)"###"
+	@echo $(B_ON)$(FG_YELLOW)"###"
 	@echo "### COMPILING $<" 
-	@echo -e "###"$(RESET)
+	@echo "###"$(RESET)
 	$(CC) $(CPP_COMPILER_OPTIONS) $(INC) -o $@ $(PREFIX)$<
 
 make_directories: $(SRC)
@@ -71,9 +72,9 @@ make_directories: $(SRC)
 #
 
 clean:
-	@echo -e $(B_ON)$(FG_RED)"###"
+	@echo $(B_ON)$(FG_RED)"###"
 	@echo "### Cleaning out ./obj, ./bin, *~, *#" 
-	@echo -e "###"$(RESET)	
+	@echo "###"$(RESET)	
 	rm -rf ${OBJ} ${OBJ_MAIN} ${EXE} ./bin/* *~ *\#
 tidy:
 	rm -rf *~ *\# src/*~ src/*\# dat/*~ dat/*\# inc/*~ inc/*\# 

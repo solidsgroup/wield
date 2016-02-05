@@ -32,7 +32,7 @@ pylab.plot(Tilt_1210_TI_Model[:,0],D_TI*Tilt_1210_TI_Model[:,1],color="green",li
 pylab.plot( Tilt_1210_TI_Wang[:,0],      Tilt_1210_TI_Wang[:,1],color="green",linewidth=2,marker='o',linestyle='--',label='$[1210]$ MD (Ti)')
 pylab.xlabel("Tilt angle (degrees)");
 pylab.ylabel("Energy ($J\\,/\\,m^2$)");
-pylab.legend(loc='upper center',fancybox=True,shadow=True,ncol=2);
+pylab.legend(loc='upper center',ncol=2);
 
 #pylab.subplot(223)
 #pylab.xlim(0,90)
@@ -53,7 +53,7 @@ pylab.plot(Tilt_0110_TI_Model[:,0],D_TI*Tilt_0110_TI_Model[:,1],color="green",li
 pylab.plot(Tilt_0110_TI_Wang[:,0],       Tilt_0110_TI_Wang[:,1],color="green",linewidth=2,marker='o',linestyle='--',label="$[0\\bar{1}10]$ MD (Ti)")
 pylab.xlabel("Tilt angle (degrees)");
 pylab.ylabel("Energy ($J/m^2$)");
-pylab.legend(loc='upper center',fancybox=True,shadow=True,ncol=2);
+pylab.legend(loc='upper center',ncol=2);
 
 
 pylab.tight_layout();

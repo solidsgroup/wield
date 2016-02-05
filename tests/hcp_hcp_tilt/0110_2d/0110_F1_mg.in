@@ -3,7 +3,7 @@ $Energy1D
 include ../hcp_mg.in
 
 $AxisX1 0 1 0
-$AxisX2 0 1 0
+$AxisX2 0 -1 0
 $AxisZ1 0 0 1
 $AxisZ2 0 0 1
  
@@ -11,5 +11,5 @@ $ThetaRotX1 -1
 $ThetaRotX2 1
 $ThetaMin 0
 $ThetaMax 90
-$DTheta 0.1
+$DTheta 0.5
 

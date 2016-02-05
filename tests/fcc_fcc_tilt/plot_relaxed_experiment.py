@@ -74,7 +74,7 @@ ax = pylab.subplot(122)
 pylab.xlim(0,180)
 pylab.ylim(0,1.)
 if unrelaxed:
-    pylab.plot(Tilt_110_Model[:,0],        1E-3*A_Cu*Tilt_110_Model[:,1],color="black",linestyle='-',label=legend('Cu(Cov)').ljust(50))
+    pylab.plot(Tilt_110_Model[:,0],        1E-3*A_Cu*Tilt_110_Model[:,1],color="black",linestyle='-',label=legend('Cu(Model)').ljust(50))
 else:
     pylab.plot(Tilt_110_Model[:,0],        1E-3*A_Cu*Tilt_110_Model[:,1],color="black",linestyle=':',label=legend('Cu (Unrelaxed model)').ljust(50))
     pylab.plot(Tilt_110_Model_Relaxed[:,0],1E-3*A_Cu*Tilt_110_Model_Relaxed[:,1],color="black",linestyle='-',label=legend('Cu (Relaxed model)').ljust(50))

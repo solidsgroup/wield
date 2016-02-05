@@ -18,14 +18,22 @@ unrelaxed=args.unrelaxed
 fig_height_in = 3.8
 fig_width_in  = 6.5
 xlabelpad = 4
-ylabelpad = 3
+ylabelpad = 0
 #data parameters
 A_Mo = 2525 # the blue things
 A_Fe = 1700 # the green things
 if args.tex_off:
     def tex(a): return "\$"+a+"\$"
+    def xlabel(a) : return "\\xlabel{"+a+"}"
+    def ylabel(a) : return "\\ylabel{"+a+"}"
+    def legend(a) : return "\\legend{"+a+"}"
+    def annotate(a) : return "\\annotate{"+a+"}"
 else:
     def tex(a): return "$"+a+"$"
+    def xlabel(a) : return a
+    def ylabel(a) : return a
+    def legend(a) : return a
+    def annotate(a) : return a
 
 
 #symmetric twist
@@ -53,7 +61,7 @@ fig = pylab.figure(figsize=(fig_width_in,fig_height_in)); #inches
 pylab.subplot(2,3,1)
 pylab.xlim(-1,91)
 if not args.labels_off:
-    pylab.title(tex("(001)(001)"))
+    pylab.title(annotate(tex("(001)(001)")))
 pylab.ylim(0,1.8)
 pylab.yticks(numpy.arange(0,1.8,0.4)) 
 if unrelaxed:
@@ -66,13 +74,13 @@ else:
     pylab.plot(90-Tilt_001_001_RModel[:,0], 1E-3*A_Fe*Tilt_001_001_RModel[:,1],color="blue",linestyle='-')
 pylab.plot(   Tilt_001_001_Wolf_Fe[:,0],       1E-3*Tilt_001_001_Wolf_Fe[:,1],color="blue",marker='o',linestyle=' ',label='MD')
 if not args.labels_off:
-    pylab.xlabel("Twist angle (degrees)",labelpad=xlabelpad);
-    pylab.ylabel("Energy "+tex("(J/m^2)"),labelpad=ylabelpad);
+    pylab.xlabel(xlabel("Twist angle (degrees)"),labelpad=xlabelpad);
+    pylab.ylabel(ylabel("Energy "+tex("(J/m^2)")),labelpad=ylabelpad);
 
 #pylab.subplot(4,3,2)
 pylab.subplot(2,3,2)
 if not args.labels_off:
-    pylab.title(tex("(011)(011)"))
+    pylab.title(annotate(tex("(011)(011)")))
 pylab.xlim(-1,181)
 pylab.ylim(0,1.800)
 pylab.yticks(numpy.arange(0,1.8,0.4)) 
@@ -83,13 +91,13 @@ else:
     pylab.plot(Tilt_011_011_RModel[:,0], 1E-3*A_Fe*Tilt_011_011_RModel[:,1], color="blue",linestyle='-')
 pylab.plot(Tilt_011_011_Wolf_Fe[:,0],1E-3*     Tilt_011_011_Wolf_Fe[:,1],color="blue",marker='o',linestyle='',label='MD')
 if not args.labels_off:
-    pylab.xlabel("Twist angle (degrees)",labelpad=xlabelpad);
-    pylab.ylabel("Energy "+tex("(J/m^2)"),labelpad=ylabelpad);
+    pylab.xlabel(xlabel("Twist angle (degrees)"),labelpad=xlabelpad);
+    pylab.ylabel(ylabel("Energy "+tex("(J/m^2)")),labelpad=ylabelpad);
 
 #ax = pylab.subplot(4,3,3)
 pylab.subplot(2,3,3)
 if not args.labels_off:
-    pylab.title(tex("(031)(031)"))
+    pylab.title(annotate(tex("(031)(031)")))
 pylab.xlim(-2,180)
 pylab.ylim(0,1.800)
 pylab.yticks(numpy.arange(0,1.8,0.4)) 
@@ -100,13 +108,13 @@ else:
     pylab.plot(Tilt_031_031_RModel[:,0], 1E-3*A_Fe*Tilt_031_031_RModel[:,1], color="blue",linestyle='-')
 pylab.plot(Tilt_031_031_Wolf_Fe[:,0],1E-3*     Tilt_031_031_Wolf_Fe[:,1],color="blue",marker='o',linestyle='',label='MD')
 if not args.labels_off:
-    pylab.xlabel("Twist angle (degrees)",labelpad=xlabelpad);
-    pylab.ylabel("Energy "+tex("(J/m^2)"),labelpad=ylabelpad);
+    pylab.xlabel(xlabel("Twist angle (degrees)"),labelpad=xlabelpad);
+    pylab.ylabel(ylabel("Energy "+tex("(J/m^2)")),labelpad=ylabelpad);
 
 #ax = pylab.subplot(4,3,4)
 pylab.subplot(2,3,4)
 if not args.labels_off:
-    pylab.title(tex("(111)(111)"))
+    pylab.title(annotate(tex("(111)(111)")))
 pylab.xlim(-1,60)
 pylab.ylim(0,1.800)
 pylab.yticks(numpy.arange(0,1.8,0.4)) 
@@ -117,25 +125,25 @@ else:
     pylab.plot(Tilt_111_111_RModel[:,0], 1E-3*A_Fe*Tilt_111_111_RModel[:,1], color="blue",linestyle='-')
 pylab.plot(Tilt_111_111_Wolf_Fe[:,0],1E-3*     Tilt_111_111_Wolf_Fe[:,1],color="blue",marker='o',linestyle='',label='MD')
 if not args.labels_off:
-    pylab.xlabel("Twist angle (degrees)",labelpad=xlabelpad);
-    pylab.ylabel("Energy "+tex("(J/m^2)"),labelpad=ylabelpad);
+    pylab.xlabel(xlabel("Twist angle (degrees)"),labelpad=xlabelpad);
+    pylab.ylabel(ylabel("Energy "+tex("(J/m^2)")),labelpad=ylabelpad);
 
 #ax = pylab.subplot(4,3,5)
 ax = pylab.subplot(2,3,5)
 if not args.labels_off:
-    pylab.title(tex("(112)(112)"))
+    pylab.title(annotate(tex("(112)(112)")))
 pylab.xlim(-2,180)
 pylab.ylim(0,1.800)
 pylab.yticks(numpy.arange(0,1.8,0.4)) 
 if unrelaxed:
-    pylab.plot(Tilt_112_112_Model[:,0],  1E-3*A_Fe*Tilt_112_112_Model[:,1],  color="blue",linestyle='-',label='Fe (Model)'.ljust(50))
+    pylab.plot(Tilt_112_112_Model[:,0],  1E-3*A_Fe*Tilt_112_112_Model[:,1],  color="blue",linestyle='-',label=legend('Fe (Model)').ljust(50))
 else:
-    pylab.plot(Tilt_112_112_Model[:,0],  1E-3*A_Fe*Tilt_112_112_Model[:,1],  color="blue",linestyle=':',label='Fe (Unrelaxed model)'.ljust(60))
-    pylab.plot(Tilt_112_112_RModel[:,0], 1E-3*A_Fe*Tilt_112_112_RModel[:,1], color="blue",linestyle='-',label='Fe (Relaxed model)'.ljust(60))
-pylab.plot(Tilt_112_112_Wolf_Fe[:,0],1E-3*     Tilt_112_112_Wolf_Fe[:,1],color="blue",marker='o',linestyle='',label='Fe (MD-Johnson)'.ljust(50))
+    pylab.plot(Tilt_112_112_Model[:,0],  1E-3*A_Fe*Tilt_112_112_Model[:,1],  color="blue",linestyle=':',label=legend('Fe (Unrelaxed model)').ljust(60))
+    pylab.plot(Tilt_112_112_RModel[:,0], 1E-3*A_Fe*Tilt_112_112_RModel[:,1], color="blue",linestyle='-',label=legend('Fe (Relaxed model)').ljust(60))
+pylab.plot(Tilt_112_112_Wolf_Fe[:,0],1E-3*     Tilt_112_112_Wolf_Fe[:,1],color="blue",marker='o',linestyle='',label=legend('Fe (MD-Johnson)').ljust(50))
 if not args.labels_off:
-    pylab.xlabel("Twist angle (degrees)",labelpad=xlabelpad);
-    pylab.ylabel("Energy "+tex("(J/m^2)"),labelpad=ylabelpad);
+    pylab.xlabel(xlabel("Twist angle (degrees)"),labelpad=xlabelpad);
+    pylab.ylabel(ylabel("Energy "+tex("(J/m^2)")),labelpad=ylabelpad);
 
 if not args.labels_off:
     lgd = pylab.legend(ncol=1,bbox_to_anchor=(1.95,1))

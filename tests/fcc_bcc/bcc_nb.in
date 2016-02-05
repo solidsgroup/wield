@@ -1,18 +1,18 @@
-$a 3.30000
-$Sigma2 $a*0.215
+$Abcc 3.30000
+$Sigma2 $Abcc*0.25
 $Epsilon 0.5
 
 $GroundZ2 1 1 0
 $GroundX2 0 0 1
 $Tolerance 1E-8
 
-$AlphaX2 $a
-$AlphaY2 $a
-$AlphaZ2 $a
+$AlphaX2 $Abcc
+$AlphaY2 $Abcc
+$AlphaZ2 $Abcc
 
 $Order2 8
-$X2 0.  $a/2.  $a/2.  $a/2.  $a/2. -$a/2. -$a/2. -$a/2. -$a/2.
-$Y2 0.  $a/2.  $a/2. -$a/2. -$a/2.  $a/2.  $a/2. -$a/2. -$a/2.
-$Z2 0.  $a/2. -$a/2.  $a/2. -$a/2.  $a/2. -$a/2.  $a/2. -$a/2.
+$X2 0.  $Abcc/2.  $Abcc/2.  $Abcc/2.  $Abcc/2. -$Abcc/2. -$Abcc/2. -$Abcc/2. -$Abcc/2.
+$Y2 0.  $Abcc/2.  $Abcc/2. -$Abcc/2. -$Abcc/2.  $Abcc/2.  $Abcc/2. -$Abcc/2. -$Abcc/2.
+$Z2 0.  $Abcc/2. -$Abcc/2.  $Abcc/2. -$Abcc/2.  $Abcc/2. -$Abcc/2.  $Abcc/2. -$Abcc/2.
 
 

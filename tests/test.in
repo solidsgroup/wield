@@ -1,23 +1,16 @@
-$Crystal1 {
-    include fcc_fcc_tilt/fcc.in
-}
+$Energy1D
+include bcc.in
+$AxisX1 1 0 0
+$AxisZ1 0 0 1
+$AxisX2 1 0 0
+$AxisZ2 0 0 1
+$ThetaRotX1 0.5
+$ThetaRotX2 -0.5
+$ThetaMin 0
+$ThetaMax 90
+$DTheta 0.5
 
-$Crystal2 {
-    include fcc_fcc_tilt/fcc.in
-}
 
-$VisualizeOR {
-    include constants.in
-    $Tolerance 1E-2
-    $X1 1 -1 0
-    $Z1 0  0 2
-    $X2 1 -1 0
-    $Z2 6 6 7
-    $Tolerance 1E-2
-    $RResolution 90/2
-    $AzimuthMin 0
-    $AzimuthMax 360
-    $AzimuthResolution 360/2
-    $OutFile out.dat
-}
+
+
 
