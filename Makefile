@@ -2,15 +2,13 @@
 # Brandon Runnels
 # Last Edited: November 5, 2013
 
-include ~/.make.reader
-include ~/.make.eigen
-include ~/.make.muparser
-#include ~/.make.lplib
-ifndef EMACS
-include ~/.make.color
-endif
+RESET              = '\033[0m'
+B_ON               = '\033[1m'
+FG_RED             = '\033[31m'
+FG_GREEN           = '\033[32m'
+FG_YELLOW          = '\033[33m'
+FG_BLUE            = '\033[34m'
 
-#include .make.local #provides CC, additional defines
 CC                    = g++	
 CPP_COMPILER_OPTIONS += -c -g3 -ggdb -Wno-deprecated -Wunused-variable 
 CPP_LINKER_OPTIONS   += -g3 -ggdb -pthread -lX11
