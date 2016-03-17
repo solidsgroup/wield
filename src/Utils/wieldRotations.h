@@ -104,4 +104,17 @@ Matrix3d createMatrixFromNormalVector(Eigen::Vector3d n)
   return N;
   WIELD_EXCEPTION_CATCH;
 }
+
+Matrix3d createMatrixFromBungeEulerAngles(double phi1, double Phi, double phi2)
+{
+  WIELD_EXCEPTION_TRY;
+  Matrix3d Z1 = createMatrixFromZAngle(phi1);
+  Matrix3d X  = createMatrixFromXAngle(Phi);
+  Matrix3d Z2 = createMatrixFromZAngle(phi2);
+  return Z2*X*Z1;
+  WIELD_EXCEPTION_CATCH;
+}
+
+
+
 #endif

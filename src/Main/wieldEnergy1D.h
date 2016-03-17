@@ -93,10 +93,17 @@ void Energy1D(Reader::Reader &reader)
 
   // Rotation matrix
   Matrix3d rot1 = Matrix3d::Identity();
-  if (reader.Find("AxisY1") && reader.Find("AxisZ1")) rot1 = createMatrixFromYZ(reader.Read<Eigen::Vector3d>("AxisY1"),reader.Read<Eigen::Vector3d>("AxisZ1")).transpose() * rot1;
-  if (reader.Find("AxisZ1") && reader.Find("AxisX1")) rot1 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("AxisZ1"),reader.Read<Eigen::Vector3d>("AxisX1")).transpose() * rot1;
-  if (reader.Find("AxisX1") && reader.Find("AxisY1")) rot1 = createMatrixFromXY(reader.Read<Eigen::Vector3d>("AxisX1"),reader.Read<Eigen::Vector3d>("AxisY1")).transpose() * rot1;
-  if (reader.Find("RotAxes1"))
+  if (reader.Find("phi1_1") && reader.Find("Phi_1") && reader.Find("phi2_1"))
+    {
+      double phi1 = reader.Read<double>("phi1_1"); 
+      double Phi = reader.Read<double>("Phi_1"); 
+      double phi2 = reader.Read<double>("phi2_1"); 
+      rot1 = createMatrixFromBungeEulerAngles(phi1,Phi,phi2)*rot1;
+    }
+  else if (reader.Find("AxisY1") && reader.Find("AxisZ1")) rot1 = createMatrixFromYZ(reader.Read<Eigen::Vector3d>("AxisY1"),reader.Read<Eigen::Vector3d>("AxisZ1")).transpose() * rot1;
+  else if (reader.Find("AxisZ1") && reader.Find("AxisX1")) rot1 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("AxisZ1"),reader.Read<Eigen::Vector3d>("AxisX1")).transpose() * rot1;
+  else if (reader.Find("AxisX1") && reader.Find("AxisY1")) rot1 = createMatrixFromXY(reader.Read<Eigen::Vector3d>("AxisX1"),reader.Read<Eigen::Vector3d>("AxisY1")).transpose() * rot1;
+  else if (reader.Find("RotAxes1"))
     {
       vector<char> rotAxes1 = reader.Read<vector<char> >("RotAxes1");
       vector<double>  rots1 = reader.Read<vector<double> >("Rots1");
@@ -104,6 +111,13 @@ void Energy1D(Reader::Reader &reader)
     }
 
   Matrix3d rot2 = Matrix3d::Identity();
+  if (reader.Find("phi1_2") && reader.Find("Phi_2") && reader.Find("phi2_2"))
+    {
+      double phi1 = reader.Read<double>("phi1_2"); 
+      double Phi  = reader.Read<double>("Phi_2"); 
+      double phi2 = reader.Read<double>("phi2_2"); 
+      rot2 = createMatrixFromBungeEulerAngles(phi1,Phi,phi2)*rot2;
+    }
   if (reader.Find("AxisY2") && reader.Find("AxisZ2")) rot2 = createMatrixFromYZ(reader.Read<Eigen::Vector3d>("AxisY2"),reader.Read<Eigen::Vector3d>("AxisZ2")).transpose() * rot2;
   if (reader.Find("AxisZ2") && reader.Find("AxisX2")) rot2 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("AxisZ2"),reader.Read<Eigen::Vector3d>("AxisX2")).transpose() * rot2;
   if (reader.Find("AxisX2") && reader.Find("AxisY2")) rot2 = createMatrixFromXY(reader.Read<Eigen::Vector3d>("AxisX2"),reader.Read<Eigen::Vector3d>("AxisY2")).transpose() * rot2;
