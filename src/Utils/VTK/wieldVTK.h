@@ -6,8 +6,6 @@
 #include <fstream>
 #include <stdexcept>
 
-using namespace std;
-
 #include "Utils/wieldTypes.h"
 #include "Utils/wieldRotations.h"
 #include "Utils/wieldProgress.h"
@@ -15,8 +13,6 @@ using namespace std;
 #include "Series/wieldCosSeries.h"
 
 #include "Reader.h"
-
-#include "Faddeeva/Faddeeva.h"
 
 #ifdef WIELD_USE_VTK
 #include <vtkVersion.h>
@@ -85,7 +81,7 @@ class PlotLine
     chart->ClearPlots();
 #endif
   }
-  void SetData(vector<double> X, vector<double> Y, bool blocking=false)
+  void SetData(std::vector<double> X, std::vector<double> Y, bool blocking=false)
   {
     WIELD_EXCEPTION_TRY;
 
@@ -142,26 +138,26 @@ class PlotLine
 #endif
 };
 
-double computeDensityFunction(double x, double y, double z, Wield::Series::CosSeries C)
-{
-  WIELD_EXCEPTION_TRY;
-  WIELD_WARNING("This function is depricated, you should really use the one in CosSeries.")
-  int order = C.order;
-  double alpha1 = C.alpha1;
-  double alpha2 = C.alpha2;
-  double alpha3 = C.alpha3;
-  double phi = 0;
-  for (int l=0; l<order; l++)
-    for (int m=0; m<order; m++)
-      for (int n=0; n<order; n++)
-	phi += 
-	  C(l,m,n) *
-	  cos(l*pi*x/alpha1) *
-	  cos(m*pi*y/alpha2) *
-	  cos(n*pi*z/alpha3);
-  return phi;
-  WIELD_EXCEPTION_CATCH;
-}
+// double computeDensityFunction(double x, double y, double z, Wield::Series::CosSeries C)
+// {
+//   WIELD_EXCEPTION_TRY;
+//   WIELD_WARNING("This function is depricated, you should really use the one in CosSeries.")
+//   int order = C.order;
+//   double alpha1 = C.alpha1;
+//   double alpha2 = C.alpha2;
+//   double alpha3 = C.alpha3;
+//   double phi = 0;
+//   for (int l=0; l<order; l++)
+//     for (int m=0; m<order; m++)
+//       for (int n=0; n<order; n++)
+// 	phi += 
+// 	  C(l,m,n) *
+// 	  cos(l*pi*x/alpha1) *
+// 	  cos(m*pi*y/alpha2) *
+// 	  cos(n*pi*z/alpha3);
+//   return phi;
+//   WIELD_EXCEPTION_CATCH;
+// }
 
 double computeDensityFunction(double x, double y, double z, Wield::Series::FourierSeries C)
 {
@@ -171,7 +167,7 @@ double computeDensityFunction(double x, double y, double z, Wield::Series::Fouri
 }
 
 template <class T>
-Actor drawCrystal(T C, Matrix3d R, Matrix3d BoxR,
+Actor drawCrystal(T C, Eigen::Matrix3d R, Eigen::Matrix3d BoxR,
 		    double xmin, double ymin, double zmin,
 		    double xmax, double ymax, double zmax,
 		    int resolution,
@@ -255,7 +251,7 @@ Actor drawCrystal(T C, Matrix3d R, Matrix3d BoxR,
   WIELD_EXCEPTION_CATCH;
 }
 
-void renderCrystals(vector<Actor> actors)
+void renderCrystals(std::vector<Actor> actors)
 {
   WIELD_EXCEPTION_TRY;
 #ifdef WIELD_USE_VTK
@@ -296,7 +292,7 @@ void renderCrystals(vector<Actor> actors)
 void renderCrystal(Actor actor)
 {
 #ifdef WIELD_USE_VTK
-  vector<Actor> actors;
+  std::vector<Actor> actors;
   actors.push_back(actor);
   renderCrystals(actors);
 #endif

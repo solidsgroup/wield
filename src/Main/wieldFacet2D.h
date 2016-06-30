@@ -44,8 +44,6 @@
 #include "IO/wieldReaderMacros.h"
 
 
-using namespace std;
-
 namespace Wield
 {
 namespace Main
@@ -67,13 +65,13 @@ void Facet2D(Reader::Reader &reader,
   // Open input deck
   // 
 
-  string dataFile          = reader.Read<string>("Facet2D", "DataFile");
+  std::string dataFile     = reader.Read<std::string>("Facet2D", "DataFile");
   int maxFacetOrder        = reader.Read<int>("Facet2D", "MaxFacetOrder", 3);
   bool symmetricY          = reader.Find("Facet2D.SymmetricY");
   double D1                = reader.Read<double>("Facet2D", "D1",  0.);
   double D2                = reader.Read<double>("Facet2D", "D2",  1.);
   double D3                = reader.Read<double>("Facet2D", "D3",  1.);
-  ifstream in(dataFile.c_str());
+  std::ifstream in(dataFile.c_str());
   if (!in)
     WIELD_EXCEPTION_NEW("Could not open input file " << dataFile); 
 
@@ -81,12 +79,12 @@ void Facet2D(Reader::Reader &reader,
   // Read in the raw data from the datafile
   //
 
-  vector<double> x,y,z,w;
-  string line;
+  std::vector<double> x,y,z,w;
+  std::string line;
   while (getline(in,line))
     {
       std::istringstream iss(line);
-      string token;
+      std::string token;
       for (int i=0; iss >> token; i++)
 	{
 	  if (i==0) x.push_back(atof(token.c_str()));
@@ -108,15 +106,15 @@ void Facet2D(Reader::Reader &reader,
   //
 
   double wMin = INFINITY;
-  Vector3d lambdaMin;
-  Vector3d n1Min, n2Min, n3Min;
+  Eigen::Vector3d lambdaMin;
+  Eigen::Vector3d n1Min, n2Min, n3Min;
 
   // 
   // Compute r, theta arrays and 
   // Store default minimum value (planar case)
   //
 
-  vector<double> r(x.size()), theta(x.size());
+  std::vector<double> r(x.size()), theta(x.size());
   for (int i=0; i<x.size(); i++)
     {
       r[i] = sqrt(x[i]*x[i] + y[i]*y[i]);
@@ -141,14 +139,14 @@ void Facet2D(Reader::Reader &reader,
   double searchRadius;
   if (reader.Find("Facet2D","N1Guess"))
     {
-      n1Min         = reader.Read<Vector3d>("Facet2D","N1Guess");
-      n2Min         = reader.Read<Vector3d>("Facet2D","N2Guess");
-      n3Min         = reader.Read<Vector3d>("Facet2D","N3Guess");
+      n1Min         = reader.Read<Eigen::Vector3d>("Facet2D","N1Guess");
+      n2Min         = reader.Read<Eigen::Vector3d>("Facet2D","N2Guess");
+      n3Min         = reader.Read<Eigen::Vector3d>("Facet2D","N3Guess");
       searchRadius  = reader.Read<double>("Facet2D", "SearchRadius");
-      cout << n1Min.transpose() << endl;
-      cout << n2Min.transpose() << endl;
-      cout << n3Min.transpose() << endl;
-      cout << searchRadius << endl;
+      std::cout << n1Min.transpose() << std::endl;
+      std::cout << n2Min.transpose() << std::endl;
+      std::cout << n3Min.transpose() << std::endl;
+      std::cout << searchRadius      << std::endl;
     }
   else
     {
@@ -195,7 +193,7 @@ void Facet2D(Reader::Reader &reader,
     }  
 
   wMin = INFINITY;
-  Matrix3d nMin;
+  Eigen::Matrix3d nMin;
   for (int i=0; i<numThreads; i++)
     {
       errorCode = pthread_join(threads[i],NULL);
@@ -212,12 +210,12 @@ void Facet2D(Reader::Reader &reader,
     }
   if (reader.Find("Facet2D","OutFile"))
     {
-      string outFile = reader.Read<string>("Facet2D", "OutFile");
-      ofstream out;
+      std::string outFile = reader.Read<std::string>("Facet2D", "OutFile");
+      std::ofstream out;
       out.open(outFile.c_str());
-      out << wMin << endl;
-      out << lambdaMin.transpose() << endl;
-      out << nMin << endl;
+      out << wMin << std::endl;
+      out << lambdaMin.transpose() << std::endl;
+      out << nMin << std::endl;
       out.close();
     }
 

@@ -10,18 +10,19 @@ const double pi = 3.14159265358979323846264338327950288419716939937510582;
 
 namespace Eigen
 {
-typedef Matrix<double,3,1> Vector3d;
+typedef Eigen::Matrix<double,3,1> Vector3d;
+typedef Eigen::Matrix<double,6,1> Vector6d;
 }
 
 namespace Reader
 {
 template<> struct Interpreter<Eigen::Vector3d >
 {
-  void operator() (const string varUnparsed, Eigen::Vector3d *varParsed)
+  void operator() (const std::string varUnparsed, Eigen::Vector3d *varParsed)
   {
     WIELD_EXCEPTION_TRY;
     std::istringstream iss(varUnparsed); 
-    string token;
+    std::string token;
     for (unsigned int i=0;i<3;i++)
       {
 	iss >> token;
@@ -32,16 +33,15 @@ template<> struct Interpreter<Eigen::Vector3d >
 };
 }
 
-typedef Matrix<double,6,1> Vector6d;
 namespace Reader
 {
-template<> struct Interpreter<Vector6d >
+template<> struct Interpreter<Eigen::Vector6d >
 {
-  void operator() (const string varUnparsed, Vector6d *varParsed)
+  void operator() (const std::string varUnparsed, Eigen::Vector6d *varParsed)
   {
     WIELD_EXCEPTION_TRY;
     std::istringstream iss(varUnparsed); 
-    string token;
+    std::string token;
     for (unsigned int i=0;i<6;i++)
       {
 	iss >> token;

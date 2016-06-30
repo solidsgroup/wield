@@ -3,8 +3,6 @@
 
 #include "Utils/wieldExceptions.h"
 
-using namespace std;
-
 #define Success_tmp Success
 #undef Success
 #undef eigen_assert
@@ -18,6 +16,5 @@ using namespace std;
 #define Success Success_tmp
 #undef  Success_tmp
 
-using namespace Eigen;
 #endif
 

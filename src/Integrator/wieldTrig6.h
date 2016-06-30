@@ -24,8 +24,6 @@
 #define MOD(a) (1 - 2*((a) & 1))
 /// \endcond
 
-using namespace std;
-
 ///
 /// \fn Trig6_Gaussian
 /// \brief Use a Gaussian weighted function

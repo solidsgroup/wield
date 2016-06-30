@@ -10,7 +10,7 @@
     std::cout << "Warning at " << __FILE__ << ":" << __LINE__ << ": ";	\
     std::cout << WIELD_COLOR_RESET;					\
     std::cout << MESSAGE;						\
-    std::cout << endl;							\
+    std::cout << std::endl;						\
   }
 
 #endif // WIELD_EXCEPTION_H

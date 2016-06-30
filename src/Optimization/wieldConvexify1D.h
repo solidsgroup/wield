@@ -6,8 +6,6 @@
 #include <stdexcept>
 
 
-using namespace std;
-
 #include "Reader.h"
 #include "Utils/wieldTypes.h"
 #include "Utils/wieldRotations.h"
@@ -19,14 +17,14 @@ namespace Wield
 {
 namespace Optimization
 {
-vector<double>
-Convexify1D(vector<double> X, vector<double> Y)
+std::vector<double>
+Convexify1D(std::vector<double> X, std::vector<double> Y)
 {
   WIELD_EXCEPTION_TRY;
   if (X.size() != Y.size())
     WIELD_EXCEPTION_NEW("X and Y not the same size");
 
-  vector<double> Yc;
+  std::vector<double> Yc;
   for (int i=0; i<X.size(); i++)
     {
       double inf = Y[i];
@@ -43,14 +41,14 @@ Convexify1D(vector<double> X, vector<double> Y)
   WIELD_EXCEPTION_CATCH;
 }
 
-vector<double>
-Convexify1DAngles(vector<double> X, vector<double> Y, vector<double> &wulff, bool full=false)
+std::vector<double>
+Convexify1DAngles(std::vector<double> X, std::vector<double> Y, std::vector<double> &wulff, bool full=false)
 {
   WIELD_EXCEPTION_TRY;
   if (X.size() != Y.size())
     WIELD_EXCEPTION_NEW("X and Y not the same size");
   
-  vector<double> Yc;
+  std::vector<double> Yc;
   for (int i=0; i<X.size(); i++)  // With the simpler for loops, this has O(n^2) scaling
     {
       double inf = Y[i];
@@ -86,7 +84,7 @@ Convexify1DAngles(vector<double> X, vector<double> Y, vector<double> &wulff, boo
       wulff.push_back(wulff_inf);
       WIELD_PROGRESS("Convexifying", i,X.size(),1);
     }
-  cout << endl;
+  std::cout << std::endl;
   return Yc;
   WIELD_EXCEPTION_CATCH;
 }

@@ -57,8 +57,6 @@
 #include "Utils/VTK/wieldVTK.h"
 #endif
 
-using namespace std;
-
 namespace Wield
 {
 namespace Main

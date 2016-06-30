@@ -10,8 +10,8 @@ FG_YELLOW          = '\033[33m'
 FG_BLUE            = '\033[34m'
 
 CC                    = g++	
-CPP_COMPILER_OPTIONS += -c -g3 -ggdb -Wno-deprecated -Wunused-variable -DMUPARSER 
-CPP_LINKER_OPTIONS   += -g3 -ggdb -pthread -lX11 
+CPP_COMPILER_OPTIONS += -c -g3 -ggdb -fopenmp -Wno-deprecated -Wunused-variable -DMUPARSER 
+CPP_LINKER_OPTIONS   += -g3 -ggdb -fopenmp -lX11 
 
 ifdef EMACS
 PREFIX                = $(shell pwd)/

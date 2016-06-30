@@ -7,29 +7,30 @@
 #include <complex>
 #include <fstream>
 #include <stdexcept>
-#include <pthread.h>
+//#include <pthread.h>
+#include <omp.h>
 
 #include "Reader.h"
 
 #include "Utils/wieldExceptions.h"
+#include "Utils/wieldNote.h"
 #include "Utils/wieldDebug.h"
 #include "Series/wieldFourierSeries.h"
 #include "Utils/VTK/wieldVTK.h"
 #include "Integrator/wieldSurface.h"
-
-using namespace std;
+#include "Integrator/wieldVolume.h"
 
 namespace Wield
 {
 namespace Main
 {
-typedef struct {
-  int index,numThreads;
-  double epsilon, tolerance;
-  Matrix3d rot1, rot2;
-  Wield::Series::FourierSeries *C1, *C2;
-  vector<double> *X, *Y, *Z, *W;
-} Energy2D_t;
+// typedef struct {
+//   int index,numThreads;
+//   double epsilon, tolerance;
+//   Eigen::Matrix3d rot1, rot2;
+//   Wield::Series::FourierSeries *C1, *C2;
+//   vector<double> *X, *Y, *Z, *W;
+// } Energy2D_t;
 
 void *Energy2D(void *args);
 void Energy2D(Reader::Reader &reader, int numThreads=1)
@@ -52,9 +53,9 @@ void Energy2D(Reader::Reader &reader, int numThreads=1)
        reader.Read<double>("AlphaY1"),
        reader.Read<double>("AlphaZ1"),
        reader.Read<double>("Sigma1"),
-       reader.Read<vector<double> >("X1"),
-       reader.Read<vector<double> >("Y1"),
-       reader.Read<vector<double> >("Z1"));
+       reader.Read<std::vector<double> >("X1"),
+       reader.Read<std::vector<double> >("Y1"),
+       reader.Read<std::vector<double> >("Z1"));
 
   Wield::Series::FourierSeries
     C2(reader.Read<int>("Order2"),
@@ -62,9 +63,9 @@ void Energy2D(Reader::Reader &reader, int numThreads=1)
        reader.Read<double>("AlphaY2"),
        reader.Read<double>("AlphaZ2"),
        reader.Read<double>("Sigma2"),
-       reader.Read<vector<double> >("X2"),
-       reader.Read<vector<double> >("Y2"),
-       reader.Read<vector<double> >("Z2"));
+       reader.Read<std::vector<double> >("X2"),
+       reader.Read<std::vector<double> >("Y2"),
+       reader.Read<std::vector<double> >("Z2"));
 
   bool normalize = false;
   double ground  = 0.;
@@ -72,9 +73,9 @@ void Energy2D(Reader::Reader &reader, int numThreads=1)
     {
       normalize = true;
 
-      Matrix3d groundRot1 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("GroundZ1"),
+      Eigen::Matrix3d groundRot1 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("GroundZ1"),
 					       reader.Read<Eigen::Vector3d>("GroundX1")).transpose();
-      Matrix3d groundRot2 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("GroundZ2"),
+      Eigen::Matrix3d groundRot2 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("GroundZ2"),
 					       reader.Read<Eigen::Vector3d>("GroundX2")).transpose();
       double g1 = Wield::Integrator::Surface(C1,groundRot1,C1,groundRot1,epsilon,tolerance);
       double g2 = Wield::Integrator::Surface(C2,groundRot2,C2,groundRot2,epsilon,tolerance);
@@ -88,6 +89,7 @@ void Energy2D(Reader::Reader &reader, int numThreads=1)
 
       ground *= (1 + tolerance);
     }
+
   if (reader.Find("Ground"))
     {
       if (normalize) WIELD_WARNING("Ground value being overwritten!");
@@ -97,10 +99,8 @@ void Energy2D(Reader::Reader &reader, int numThreads=1)
       ground = reader.Read<double>("Ground");
     }
 
-  ofstream out(reader.Read<string>("OutFile").c_str());
-
   // Rotation matrix
-  Matrix3d rot1 = Matrix3d::Identity();
+  Eigen::Matrix3d rot1 = Eigen::Matrix3d::Identity();
   if (reader.Find("AxisY1") && reader.Find("AxisZ1")) 
     rot1 = createMatrixFromYZ(reader.Read<Eigen::Vector3d>("AxisY1"),reader.Read<Eigen::Vector3d>("AxisZ1")).transpose() * rot1;
   if (reader.Find("AxisZ1") && reader.Find("AxisX1")) 
@@ -118,12 +118,12 @@ void Energy2D(Reader::Reader &reader, int numThreads=1)
 
   if (reader.Find("RotAxes1"))
     {
-      vector<char> rotAxes1 = reader.Read<vector<char> >("RotAxes1");
-      vector<double>  rots1 = reader.Read<vector<double> >("Rots1");
+      std::vector<char> rotAxes1 = reader.Read<std::vector<char> >("RotAxes1");
+      std::vector<double>  rots1 = reader.Read<std::vector<double> >("Rots1");
       for (int i=0; i<rotAxes1.size(); i++) rot1 = createMatrixFromAngle(rots1[i],rotAxes1[i]) * rot1;
     }
 
-  Matrix3d rot2 = Matrix3d::Identity();
+  Eigen::Matrix3d rot2 = Eigen::Matrix3d::Identity();
   if (reader.Find("AxisY2") && reader.Find("AxisZ2")) rot2 = createMatrixFromYZ(reader.Read<Eigen::Vector3d>("AxisY2"),reader.Read<Eigen::Vector3d>("AxisZ2")).transpose() * rot2;
   if (reader.Find("AxisZ2") && reader.Find("AxisX2")) rot2 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("AxisZ2"),reader.Read<Eigen::Vector3d>("AxisX2")).transpose() * rot2;
   if (reader.Find("AxisX2") && reader.Find("AxisY2")) rot2 = createMatrixFromXY(reader.Read<Eigen::Vector3d>("AxisX2"),reader.Read<Eigen::Vector3d>("AxisY2")).transpose() * rot2;
@@ -133,17 +133,17 @@ void Energy2D(Reader::Reader &reader, int numThreads=1)
       double phi1 = reader.Read<double>("phi1_2"); 
       double Phi = reader.Read<double>("Phi_2"); 
       double phi2 = reader.Read<double>("phi2_2"); 
-      rot1 = createMatrixFromBungeEulerAngles(phi1,Phi,phi2)*rot1;
+      rot2 = createMatrixFromBungeEulerAngles(phi1,Phi,phi2)*rot2;
     }
 
   if (reader.Find("RotAxes2"))
     {
-      vector<char> rotAxes2 = reader.Read<vector<char> >("RotAxes2");
-      vector<double>  rots2 = reader.Read<vector<double> >("Rots2");
+      std::vector<char> rotAxes2 = reader.Read<std::vector<char> >("RotAxes2");
+      std::vector<double>  rots2 = reader.Read<std::vector<double> >("Rots2");
       for (int i=0; i<rotAxes2.size(); i++) rot2 = createMatrixFromAngle(rots2[i],rotAxes2[i]) * rot2;
     }
 
-  vector<double> X,Y,Z;
+  std::vector<double> X,Y,Z;
   for (double theta = thetaMin; theta <= thetaMax; theta += dTheta) 
     for (double r = rMin; r <= (rMax+tolerance); r += dR) 
       {
@@ -152,77 +152,64 @@ void Energy2D(Reader::Reader &reader, int numThreads=1)
 	if (1.-(r*r) > 0) Z.push_back(sqrt(1.-(r*r)));
 	else Z.push_back(0.);
       }
-  vector<double> W(X.size());
+  std::vector<double> W(X.size());
   
-  vector<Energy2D_t> data(numThreads);
-  vector<pthread_t> threads(numThreads);
-  for (int i=0; i<numThreads; i++)
-    {
-      data[i].index     = i;
-      data[i].numThreads= numThreads;
-      data[i].epsilon   = epsilon;
-      data[i].tolerance = tolerance;
-      data[i].rot1      = rot1;
-      data[i].rot2      = rot2;
-      data[i].C1        = &C1;
-      data[i].C2        = &C2;
-      data[i].X         = &X;
-      data[i].Y         = &Y;
-      data[i].Z         = &Z;
-      data[i].W         = &W;
-      int errorCode = pthread_create(&threads[i], NULL, Energy2D, (void*)(&data[i]));
-      if (errorCode)
-	WIELD_EXCEPTION_NEW("Error starting thread #" << i << ": errorCode = " << errorCode);
-    }
+  std::cout << rot1 << std::endl;
+  std::cout << rot2 << std::endl;
 
-  for (int i=0; i<numThreads; i++)
+  double 
+    c1c1 = Wield::Integrator::Volume(C1,rot1,C1,rot1,epsilon,tolerance), 
+    c2c2 = Wield::Integrator::Volume(C2,rot2,C2,rot2,epsilon,tolerance), 
+    c1c2 = Wield::Integrator::Volume(C1,rot1,C2,rot2,epsilon,tolerance);
+
+  std::cout << c1c1 << " " << c2c2 << " " << c1c2 << std::endl;
+
+  std::cout << sqrt(c1c1)*sqrt(c2c2) / c1c2 << std::endl;
+
+  return;
+
+
+  //
+  // Run computation with optional OpenMP parallelism
+  //
+
+  int num = X.size();
+
+  #pragma omp parallel for num_threads(numThreads)
+  for (int i=0; i<num; i++)
     {
-      int errorCode = pthread_join(threads[i],NULL);
-      if (errorCode)
-	WIELD_EXCEPTION_NEW("Error starting thread #" << i << ": errorCode = " << errorCode);
+      int index = omp_get_thread_num();
+
+      if (i==0) 
+	WIELD_NOTE("Number of threads: " << omp_get_num_threads())
+
+      Eigen::Vector3d n(X[i],Y[i],Z[i]);
+      Eigen::Matrix3d N = createMatrixFromNormalVector(n);
+      
+      W[i] = Wield::Integrator::Surface(C1,N.transpose()*rot1,
+      					C2,N.transpose()*rot2,
+      					epsilon, tolerance);
+
+      if (index==0) WIELD_PROGRESS("Energy surface",i,X.size()/numThreads,1);
     }
+  std::cout << std::endl;
+
+
+  //
+  // Print results to output file
+  //
+
+  std::ofstream out(reader.Read<std::string>("OutFile").c_str());
 
   for (int i=0; i<X.size(); i++)
     if (normalize) 
-      out << X[i] << " " << Y[i] << " " << Z[i] << " " << 1-(W[i]/ground) << endl;
+      out << X[i] << " " << Y[i] << " " << Z[i] << " " << 1-(W[i]/ground) << std::endl;
     else
-      out << X[i] << " " << Y[i] << " " << Z[i] << " " << -W[i] << endl;
+      out << X[i] << " " << Y[i] << " " << Z[i] << " " << -W[i] << std::endl;
   out.close();
-  
+
   WIELD_EXCEPTION_CATCH;
 }
-void *Energy2D(void *args)
-{
-  int index                        = ((Energy2D_t*)args)->index;
-  int numThreads                   = ((Energy2D_t*)args)->numThreads;
-  double epsilon                   = ((Energy2D_t*)args)->epsilon;
-  double tolerance                 = ((Energy2D_t*)args)->tolerance;
-  Wield::Series::FourierSeries &C1 = *(((Energy2D_t*)args)->C1);
-  Wield::Series::FourierSeries &C2 = *(((Energy2D_t*)args)->C2);
-  Matrix3d rot1                    = ((Energy2D_t*)args)->rot1;
-  Matrix3d rot2                    = ((Energy2D_t*)args)->rot2;
-  vector<double> &X                = *(((Energy2D_t*)args)->X);
-  vector<double> &Y                = *(((Energy2D_t*)args)->Y);
-  vector<double> &Z                = *(((Energy2D_t*)args)->Z);
-  vector<double> &W                = *(((Energy2D_t*)args)->W);
-
-  for (int i=0; i<X.size(); i++)
-    {
-      if (i%numThreads != index) continue;
-      Eigen::Vector3d n(X[i],Y[i],Z[i]);
-      Matrix3d N = 
-	createMatrixFromNormalVector(n);
-      
-      W[i] = Wield::Integrator::Surface(C1,N.transpose()*rot1,
-					C2,N.transpose()*rot2,
-					epsilon, tolerance);
-      if (index==0) WIELD_PROGRESS("Energy surface",i,X.size(),1);
-    }
-  if (index==0) cout << endl;
-  return 0;
-}
-
-
 }
 }
 

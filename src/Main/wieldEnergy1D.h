@@ -17,8 +17,6 @@
 #include "Integrator/wieldSurface.h"
 #include "Optimization/wieldConvexify1D.h"
 
-using namespace std;
-
 namespace Wield
 {
 namespace Main
@@ -44,9 +42,9 @@ void Energy1D(Reader::Reader &reader)
        reader.Read<double>("AlphaY1"),
        reader.Read<double>("AlphaZ1"),
        reader.Read<double>("Sigma1"),
-       reader.Read<vector<double> >("X1"),
-       reader.Read<vector<double> >("Y1"),
-       reader.Read<vector<double> >("Z1"));
+       reader.Read<std::vector<double> >("X1"),
+       reader.Read<std::vector<double> >("Y1"),
+       reader.Read<std::vector<double> >("Z1"));
   
   Wield::Series::FourierSeries
     C2(reader.Read<int>("Order2"),
@@ -54,9 +52,9 @@ void Energy1D(Reader::Reader &reader)
        reader.Read<double>("AlphaY2"),
        reader.Read<double>("AlphaZ2"),
        reader.Read<double>("Sigma2"),
-       reader.Read<vector<double> >("X2"),
-       reader.Read<vector<double> >("Y2"),
-       reader.Read<vector<double> >("Z2"));
+       reader.Read<std::vector<double> >("X2"),
+       reader.Read<std::vector<double> >("Y2"),
+       reader.Read<std::vector<double> >("Z2"));
 
   bool normalize = false;
   double ground  = 0.;
@@ -64,9 +62,9 @@ void Energy1D(Reader::Reader &reader)
     {
       normalize = true;
 
-      Matrix3d groundRot1 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("GroundZ1"),
+      Eigen::Matrix3d groundRot1 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("GroundZ1"),
 					       reader.Read<Eigen::Vector3d>("GroundX1")).transpose();
-      Matrix3d groundRot2 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("GroundZ2"),
+      Eigen::Matrix3d groundRot2 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("GroundZ2"),
 					       reader.Read<Eigen::Vector3d>("GroundX2")).transpose();
       double g1 = Wield::Integrator::Surface(C1,groundRot1,C1,groundRot1,epsilon,tolerance);
       double g2 = Wield::Integrator::Surface(C2,groundRot2,C2,groundRot2,epsilon,tolerance);
@@ -89,10 +87,10 @@ void Energy1D(Reader::Reader &reader)
       ground = reader.Read<double>("Ground");
     }
 
-  ofstream out(reader.Read<string>("OutFile").c_str());
+  std::ofstream out(reader.Read<std::string>("OutFile").c_str());
 
   // Rotation matrix
-  Matrix3d rot1 = Matrix3d::Identity();
+  Eigen::Matrix3d rot1 = Eigen::Matrix3d::Identity();
   if (reader.Find("phi1_1") && reader.Find("Phi_1") && reader.Find("phi2_1"))
     {
       double phi1 = reader.Read<double>("phi1_1"); 
@@ -105,12 +103,12 @@ void Energy1D(Reader::Reader &reader)
   else if (reader.Find("AxisX1") && reader.Find("AxisY1")) rot1 = createMatrixFromXY(reader.Read<Eigen::Vector3d>("AxisX1"),reader.Read<Eigen::Vector3d>("AxisY1")).transpose() * rot1;
   else if (reader.Find("RotAxes1"))
     {
-      vector<char> rotAxes1 = reader.Read<vector<char> >("RotAxes1");
-      vector<double>  rots1 = reader.Read<vector<double> >("Rots1");
+      std::vector<char> rotAxes1 = reader.Read<std::vector<char> >("RotAxes1");
+      std::vector<double>  rots1 = reader.Read<std::vector<double> >("Rots1");
       for (int i=0; i<rotAxes1.size(); i++) rot1 = createMatrixFromAngle(rots1[i],rotAxes1[i]) * rot1;
     }
 
-  Matrix3d rot2 = Matrix3d::Identity();
+  Eigen::Matrix3d rot2 = Eigen::Matrix3d::Identity();
   if (reader.Find("phi1_2") && reader.Find("Phi_2") && reader.Find("phi2_2"))
     {
       double phi1 = reader.Read<double>("phi1_2"); 
@@ -123,8 +121,8 @@ void Energy1D(Reader::Reader &reader)
   if (reader.Find("AxisX2") && reader.Find("AxisY2")) rot2 = createMatrixFromXY(reader.Read<Eigen::Vector3d>("AxisX2"),reader.Read<Eigen::Vector3d>("AxisY2")).transpose() * rot2;
   if (reader.Find("RotAxes2"))
     {
-      vector<char> rotAxes2 = reader.Read<vector<char> >("RotAxes2");
-      vector<double>  rots2 = reader.Read<vector<double> >("Rots2");
+      std::vector<char> rotAxes2 = reader.Read<std::vector<char> >("RotAxes2");
+      std::vector<double>  rots2 = reader.Read<std::vector<double> >("Rots2");
       for (int i=0; i<rotAxes2.size(); i++) rot2 = createMatrixFromAngle(rots2[i],rotAxes2[i]) * rot2;
     }
 
@@ -137,11 +135,11 @@ void Energy1D(Reader::Reader &reader)
     thetaRotZ2 = reader.Read<double>("ThetaRotZ2",0.);
 
   double w = 0;
-  vector<double> thetas, ws;
+  std::vector<double> thetas, ws;
 
   for (double theta = thetaMin; theta <= thetaMax ; theta += dTheta)
     {
-      Matrix3d
+      Eigen::Matrix3d
 	omega1 =
 	createMatrixFromXAngle(thetaRotX1*theta) *
 	createMatrixFromYAngle(thetaRotY1*theta) *
@@ -164,18 +162,18 @@ void Energy1D(Reader::Reader &reader)
       ws.push_back(w);
       WIELD_PROGRESS("Computing energy", theta-thetaMin, thetaMax-thetaMin, dTheta)
     }
-  cout << endl;
+  std::cout << std::endl;
 
   if (convexify || fullConvexify)
     {
-      vector<double> wulff;
-      vector<double> wcs = Wield::Optimization::Convexify1DAngles(thetas,ws,wulff,fullConvexify);
+      std::vector<double> wulff;
+      std::vector<double> wcs = Wield::Optimization::Convexify1DAngles(thetas,ws,wulff,fullConvexify);
       for (int i=0; i<thetas.size(); i++)
-	out << thetas[i] << " " << ws[i] << " " << wcs[i] << " " << wulff[i] << endl;
+	out << thetas[i] << " " << ws[i] << " " << wcs[i] << " " << wulff[i] << std::endl;
     }
   else
     for (int i=0; i<thetas.size(); i++)
-      out << thetas[i] << " " << ws[i] << endl;
+      out << thetas[i] << " " << ws[i] << std::endl;
 
 
   out.close();

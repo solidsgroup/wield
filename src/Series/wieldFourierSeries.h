@@ -6,7 +6,6 @@
 #include <vector>
 #include <fstream>
 #include <stdexcept>
-using namespace std;
 
 #include "Reader.h"
 #include "Utils/wieldTypes.h"
@@ -16,24 +15,22 @@ using namespace std;
 #include "Utils/wieldWarnings.h"
 #include "Utils/wieldProgress.h"
 
-#include "Faddeeva/Faddeeva.h"
-
 namespace Wield
 {
 namespace Series
 {
 
-complex<double> ComputeFourierCoefficient(int n, double x0, double sigma, double alpha)
+class GaussDiracMollifier
 {
-  complex<double> I(0,1);
-  return
-    0.5*sqrt(pi)*sigma*
-    (
-     Faddeeva::erf((- 2*(alpha/2.)*(alpha/2.) - 2*(alpha/2.)*x0 + I*(double)n*pi*sigma*sigma)/(2*sigma*(alpha/2.))) -
-     Faddeeva::erf((+ 2*(alpha/2.)*(alpha/2.) - 2*(alpha/2.)*x0 + I*(double)n*pi*sigma*sigma)/(2*sigma*(alpha/2.)))
-     )
-    * exp( - (double)n*pi*(4.*I*(alpha/2.)*x0 + (double)n*pi*sigma*sigma) / (4*(alpha/2.)*(alpha/2.)));
-}
+public:
+  GaussDiracMollifier(double _sigma): sigma(_sigma) {} 
+  std::complex<double> operator () (Eigen::Vector3d k)
+  {
+    return exp(-sigma*sigma*(k.dot(k))/4.) / sqrt(8*pi*pi*pi);
+  }
+private:
+  double sigma;
+};
 
 class FourierSeries
 {
@@ -47,7 +44,7 @@ public:
   }
 
   FourierSeries(int _order, double _alphaX, double _alphaY, double _alphaZ,
-		double _sigma, vector<double> X, vector<double> Y, vector<double> Z):
+		double _sigma, std::vector<double> X, std::vector<double> Y, std::vector<double> Z):
     order(_order),alphaX(_alphaX),alphaY(_alphaY),alphaZ(_alphaZ),sigma(_sigma)
   {
     C.resize((2*order - 1)*(2*order - 1)*(2*order - 1));
@@ -55,7 +52,7 @@ public:
     if ((X.size() != Y.size()) || (Y.size() != Z.size()) || (Z.size() != X.size()))
       WIELD_EXCEPTION_NEW("Error: X, Y, Z vectors must be the same size");
 
-    complex<double> I(0,1);
+    std::complex<double> I(0,1);
     int size = X.size();
     for (int l=-order+1; l<order; l++)
       for (int m=-order+1; m<order; m++)
@@ -84,14 +81,14 @@ public:
     //    cout << endl;
   }
 
-  complex<double> & operator() (signed int i, signed int j, signed int k)
+  std::complex<double> & operator() (signed int i, signed int j, signed int k)
   {
     return C[(2*order-1)*(2*order-1)*(order + i - 1) + (2*order-1)*(order + j - 1) + (order + k - 1)];
   }      
 
-  complex<double> operator() (double x, double y, double z)
+  std::complex<double> operator() (double x, double y, double z)
   {
-    complex<double> I(0,1), val(0,0);
+    std::complex<double> I(0,1), val(0,0);
     for (int l=-order+1; l<order; l++)
       for (int m=-order+1; m<order; m++)
       	for (int n=-order+1; n<order; n++)
@@ -106,7 +103,7 @@ public:
   double alphaZ;  ///< \brief Z Lattice coefficient
   double sigma;
 private:
-  vector<complex<double> > C;          ///< Matrix of complex Fourier coefficients
+  std::vector<std::complex<double> > C;          ///< Matrix of complex Fourier coefficients
 };
 
 

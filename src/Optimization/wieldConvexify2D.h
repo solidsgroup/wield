@@ -15,8 +15,6 @@
 #include <stdexcept>
 #include <pthread.h>
 
-using namespace std;
-
 #include "Reader.h"
 #include "Utils/wieldColor.h"
 #include "Utils/wieldTypes.h"
@@ -81,12 +79,12 @@ struct ConvexifyData2D<3>
   int index;
   int numThreads;
   int maxFacetOrder;
-  vector<double> *x;
-  vector<double> *y;
-  vector<double> *z;
-  vector<double> *r;
-  vector<double> *theta;
-  vector<double> *w;
+  std::vector<double> *x;
+  std::vector<double> *y;
+  std::vector<double> *z;
+  std::vector<double> *r;
+  std::vector<double> *theta;
+  std::vector<double> *w;
   double wMin;
   Eigen::Vector3d lambdaMin;
   Eigen::Vector3d n1Min;
@@ -103,9 +101,9 @@ template<int facetOrder>
 void *Convexify2D(void *args);
 
 static inline
-Vector2d ConvexCoefficients(Eigen::Vector3d n1, Eigen::Vector3d n2, Eigen::Vector3d e)
+Eigen::Vector2d ConvexCoefficients(Eigen::Vector3d n1, Eigen::Vector3d n2, Eigen::Vector3d e)
 {
-  Vector2d lambda(0,0);
+  Eigen::Vector2d lambda(0,0);
   double theta1 = asin(sqrt(n1(0)*n1(0) + n1(1)*n1(1))); double theta2 = -asin(sqrt(n2(0)*n2(0) + n2(1)*n2(1)));
   double det = sin(theta1-theta2);
   if (fabs(det)<1E-5) {lambda[0]=0; lambda[1]=0; return lambda;}
@@ -114,9 +112,9 @@ Vector2d ConvexCoefficients(Eigen::Vector3d n1, Eigen::Vector3d n2, Eigen::Vecto
   return lambda;
 }
 static inline
-Vector3d ConvexCoefficients(Eigen::Vector3d n1, Eigen::Vector3d n2, Eigen::Vector3d n3, Eigen::Vector3d e)
+Eigen::Vector3d ConvexCoefficients(Eigen::Vector3d n1, Eigen::Vector3d n2, Eigen::Vector3d n3, Eigen::Vector3d e)
 {
-  Vector3d lambda(0,0,0);
+  Eigen::Vector3d lambda(0,0,0);
   double det = 
     + n1[0]*n2[1]*n3[2] 
     + n1[1]*n2[2]*n3[0]
@@ -160,12 +158,12 @@ void *Convexify2D<3>(void *args)
   int index                  =   ((ConvexifyData2D<3> *)(args))->index;
   int numThreads             =   ((ConvexifyData2D<3> *)(args))->numThreads;
   int maxFacetOrder          =   ((ConvexifyData2D<3> *)(args))->maxFacetOrder;
-  vector<double> &x          = *(((ConvexifyData2D<3> *)(args))->x);
-  vector<double> &y          = *(((ConvexifyData2D<3> *)(args))->y);
-  vector<double> &z          = *(((ConvexifyData2D<3> *)(args))->z);
-  vector<double> &r          = *(((ConvexifyData2D<3> *)(args))->r);
-  vector<double> &theta      = *(((ConvexifyData2D<3> *)(args))->theta);
-  vector<double> &w          = *(((ConvexifyData2D<3> *)(args))->w);
+  std::vector<double> &x          = *(((ConvexifyData2D<3> *)(args))->x);
+  std::vector<double> &y          = *(((ConvexifyData2D<3> *)(args))->y);
+  std::vector<double> &z          = *(((ConvexifyData2D<3> *)(args))->z);
+  std::vector<double> &r          = *(((ConvexifyData2D<3> *)(args))->r);
+  std::vector<double> &theta      = *(((ConvexifyData2D<3> *)(args))->theta);
+  std::vector<double> &w          = *(((ConvexifyData2D<3> *)(args))->w);
   double &wMin               =   ((ConvexifyData2D<3> *)(args))->wMin;
   Eigen::Vector3d &lambdaMin =   ((ConvexifyData2D<3> *)(args))->lambdaMin;
   Eigen::Vector3d &n1Min     =   ((ConvexifyData2D<3> *)(args))->n1Min;
@@ -184,8 +182,8 @@ void *Convexify2D<3>(void *args)
 
   Eigen::Vector3d e; e << 0, 0, 1; 
 
-  Vector3d lambda;
-  Matrix3d n;
+  Eigen::Vector3d lambda;
+  Eigen::Matrix3d n;
   for (int i =0; i < x.size(); i++) 
     {
       Eigen::Vector3d n1(x[i], y[i], z[i]);
@@ -302,7 +300,7 @@ void *Convexify2D<3>(void *args)
 	}
       if (index == 0) WIELD_PROGRESS("Faceting", i, x.size(), 1);
     }
-  if (index == 0) {WIELD_PROGRESS("Faceting", x.size(), x.size(), 1); cout << endl;}
+  if (index == 0) {WIELD_PROGRESS("Faceting", x.size(), x.size(), 1); std::cout << std::endl;}
   pthread_exit(args);
   return NULL;
   WIELD_EXCEPTION_CATCH;

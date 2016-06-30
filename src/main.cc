@@ -73,8 +73,7 @@
 // #include "Main/wieldEnergyOR1D.h"
 #include "Main/wieldFacet2D.h"
 #include "Utils/wieldExceptions.h"
-
-using namespace std;
+#include "Utils/wieldProgress.h"
 
 ///
 /// \fn signalHandler
@@ -83,8 +82,8 @@ using namespace std;
 void signalHandler(int signum)
 {
   /// Hello world
-  cout << endl;
-  cout << WIELD_COLOR_RESET << "Program terminated" << endl;
+  std::cout << std::endl;
+  std::cout << WIELD_COLOR_RESET << "Program terminated" << std::endl;
   exit(signum);
 }
 
@@ -104,11 +103,11 @@ int main(int argc,     ///< Number of arguments
   TCLAP::SwitchArg switchDynamicPlot("p", "dynamic-plot", "Show real-time VTK plot of energy", cmd, false);
   TCLAP::ValueArg<int> valueNumThreads("n", "num-threads", "Number of pthreads to use",false,1,"", cmd);
   TCLAP::IgnoreArg testIgnoreArg("D","User defined variables","",cmd);
-  TCLAP::UnlabeledValueArg<string> argFileName("name", "Path to input file", false, "", "inputfile", cmd);
+  TCLAP::UnlabeledValueArg<std::string> argFileName("name", "Path to input file", false, "", "inputfile", cmd);
   cmd.parse(argc, argv);
   bool dynamicPlot; dynamicPlot = switchDynamicPlot.getValue();
   int numThreads = valueNumThreads.getValue();
-  string fileName = argFileName.getValue();
+  std::string fileName = argFileName.getValue();
 
   //
   // INPUT FILE PARSING

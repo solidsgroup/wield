@@ -24,8 +24,6 @@
 #include "IO/wieldReaderMacros.h"
 
 
-using namespace std;
-
 namespace Wield
 {
 namespace Main
