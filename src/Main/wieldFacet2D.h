@@ -38,7 +38,6 @@
 #include "Utils/wieldRotations.h"
 #include "Utils/wieldProgress.h"
 #include "Utils/wieldEigen.h"
-#include "Series/wieldCosSeries.h"
 #include "Optimization/wieldConvexify2D.h"
 #include "Integrator/wieldSurface.h"
 #include "IO/wieldReaderMacros.h"

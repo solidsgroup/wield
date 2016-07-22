@@ -17,9 +17,10 @@ namespace Wield
 {
 namespace Integrator
 {
-double Volume(Wield::Series::FourierSeries C1,
+template<class Mollifier>
+double Volume(Wield::Series::FourierSeries<Mollifier> C1,
 	      Eigen::Matrix3d R1,
-	      Wield::Series::FourierSeries C2,
+	      Wield::Series::FourierSeries<Mollifier> C2,
 	      Eigen::Matrix3d R2,
 	      double epsilon,
 	      double tolerance=0)
@@ -44,10 +45,11 @@ double Volume(Wield::Series::FourierSeries C1,
 				       (double)q * 2.* pi / C2.alphaY,
 				       (double)r * 2.* pi / C2.alphaZ);
 		    Eigen::Vector3d arg= R1*a1 - R2*a2;
-		    w12 += C1(l,m,n)*conj(C2(p,q,r))*2.*pi*exp(- sqrt( arg[0]*arg[0] + arg[1]*arg[1] + arg[2]*arg[2] )/epsilon);
+		    //w12 += C1(l,m,n)*conj(C2(p,q,r))*2.*pi*exp(- sqrt( arg[0]*arg[0] + arg[1]*arg[1] + arg[2]*arg[2] )/epsilon);
+		    w12 += C1(l,m,n)*conj(C2(p,q,r))*2.*pi*exp(- (arg[0]*arg[0] + arg[1]*arg[1] + arg[2]*arg[2] )/(epsilon*epsilon));
 		  }
   return real(w12);
 }
 }
-}
+ }
 #endif 

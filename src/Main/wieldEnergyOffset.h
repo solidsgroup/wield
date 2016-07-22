@@ -13,6 +13,7 @@
 
 #include "Utils/wieldExceptions.h"
 #include "Series/wieldFourierSeries.h"
+#include "Series/wieldGaussDirac.h"
 #include "Utils/VTK/wieldVTK.h"
 #include "Integrator/wieldSurface.h"
 #include "Optimization/wieldConvexify1D.h"
@@ -30,22 +31,24 @@ void EnergyOffset(Reader::Reader &reader)
     epsilon = reader.Read<double>("Epsilon",0.2),
     tolerance = reader.Read<double>("Tolerance",1E-16);
   
-  Wield::Series::FourierSeries
+  Wield::Series::FourierSeries<Wield::Series::GaussDirac>
     C1(reader.Read<int>("Order1"),
        reader.Read<double>("AlphaX1"),
        reader.Read<double>("AlphaY1"),
        reader.Read<double>("AlphaZ1"),
-       reader.Read<double>("Sigma1"),
+       //reader.Read<double>("Sigma1"),
+       Wield::Series::GaussDirac(reader.Read<double>("Sigma1")), 
        reader.Read<std::vector<double> >("X1"),
        reader.Read<std::vector<double> >("Y1"),
        reader.Read<std::vector<double> >("Z1"));
   
-  Wield::Series::FourierSeries
+  Wield::Series::FourierSeries<Wield::Series::GaussDirac>
     C2(reader.Read<int>("Order2"),
        reader.Read<double>("AlphaX2"),
        reader.Read<double>("AlphaY2"),
        reader.Read<double>("AlphaZ2"),
-       reader.Read<double>("Sigma2"),
+       //reader.Read<double>("Sigma2"),
+       Wield::Series::GaussDirac(reader.Read<double>("Sigma2")), 
        reader.Read<std::vector<double> >("X2"),
        reader.Read<std::vector<double> >("Y2"),
        reader.Read<std::vector<double> >("Z2"));

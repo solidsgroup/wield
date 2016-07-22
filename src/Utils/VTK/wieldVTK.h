@@ -10,7 +10,8 @@
 #include "Utils/wieldRotations.h"
 #include "Utils/wieldProgress.h"
 #include "Utils/wieldEigen.h"
-#include "Series/wieldCosSeries.h"
+#include "Series/wieldFourierSeries.h"
+//#include "Series/wieldCosSeries.h"
 
 #include "Reader.h"
 
@@ -159,7 +160,8 @@ class PlotLine
 //   WIELD_EXCEPTION_CATCH;
 // }
 
-double computeDensityFunction(double x, double y, double z, Wield::Series::FourierSeries C)
+template<class Mollifier>
+double computeDensityFunction(double x, double y, double z, Wield::Series::FourierSeries<Mollifier> C)
 {
   WIELD_EXCEPTION_TRY;
   return C(x,y,z).real();

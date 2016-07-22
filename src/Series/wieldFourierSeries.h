@@ -20,32 +20,33 @@ namespace Wield
 namespace Series
 {
 
-class GaussDiracMollifier
-{
-public:
-  GaussDiracMollifier(double _sigma): sigma(_sigma) {} 
-  std::complex<double> operator () (Eigen::Vector3d k)
-  {
-    return exp(-sigma*sigma*(k.dot(k))/4.) / sqrt(8*pi*pi*pi);
-  }
-private:
-  double sigma;
-};
-
+template<class Mollifier>
 class FourierSeries
 {
 public:  
   
   // convolution function: exp(||x||^2 / sigma^2) / (sigma sqrt(pi))^3
   // FS function: exp(- sigma^2||k||^2 / 4) / (2 pi)^{3/2}
-  inline double WHat(double x, double y, double z)
-  {
-    return exp(-sigma*sigma*(x*x + y*y + z*z)/4.) / sqrt(8*pi*pi*pi);
-  }
+  // inline double WHat(double x, double y, double z)
+  // {
+  //   return exp(-sigma*sigma*(x*x + y*y + z*z)/4.) / sqrt(8*pi*pi*pi);
+  // }
 
-  FourierSeries(int _order, double _alphaX, double _alphaY, double _alphaZ,
-		double _sigma, std::vector<double> X, std::vector<double> Y, std::vector<double> Z):
-    order(_order),alphaX(_alphaX),alphaY(_alphaY),alphaZ(_alphaZ),sigma(_sigma)
+  FourierSeries(int _order, 
+		double _alphaX, 
+		double _alphaY, 
+		double _alphaZ,
+		//double _sigma, 
+		Mollifier _mollifier,
+		std::vector<double> X, 
+		std::vector<double> Y, 
+		std::vector<double> Z):
+    order(_order),
+    alphaX(_alphaX),
+    alphaY(_alphaY),
+    alphaZ(_alphaZ),
+    //sigma(_sigma)
+    phiHat(_mollifier)
   {
     C.resize((2*order - 1)*(2*order - 1)*(2*order - 1));
 
@@ -70,13 +71,17 @@ public:
 		if (fabs(fabs(Y[i]) - 0.5*alphaY) < 1E-8) lambda *= 0.5;
 		if (fabs(fabs(Z[i]) - 0.5*alphaZ) < 1E-8) lambda *= 0.5;
 
+		Eigen::Covector3d k(2.*pi*(double)l/alphaX, 2.*pi*(double)m/alphaY, 2.*pi*(double)n/alphaZ);
+		Eigen::Vector3d x(X[i],Y[i],Z[i]);
+
 		(*this)(l,m,n) +=
 		  lambda
-		  * WHat(2.*pi*(double)l/alphaX, 2.*pi*(double)m/alphaY, 2.*pi*(double)n/alphaZ)
-		  * exp(-I * (2.*pi*(double)l*X[i]/alphaX + 2.*pi*(double)m*Y[i]/alphaY + 2.*pi*(double)n*Z[i]/alphaZ))
-		  / (8. * pi * pi * pi * alphaX * alphaY * alphaZ);
+		  * phiHat(k)
+		  * exp(-I * (double)(k*x))
+		  / (alphaX * alphaY * alphaZ);
+		  /// (8. * pi * pi * pi * alphaX * alphaY * alphaZ); <--- this looks like it was wrong...
 	      }
-	    //cout << "(" << l << "," << m << "," << n << ") " << (*this)(l,m,n) << endl;
+	    //std::cout << "(" << l << "," << m << "," << n << ") " << (*this)(l,m,n) << std::endl;
 	  }
     //    cout << endl;
   }
@@ -86,13 +91,17 @@ public:
     return C[(2*order-1)*(2*order-1)*(order + i - 1) + (2*order-1)*(order + j - 1) + (order + k - 1)];
   }      
 
-  std::complex<double> operator() (double x, double y, double z)
+  std::complex<double> operator() (double X, double Y, double Z)
   {
+    Eigen::Vector3d x(X,Y,Z);
     std::complex<double> I(0,1), val(0,0);
     for (int l=-order+1; l<order; l++)
       for (int m=-order+1; m<order; m++)
       	for (int n=-order+1; n<order; n++)
-	  val += (*this)(l,m,n) * exp(I * 2. * pi * (l*x/alphaX + m*y/alphaY + n*z/alphaZ));
+	  {
+	    Eigen::Covector3d k(2.*pi*(double)l / alphaX, 2.*pi*(double)m / alphaY, 2.*pi*(double)n / alphaZ); 
+	    val += (*this)(l,m,n) * exp(I * (double)(k*x));
+	  }
     return val;
   }      
 
@@ -104,6 +113,7 @@ public:
   double sigma;
 private:
   std::vector<std::complex<double> > C;          ///< Matrix of complex Fourier coefficients
+  Mollifier phiHat;
 };
 
 

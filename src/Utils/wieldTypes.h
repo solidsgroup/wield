@@ -6,11 +6,12 @@ const double pi = 3.14159265358979323846264338327950288419716939937510582;
 
 #include "Utils/wieldExceptions.h"
 #include "Utils/wieldEigen.h"
-#include "Series/wieldCosSeries.h"
+//#include "Series/wieldCosSeries.h"
 
 namespace Eigen
 {
 typedef Eigen::Matrix<double,3,1> Vector3d;
+typedef Eigen::Matrix<double,1,3> Covector3d;
 typedef Eigen::Matrix<double,6,1> Vector6d;
 }
 
