@@ -11,6 +11,7 @@
 
 #include "Utils/wieldTypes.h"
 #include "Utils/wieldEigen.h"
+#include "Utils/wieldWarnings.h"
 #include "Series/wieldFourierSeries.h"
 
 namespace Wield
@@ -35,19 +36,27 @@ double Volume(Wield::Series::FourierSeries<Mollifier> C1,
 	for (int p=1-C2.order; p < C2.order; p++)
 	  for (int q=1-C2.order; q < C2.order; q++)
 	    for (int r=1-C2.order; r < C2.order; r++)
-	    if (fabs(real(C1(p,q,r))<tolerance)) continue;
-		else
-		  {
-		    Eigen::Vector3d a1((double)l * 2.* pi / C1.alphaX,
-				       (double)m * 2.* pi / C1.alphaY,
-				       (double)n * 2.* pi / C1.alphaZ);
-		    Eigen::Vector3d a2((double)p * 2.* pi / C2.alphaX,
-				       (double)q * 2.* pi / C2.alphaY,
-				       (double)r * 2.* pi / C2.alphaZ);
-		    Eigen::Vector3d arg= R1*a1 - R2*a2;
-		    //w12 += C1(l,m,n)*conj(C2(p,q,r))*2.*pi*exp(- sqrt( arg[0]*arg[0] + arg[1]*arg[1] + arg[2]*arg[2] )/epsilon);
-		    w12 += C1(l,m,n)*conj(C2(p,q,r))*2.*pi*exp(- (arg[0]*arg[0] + arg[1]*arg[1] + arg[2]*arg[2] )/(epsilon*epsilon));
-		  }
+	      if (fabs(real(C1(p,q,r))<tolerance)) continue;
+	      else
+		{
+		  if (l==(1-C1.order) || l==(C1.order-1) ||
+		      m==(1-C1.order) || m==(C1.order-1) ||
+		      n==(1-C1.order) || n==(C1.order-1) ||
+		      p==(1-C2.order) || p==(C2.order-1) ||
+		      q==(1-C2.order) || q==(C2.order-1) ||
+			r==(1-C2.order) || r==(C2.order-1))
+		    WIELD_WARNING("Reached the bound of Fourier expansion; try increasing Order");
+
+		  Eigen::Vector3d a1((double)l * 2.* pi / C1.alphaX,
+				     (double)m * 2.* pi / C1.alphaY,
+				     (double)n * 2.* pi / C1.alphaZ);
+		  Eigen::Vector3d a2((double)p * 2.* pi / C2.alphaX,
+				     (double)q * 2.* pi / C2.alphaY,
+				     (double)r * 2.* pi / C2.alphaZ);
+		  Eigen::Vector3d arg= R1*a1 - R2*a2;
+
+		  w12 += C1(l,m,n)*conj(C2(p,q,r))*2.*pi*exp(- (arg[0]*arg[0] + arg[1]*arg[1] + arg[2]*arg[2] )/(epsilon*epsilon));
+		}
   return real(w12);
 }
 }
