@@ -79,11 +79,8 @@ public:
 		  * phiHat(k)
 		  * exp(-I * (double)(k*x))
 		  / (alphaX * alphaY * alphaZ);
-		  /// (8. * pi * pi * pi * alphaX * alphaY * alphaZ); <--- this looks like it was wrong...
 	      }
-	    //std::cout << "(" << l << "," << m << "," << n << ") " << (*this)(l,m,n) << std::endl;
 	  }
-    //    cout << endl;
   }
 
   std::complex<double> & operator() (signed int i, signed int j, signed int k)

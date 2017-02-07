@@ -12,6 +12,7 @@
 #include "Utils/wieldTypes.h"
 #include "Utils/wieldEigen.h"
 #include "Utils/wieldWarnings.h"
+#include "Utils/wieldExceptions.h"
 #include "Series/wieldFourierSeries.h"
 
 namespace Wield
@@ -26,6 +27,7 @@ double Volume(Wield::Series::FourierSeries<Mollifier> C1,
 	      double epsilon,
 	      double tolerance=0)
 {
+  WIELD_EXCEPTION_TRY;
   std::complex<double> w12 = 0;
 
   for (int l=1-C1.order; l < C1.order; l++)
@@ -45,7 +47,7 @@ double Volume(Wield::Series::FourierSeries<Mollifier> C1,
 		      p==(1-C2.order) || p==(C2.order-1) ||
 		      q==(1-C2.order) || q==(C2.order-1) ||
 			r==(1-C2.order) || r==(C2.order-1))
-		    WIELD_WARNING("Reached the bound of Fourier expansion; try increasing Order");
+		    WIELD_EXCEPTION_NEW("Reached the bound of Fourier expansion; try increasing Order");
 
 		  Eigen::Vector3d a1((double)l * 2.* pi / C1.alphaX,
 				     (double)m * 2.* pi / C1.alphaY,
@@ -55,10 +57,13 @@ double Volume(Wield::Series::FourierSeries<Mollifier> C1,
 				     (double)r * 2.* pi / C2.alphaZ);
 		  Eigen::Vector3d arg= R1*a1 - R2*a2;
 
-		  w12 += C1(l,m,n)*conj(C2(p,q,r))*2.*pi*exp(- (arg[0]*arg[0] + arg[1]*arg[1] + arg[2]*arg[2] )/(epsilon*epsilon));
-		}
+		  std::complex<double> add = C1(l,m,n)*conj(C2(p,q,r))*exp(- (arg[0]*arg[0] + arg[1]*arg[1] + arg[2]*arg[2] )/(epsilon*epsilon));
+		  std::cout << l << m << n << p << q << r << " " << add << std::endl;
+		  w12 += add;
+		    }
   return real(w12);
+  WIELD_EXCEPTION_CATCH;
 }
 }
- }
+}
 #endif 

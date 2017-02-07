@@ -121,13 +121,18 @@ void CSL(Reader::Reader &reader, int numThreads=1)
   //   std::cout << x << " " << C1(x,0.0,0.0).real() << std::endl;
   // exit(0);
 
-  std::cout << "computing..." << std::endl;
+  std::cout << "beginning serial computation..." << std::endl;
 
 
   std::vector<double> thetas;
   for (double theta = thetaMin; theta <= thetaMax ; theta += dTheta) thetas.push_back(theta);
   std::vector<double> sigmas(thetas.size());
   
+  double 
+    c1c1 = Wield::Integrator::Volume(C1,Eigen::Matrix3d::Identity(),C1,Eigen::Matrix3d::Identity(),epsilon,tolerance),
+    c2c2 = c1c1;
+  
+  std::cout << "beginning parallel computation..." << std::endl;
   #pragma omp parallel for num_threads(numThreads)
   for ( int i = 0 ; i < thetas.size(); i++)
     {
@@ -145,8 +150,6 @@ void CSL(Reader::Reader &reader, int numThreads=1)
 	createMatrixFromZAngle(thetaRotZ2*thetas[i]) *
 	rot2;      
       double 
-	c1c1 = Wield::Integrator::Volume(C1,omega1,C1,omega1,epsilon,tolerance), 
-	c2c2 = Wield::Integrator::Volume(C2,omega2,C2,omega2,epsilon,tolerance), 
 	c1c2 = Wield::Integrator::Volume(C1,omega1,C2,omega2,epsilon,tolerance);
 
       sigmas[i] = sqrt(c1c1)*sqrt(c2c2) / c1c2;
