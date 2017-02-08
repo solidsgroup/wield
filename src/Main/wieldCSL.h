@@ -23,13 +23,52 @@ namespace Wield
 {
 namespace Main
 {
-void CSL(Reader::Reader &reader, int numThreads=1)
+
+/// Coincident Site Lattice Computation
+/// ===================================
+/// 
+/// Compute the Coincident Site Lattice \f$\Sigma\f$ value for a bicrystal.
+/// The setup for this function is very similar to that for grain boundary computations.
+/// Here is an example input file to compute \f$\Sigma\f$ for FCC aluminum tilte about the
+/// [100] axis:
+/// 
+///     $CSL
+///     $a 3.597
+///     $Sigma1 0.06
+///     $Epsilon 0.3
+///     $Order1 64
+///     $AlphaX1 $a
+///     $AlphaY1 $a
+///     $AlphaZ1 $a
+///     $X1 0.    0.     0.     0.     0. $a/2. -$a/2.  $a/2. -$a/2. $a/2.  $a/2. -$a/2. -$a/2.
+///     $Y1 0. $a/2.  $a/2. -$a/2. -$a/2.    0.     0.     0.     0. $a/2. -$a/2.  $a/2. -$a/2.
+///     $Z1 0. $a/2. -$a/2.  $a/2. -$a/2. $a/2.  $a/2. -$a/2. -$a/2.    0.     0.     0.     0.
+///     $Tolerance 1E-8
+///     $ThetaRotX1 0.5
+///     $ThetaRotX2 -0.5
+///     $ThetaMin 0
+///     $ThetaMax 45
+///     $DTheta 0.1
+///     $OutFile csl_$Sigma1_$Epsilon.dat
+///
+/// Additional examples are included in the tests directory.
+/// 
+/// **Relevant Publications**
+/// - B Runnels,
+///   [A projection-based formulation of the coincident site lattice \f$\Sigma\f$ for arbitrary bicrystals at finite temperature](http://scripts.iucr.org/cgi-bin/paper?S205327331700122X)
+///   *Acta Crystallographica A*, 2017
+void CSL(Reader::Reader &reader, ///< [in] Reader object to parse input commands
+	 int numThreads=1,       ///< [in] Number of OpenMP threads to spawn
+	 bool verbose=false      ///< [in] Whether to include extra output information
+	 )
 {
   WIELD_EXCEPTION_TRY;
+  if(verbose) WIELD_NOTE("Beginning CSL Computation")
+  if(verbose) WIELD_NOTE("Reading in parameters")
 
   double 
      thetaMin  = reader.Read<double>("ThetaMin",0.),
-     thetaMax  = reader.Read<double>("ThetaMax",360.),
+     thetaMax  = reader.Read<double>("ThetaMax",0.),
      dTheta    = reader.Read<double>("DTheta",1.),
     // rMin      = reader.Read<double>("RMin",0.),
     // rMax      = reader.Read<double>("RMax",1.),
@@ -45,30 +84,48 @@ void CSL(Reader::Reader &reader, int numThreads=1)
     thetaRotY2 = reader.Read<double>("ThetaRotY2",0.),
     thetaRotZ2 = reader.Read<double>("ThetaRotZ2",0.);
 
+  Wield::Series::FourierSeries<Wield::Series::SqrtGaussDirac> *C1, *C2;
 
-  Wield::Series::FourierSeries<Wield::Series::SqrtGaussDirac>
-    C1(reader.Read<int>("Order1"),
-       reader.Read<double>("AlphaX1"),
-       reader.Read<double>("AlphaY1"),
-       reader.Read<double>("AlphaZ1"),
-       Wield::Series::SqrtGaussDirac(reader.Read<double>("Sigma1")),
-       reader.Read<std::vector<double> >("X1"),
-       reader.Read<std::vector<double> >("Y1"),
-       reader.Read<std::vector<double> >("Z1"));
+  if(verbose) WIELD_NOTE("Generating crystal 1");
 
-  Wield::Series::FourierSeries<Wield::Series::SqrtGaussDirac>
-    C2(reader.Read<int>("Order2"),
-       reader.Read<double>("AlphaX2"),
-       reader.Read<double>("AlphaY2"),
-       reader.Read<double>("AlphaZ2"),
-       Wield::Series::SqrtGaussDirac(reader.Read<double>("Sigma2")),
-       reader.Read<std::vector<double> >("X2"),
-       reader.Read<std::vector<double> >("Y2"),
-       reader.Read<std::vector<double> >("Z2"));
+  
+  C1 = new Wield::Series::FourierSeries<Wield::Series::SqrtGaussDirac>
+    (reader.Read<int>("Order1"),
+     reader.Read<double>("AlphaX1"),
+     reader.Read<double>("AlphaY1"),
+     reader.Read<double>("AlphaZ1"),
+     Wield::Series::SqrtGaussDirac(reader.Read<double>("Sigma1")),
+     reader.Read<std::vector<double> >("X1"),
+     reader.Read<std::vector<double> >("Y1"),
+     reader.Read<std::vector<double> >("Z1"),
+     verbose);
+  
+  if (reader.Find("Order2") 
+      && reader.Find("AlphaX2") && reader.Find("AlphaY2") && reader.Find("AlphaZ2") 
+      && reader.Find("Sigma2") 
+      && reader.Find("X2") && reader.Find("Y2") && reader.Find("Z2"))
+    {
+      if(verbose) WIELD_NOTE("Generating crystal 2");
+      C2 = new Wield::Series::FourierSeries<Wield::Series::SqrtGaussDirac>(reader.Read<int>("Order2"),
+									     reader.Read<double>("AlphaX2"),
+									     reader.Read<double>("AlphaY2"),
+									     reader.Read<double>("AlphaZ2"),
+									     Wield::Series::SqrtGaussDirac(reader.Read<double>("Sigma2")),
+									     reader.Read<std::vector<double> >("X2"),
+									     reader.Read<std::vector<double> >("Y2"),
+									     reader.Read<std::vector<double> >("Z2"),
+									     verbose);
+    }
+  else
+    {
+      if(verbose) WIELD_NOTE("Creating a copy of crystal 1");
+      C2 = new Wield::Series::FourierSeries<Wield::Series::SqrtGaussDirac>(*C1);
+    }
 
   //
   // CONSTRUCT ROTATION MATRIX FOR CRYSTAL 1
   //
+  if(verbose) WIELD_NOTE("Computing rotation matrices")
 
   Eigen::Matrix3d rot1 = Eigen::Matrix3d::Identity();
   if (reader.Find("AxisY1") && reader.Find("AxisZ1")) 
@@ -117,26 +174,26 @@ void CSL(Reader::Reader &reader, int numThreads=1)
       for (int i=0; i<rotAxes2.size(); i++) rot2 = createMatrixFromAngle(rots2[i],rotAxes2[i]) * rot2;
     }
 
-  // for (double x = -10; x < 10.0; x += 0.01)
-  //   std::cout << x << " " << C1(x,0.0,0.0).real() << std::endl;
-  // exit(0);
-
-  std::cout << "beginning serial computation..." << std::endl;
-
 
   std::vector<double> thetas;
   for (double theta = thetaMin; theta <= thetaMax ; theta += dTheta) thetas.push_back(theta);
   std::vector<double> sigmas(thetas.size());
+  if(verbose) WIELD_NOTE("Beginning computation: with thetaMin="<<thetaMin<<", thetaMax="<<thetaMax<<", dTheta="<<dTheta<<", # of computations = "<<thetas.size());
+
   
-  double 
-    c1c1 = Wield::Integrator::Volume(C1,Eigen::Matrix3d::Identity(),C1,Eigen::Matrix3d::Identity(),epsilon,tolerance),
-    c2c2 = c1c1;
+  if (verbose) WIELD_NOTE("Computing norm of crystal 1");
+  double c1c1 = Wield::Integrator::Volume(*C1,rot1,*C1,rot1,epsilon,tolerance,false);
+  if (verbose) WIELD_NOTE("Computing norm of crystal 2");
+  double c2c2 = Wield::Integrator::Volume(*C2,rot2,*C2,rot2,epsilon,tolerance,false); 
   
-  std::cout << "beginning parallel computation..." << std::endl;
   #pragma omp parallel for num_threads(numThreads)
   for ( int i = 0 ; i < thetas.size(); i++)
     {
       int index = omp_get_thread_num();
+      //if (index != 0) verbose = false;
+
+      //if (verbose){ WIELD_NOTE("Computing for theta " << i << " / " << thetas.size());}
+      if (index==0) WIELD_PROGRESS("Computing CSL", thetas[i]-thetaMin, (thetaMax-thetaMin)/numThreads, dTheta);
 
       Eigen::Matrix3d
 	omega1 =
@@ -150,14 +207,13 @@ void CSL(Reader::Reader &reader, int numThreads=1)
 	createMatrixFromZAngle(thetaRotZ2*thetas[i]) *
 	rot2;      
       double 
-	c1c2 = Wield::Integrator::Volume(C1,omega1,C2,omega2,epsilon,tolerance);
+	c1c2 = Wield::Integrator::Volume(*C1,omega1,*C2,omega2,epsilon,tolerance,false);
 
       sigmas[i] = sqrt(c1c1)*sqrt(c2c2) / c1c2;
-      //std::cout << theta << " " << c1c1 << " " << c2c2 << " " << c1c2 << " --> " << sqrt(c1c1)*sqrt(c2c2) / c1c2 << std::endl;
+      //std::cout << thetas[i] << " " << c1c1 << " " << c2c2 << " " << c1c2 << " --> " << sqrt(c1c1)*sqrt(c2c2) / c1c2 << std::endl;
 
-      //ws.push_back(w);
-      if (index==0) WIELD_PROGRESS("Computing CSL", thetas[i]-thetaMin, (thetaMax-thetaMin)/numThreads, dTheta)
     }
+  WIELD_PROGRESS_COMPLETE("Computing CSL");
 
   std::ofstream out(reader.Read<std::string>("OutFile").c_str());
 

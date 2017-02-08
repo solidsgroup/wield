@@ -20,13 +20,14 @@
   }
 #define WIELD_EXCEPTION_NEW(MESSAGE)					\
   {									\
+    std::cout << std::endl;						\
     std::cout << WIELD_COLOR_B_ON << "Exception " <<WIELD_COLOR_FG_RED<< "thrown"; \
-    std::cout << WIELD_COLOR_FG_DEFAULT << ": " << MESSAGE << std::endl ;	\
-    std::cout << "\t" << WIELD_COLOR_B_ON << WIELD_COLOR_FG_BLUE<<__FILE__;	\
+    std::cout << WIELD_COLOR_FG_DEFAULT << ": " << MESSAGE << std::endl ; \
+    std::cout << "\t" << WIELD_COLOR_B_ON << WIELD_COLOR_FG_BLUE<<__FILE__; \
     std::cout << WIELD_COLOR_FG_DEFAULT << ":";				\
     std::cout << WIELD_COLOR_FG_BLUE <<__LINE__ <<WIELD_COLOR_FG_DEFAULT << std::endl; \
     std::cout << "\t" << WIELD_COLOR_FG_YELLOW << __func__;		\
-    std::cout << WIELD_COLOR_RESET<<std::endl;					\
+    std::cout << WIELD_COLOR_RESET<<std::endl;				\
     std::stringstream ss; ss << MESSAGE; throw std::runtime_error(ss.str()); \
   }
 

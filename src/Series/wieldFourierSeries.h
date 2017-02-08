@@ -32,6 +32,15 @@ public:
   //   return exp(-sigma*sigma*(x*x + y*y + z*z)/4.) / sqrt(8*pi*pi*pi);
   // }
 
+  FourierSeries(const FourierSeries<Mollifier> &copy):
+    order(copy.order),
+    alphaX(copy.alphaX),
+    alphaY(copy.alphaY),
+    alphaZ(copy.alphaZ),
+    phiHat(copy.phiHat),
+    sigma(copy.sigma),
+    C(copy.C) {}
+
   FourierSeries(int _order, 
 		double _alphaX, 
 		double _alphaY, 
@@ -40,7 +49,8 @@ public:
 		Mollifier _mollifier,
 		std::vector<double> X, 
 		std::vector<double> Y, 
-		std::vector<double> Z):
+		std::vector<double> Z,
+		int verbose=false):
     order(_order),
     alphaX(_alphaX),
     alphaY(_alphaY),
@@ -56,31 +66,35 @@ public:
     std::complex<double> I(0,1);
     int size = X.size();
     for (int l=-order+1; l<order; l++)
-      for (int m=-order+1; m<order; m++)
-	for (int n=-order+1; n<order; n++)
-	  {
-	    (*this)(l,m,n) = 0;
-	    for (unsigned int i=0; i<size; i++)
-	      {
-		if (fabs(X[i]) > 0.5*alphaX) WIELD_WARNING("X[i] = " << X[i] << " > 0.5*alphaX= " << 0.5*alphaX );
- 		if (fabs(Y[i]) > 0.5*alphaY) WIELD_WARNING("Y[i] = " << Y[i] << " > 0.5*alphaY= " << 0.5*alphaY );
-		if (fabs(Z[i]) > 0.5*alphaZ) WIELD_WARNING("Z[i] = " << Z[i] << " > 0.5*alphaZ= " << 0.5*alphaZ );
+      {
+	if(verbose) WIELD_PROGRESS("Computing CSL", l+order, 2*order, 1);
+	for (int m=-order+1; m<order; m++)
+	  for (int n=-order+1; n<order; n++)
+	    {
+	      (*this)(l,m,n) = 0;
+	      for (unsigned int i=0; i<size; i++)
+		{
+		  if (fabs(X[i]) > 0.5*alphaX) WIELD_WARNING("X[i] = " << X[i] << " > 0.5*alphaX= " << 0.5*alphaX );
+		  if (fabs(Y[i]) > 0.5*alphaY) WIELD_WARNING("Y[i] = " << Y[i] << " > 0.5*alphaY= " << 0.5*alphaY );
+		  if (fabs(Z[i]) > 0.5*alphaZ) WIELD_WARNING("Z[i] = " << Z[i] << " > 0.5*alphaZ= " << 0.5*alphaZ );
 
-		double lambda = 1.;
-		if (fabs(fabs(X[i]) - 0.5*alphaX) < 1E-8) lambda *= 0.5;
-		if (fabs(fabs(Y[i]) - 0.5*alphaY) < 1E-8) lambda *= 0.5;
-		if (fabs(fabs(Z[i]) - 0.5*alphaZ) < 1E-8) lambda *= 0.5;
+		  double lambda = 1.;
+		  if (fabs(fabs(X[i]) - 0.5*alphaX) < 1E-8) lambda *= 0.5;
+		  if (fabs(fabs(Y[i]) - 0.5*alphaY) < 1E-8) lambda *= 0.5;
+		  if (fabs(fabs(Z[i]) - 0.5*alphaZ) < 1E-8) lambda *= 0.5;
 
-		Eigen::Covector3d k(2.*pi*(double)l/alphaX, 2.*pi*(double)m/alphaY, 2.*pi*(double)n/alphaZ);
-		Eigen::Vector3d x(X[i],Y[i],Z[i]);
+		  Eigen::Covector3d k(2.*pi*(double)l/alphaX, 2.*pi*(double)m/alphaY, 2.*pi*(double)n/alphaZ);
+		  Eigen::Vector3d x(X[i],Y[i],Z[i]);
 
-		(*this)(l,m,n) +=
-		  lambda
-		  * phiHat(k)
-		  * exp(-I * (double)(k*x))
-		  / (alphaX * alphaY * alphaZ);
-	      }
-	  }
+		  (*this)(l,m,n) +=
+		    lambda
+		    * phiHat(k)
+		    * exp(-I * (double)(k*x))
+		    / (alphaX * alphaY * alphaZ);
+		}
+	    }
+      }
+    if(verbose) WIELD_PROGRESS_COMPLETE("Computing CSL");
   }
 
   std::complex<double> & operator() (signed int i, signed int j, signed int k)

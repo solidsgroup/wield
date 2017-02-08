@@ -32,18 +32,15 @@
 /// - -n --num-threads <num>: for some supported functions, use pthread parallelism
 ///
 /// Methods
-/// =======
+/// -------
 /// 
 /// This program is a collection of other methods that can be run seperately or simultaneously.
-/// Please see the following pages for descriptions of each individual routine.
-/// - \ref MainOR1D Compute the interface energy as a function of an orientation relationship, parameterized by one angle
-/// - \ref MainInterface1D Compute the interface energy as a function of interface orientation, parameterized by one angle
-/// - \ref MainESS This routine computes the full 2D energy sphere projection
+/// Use the following links to find documentation and example input files for each method
+/// 
+/// - \ref Wield::Main::CSL Compute the thermalized coincident site lattice \f$\Sigma\f$ value of a bicrystal
+/// - \ref Wield::Main::Energy1D Compute the thermalized grain boundary energy for an interface
+/// - \ref Wield::Main::MainInterface1D Compute the interface energy as a function of interface orientation, parameterized by one angle
 /// - \ref MainFacet2D Use the relaxation algorithm to compute the facet pattern and relaxed energy, given an energy surface
-///
-
-
-
 ///
 /// \file main.cpp
 /// \brief This is the short description for main.cpp
@@ -102,11 +99,13 @@ int main(int argc,     ///< Number of arguments
   // 
   TCLAP::CmdLine cmd("(W)eak approximation of (I)nterface (E)nergy for bicrysta(L) boun(D)aries");
   TCLAP::SwitchArg switchDynamicPlot("p", "dynamic-plot", "Show real-time VTK plot of energy", cmd, false);
+  TCLAP::SwitchArg switchVerbose("v", "verbose", "Print extraneous information", cmd, false);
   TCLAP::ValueArg<int> valueNumThreads("n", "num-threads", "Number of pthreads to use",false,1,"", cmd);
   TCLAP::IgnoreArg testIgnoreArg("D","User defined variables","",cmd);
   TCLAP::UnlabeledValueArg<std::string> argFileName("name", "Path to input file", false, "", "inputfile", cmd);
   cmd.parse(argc, argv);
   bool dynamicPlot; dynamicPlot = switchDynamicPlot.getValue();
+  bool verbose; verbose = switchVerbose.getValue();
   int numThreads = valueNumThreads.getValue();
   std::string fileName = argFileName.getValue();
 
@@ -126,7 +125,7 @@ int main(int argc,     ///< Number of arguments
   if (rabbit->Find("Energy2D"))
     Wield::Main::Energy2D(*rabbit,numThreads);
   if (rabbit->Find("CSL"))
-    Wield::Main::CSL(*rabbit,numThreads);
+    Wield::Main::CSL(*rabbit,numThreads,verbose);
   if (rabbit->Find("EnergyOffset"))
     Wield::Main::EnergyOffset(*rabbit);
   // if (rabbit->Find("BlenderVoxelData"))
