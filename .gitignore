@@ -17,3 +17,5 @@ __pycache__
 *.pyc
 notes
 110_fcc.in
+*.in
+.smt

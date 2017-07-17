@@ -155,20 +155,12 @@ void Energy2D(Reader::Reader &reader, int numThreads=1)
 	else Z.push_back(0.);
       }
   std::vector<double> W(X.size());
-  
-  std::cout << rot1 << std::endl;
-  std::cout << rot2 << std::endl;
 
   double 
     c1c1 = Wield::Integrator::Volume(C1,rot1,C1,rot1,epsilon,tolerance), 
     c2c2 = Wield::Integrator::Volume(C2,rot2,C2,rot2,epsilon,tolerance), 
     c1c2 = Wield::Integrator::Volume(C1,rot1,C2,rot2,epsilon,tolerance);
 
-  std::cout << c1c1 << " " << c2c2 << " " << c1c2 << std::endl;
-
-  std::cout << sqrt(c1c1)*sqrt(c2c2) / c1c2 << std::endl;
-
-  return;
 
 
   //
