@@ -10,8 +10,8 @@ Eigen::Matrix3d createMatrixFromXAngle(double theta)
   Eigen::Matrix3d Omega;
   Omega << 
     1,          0,         0,
-    0, cos(theta*pi/180.),sin(theta*pi/180.),
-    0,-sin(theta*pi/180.),cos(theta*pi/180.);
+    0, cos(theta*pi/180.),-sin(theta*pi/180.),
+    0, sin(theta*pi/180.), cos(theta*pi/180.);
   return Omega;
 }
 Eigen::Matrix3d createMatrixFromYAngle(double theta)
@@ -27,8 +27,8 @@ Eigen::Matrix3d createMatrixFromZAngle(double theta)
 {
   Eigen::Matrix3d Omega;
   Omega << 
-    cos(theta*pi/180.), sin(theta*pi/180.), 0,
-    -sin(theta*pi/180.),cos(theta*pi/180.), 0,
+    cos(theta*pi/180.), -sin(theta*pi/180.), 0,
+    sin(theta*pi/180.),cos(theta*pi/180.), 0,
     0,                   0, 1;
   return Omega;
 }
