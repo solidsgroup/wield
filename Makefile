@@ -64,6 +64,16 @@ make_directories: $(SRC)
 
 %.h :
 
+#
+# Unit Tests
+#
+TEST_DIRS = $(shell find tests -mindepth 1 -type d)
+
+test: $(TEST_DIRS:=/output.dat)
+%/output.dat: .FORCE
+	-@python3 scripts/unittest.py $(@:output.dat=)
+.FORCE:
+
 
 #
 # Utility Targets

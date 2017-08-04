@@ -147,13 +147,6 @@ void Energy2D(Reader::Reader &reader, int numThreads=1)
       }
   std::vector<double> W(X.size());
 
-  double 
-    c1c1 = Wield::Integrator::Volume(C1,rot1,C1,rot1,epsilon,tolerance), 
-    c2c2 = Wield::Integrator::Volume(C2,rot2,C2,rot2,epsilon,tolerance), 
-    c1c2 = Wield::Integrator::Volume(C1,rot1,C2,rot2,epsilon,tolerance);
-
-
-
   //
   // Run computation with optional OpenMP parallelism
   //
@@ -178,7 +171,6 @@ void Energy2D(Reader::Reader &reader, int numThreads=1)
       if (index==0) WIELD_PROGRESS("Energy surface",i,X.size()/numThreads,1);
     }
   std::cout << std::endl;
-
 
   //
   // Print results to output file

@@ -48,7 +48,7 @@ double Volume(Wield::Series::FourierSeries<Mollifier> &C1, ///< [in] Structure f
 {
   WIELD_EXCEPTION_TRY;
   std::complex<double> w12 = 0;
-  double mod_tolerance = sqrt( epsilon * epsilon * log(1/tolerance));
+  double mod_tolerance = epsilon * sqrt( -log(tolerance) );
 
   int order_max = 0;
 
@@ -65,14 +65,21 @@ double Volume(Wield::Series::FourierSeries<Mollifier> &C1, ///< [in] Structure f
 				 (double)n * 2.* pi / C1.alphaZ);
 	      Eigen::Vector3d Ra1 = R2.transpose()*R1*a1;
 
-	      int xmin = std::max(1-C2.order, (int)((C2.alphaX/2./pi)*(Ra1[0]-2*mod_tolerance)));
-	      int xmax = std::min(C2.order,   (int)((C2.alphaX/2./pi)*(Ra1[0]+2*mod_tolerance)));
+	      // int xmin = std::max(1-C2.order, (int)((C2.alphaX/2./pi)*(Ra1[0]-2*mod_tolerance)));
+	      // int xmax = std::min(C2.order,   (int)((C2.alphaX/2./pi)*(Ra1[0]+2*mod_tolerance)));
+	      // int ymin = std::max(1-C2.order, (int)((C2.alphaY/2./pi)*(Ra1[1]-2*mod_tolerance)));
+	      // int ymax = std::min(C2.order,   (int)((C2.alphaY/2./pi)*(Ra1[1]+2*mod_tolerance)));
+	      // int zmin = std::max(1-C2.order, (int)((C2.alphaZ/2./pi)*(Ra1[2]-2*mod_tolerance)));
+	      // int zmax = std::min(C2.order,   (int)((C2.alphaZ/2./pi)*(Ra1[2]+2*mod_tolerance)));
 
-	      int ymin = std::max(1-C2.order, (int)((C2.alphaY/2./pi)*(Ra1[1]-2*mod_tolerance)));
-	      int ymax = std::min(C2.order,   (int)((C2.alphaY/2./pi)*(Ra1[1]+2*mod_tolerance)));
+	      int xmin = (int)((C2.alphaX/2./pi)*(Ra1[0])) - 2;
+	      int xmax = (int)((C2.alphaX/2./pi)*(Ra1[0])) + 2;
+	      int ymin = (int)((C2.alphaY/2./pi)*(Ra1[1])) - 2;
+	      int ymax = (int)((C2.alphaY/2./pi)*(Ra1[1])) + 2;
+	      int zmin = (int)((C2.alphaZ/2./pi)*(Ra1[2])) - 2;
+	      int zmax = (int)((C2.alphaZ/2./pi)*(Ra1[2])) + 2;
 
-	      int zmin = std::max(1-C2.order, (int)((C2.alphaZ/2./pi)*(Ra1[2]-2*mod_tolerance)));
-	      int zmax = std::min(C2.order,   (int)((C2.alphaZ/2./pi)*(Ra1[2]+2*mod_tolerance)));
+	      //std::cout << xmax<<"-"<<xmin << " " << ymax<<"-"<<ymin << " " << zmax<<"-"<<zmin << std::endl;
 
 	      for (int p=xmin; p < xmax; p++)
 		{

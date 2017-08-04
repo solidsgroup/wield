@@ -123,56 +123,45 @@ void CSL(Reader::Reader &reader, ///< [in] Reader object to parse input commands
     }
 
   //
-  // CONSTRUCT ROTATION MATRIX FOR CRYSTAL 1
+  // Rotation matrix 1
   //
   if(verbose) WIELD_NOTE("Computing rotation matrices")
 
   Eigen::Matrix3d rot1 = Eigen::Matrix3d::Identity();
-  if (reader.Find("AxisY1") && reader.Find("AxisZ1")) 
+  if (reader.Find("AxisY1") && reader.Find("AxisZ1"))
     rot1 = createMatrixFromYZ(reader.Read<Eigen::Vector3d>("AxisY1"),reader.Read<Eigen::Vector3d>("AxisZ1")).transpose() * rot1;
-  if (reader.Find("AxisZ1") && reader.Find("AxisX1")) 
-    rot1 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("AxisZ1"),reader.Read<Eigen::Vector3d>("AxisX1")).transpose() * rot1;
-  if (reader.Find("AxisX1") && reader.Find("AxisY1")) 
-    rot1 = createMatrixFromXY(reader.Read<Eigen::Vector3d>("AxisX1"),reader.Read<Eigen::Vector3d>("AxisY1")).transpose() * rot1;
-
-  if (reader.Find("phi1_1") && reader.Find("Phi_1") && reader.Find("phi2_1"))
-    {
-      double phi1 = reader.Read<double>("phi1_1"); 
-      double Phi = reader.Read<double>("Phi_1"); 
-      double phi2 = reader.Read<double>("phi2_1"); 
-      rot1 = createMatrixFromBungeEulerAngles(phi1,Phi,phi2)*rot1;
-    }
-
-  if (reader.Find("RotAxes1"))
+  else if (reader.Find("AxisZ1") && reader.Find("AxisX1"))
+    rot1 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("AxisZ1"),reader.Read<Eigen::Vector3d>("AxisX1")).transpose() * rot1; // added transpose
+  else if (reader.Find("AxisX1") && reader.Find("AxisY1"))
+    rot1 = createMatrixFromXY(reader.Read<Eigen::Vector3d>("AxisX1"),reader.Read<Eigen::Vector3d>("AxisY1")).transpose() * rot1; // added transpose
+  else if (reader.Find("RotAxes1"))
     {
       std::vector<char> rotAxes1 = reader.Read<std::vector<char> >("RotAxes1");
       std::vector<double>  rots1 = reader.Read<std::vector<double> >("Rots1");
       for (int i=0; i<rotAxes1.size(); i++) rot1 = createMatrixFromAngle(rots1[i],rotAxes1[i]) * rot1;
     }
+  if (verbose) WIELD_NOTE("Rot1 components: " << std::endl << rot1);
+  if (verbose) WIELD_NOTE("Rot1 Euler angles: " << rot1.eulerAngles(2,0,2).transpose()*180./pi);
 
   //
-  // CONSTRUCT ROTATION MATRIX FOR CRYSTAL 2
+  // Rotation matrix 2
   //
 
   Eigen::Matrix3d rot2 = Eigen::Matrix3d::Identity();
-  if (reader.Find("AxisY2") && reader.Find("AxisZ2")) rot2 = createMatrixFromYZ(reader.Read<Eigen::Vector3d>("AxisY2"),reader.Read<Eigen::Vector3d>("AxisZ2")).transpose() * rot2;
-  if (reader.Find("AxisZ2") && reader.Find("AxisX2")) rot2 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("AxisZ2"),reader.Read<Eigen::Vector3d>("AxisX2")).transpose() * rot2;
-  if (reader.Find("AxisX2") && reader.Find("AxisY2")) rot2 = createMatrixFromXY(reader.Read<Eigen::Vector3d>("AxisX2"),reader.Read<Eigen::Vector3d>("AxisY2")).transpose() * rot2;
-  
-  if (reader.Find("phi1_2") && reader.Find("Phi_2") && reader.Find("phi2_2"))
-    {
-      double phi1 = reader.Read<double>("phi1_2"); 
-      double Phi = reader.Read<double>("Phi_2"); 
-      double phi2 = reader.Read<double>("phi2_2"); 
-      rot2 = createMatrixFromBungeEulerAngles(phi1,Phi,phi2)*rot2;
-    }
-  
-  if (reader.Find("RotAxes2"))
+  if (reader.Find("AxisY2") && reader.Find("AxisZ2")) 
+    rot2 = createMatrixFromYZ(reader.Read<Eigen::Vector3d>("AxisY2"),reader.Read<Eigen::Vector3d>("AxisZ2")).transpose() * rot2; // added transpose
+  else if (reader.Find("AxisZ2") && reader.Find("AxisX2")) 
+    rot2 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("AxisZ2"),reader.Read<Eigen::Vector3d>("AxisX2")).transpose() * rot2; // added transpose
+  else if (reader.Find("AxisX2") && reader.Find("AxisY2")) 
+    rot2 = createMatrixFromXY(reader.Read<Eigen::Vector3d>("AxisX2"),reader.Read<Eigen::Vector3d>("AxisY2")).transpose() * rot2; // added transpose
+  else if (reader.Find("RotAxes2"))
     {
       std::vector<char> rotAxes2 = reader.Read<std::vector<char> >("RotAxes2");
       std::vector<double>  rots2 = reader.Read<std::vector<double> >("Rots2");
       for (int i=0; i<rotAxes2.size(); i++) rot2 = createMatrixFromAngle(rots2[i],rotAxes2[i]) * rot2;
     }
+  if (verbose) WIELD_NOTE("Rot2 components: " << std::endl << rot2);
+  if (verbose) WIELD_NOTE("Rot2 Euler angles: " << rot2.eulerAngles(2,0,2).transpose()*180./pi);
 
 
   std::vector<double> thetas;
@@ -210,8 +199,6 @@ void CSL(Reader::Reader &reader, ///< [in] Reader object to parse input commands
 	c1c2 = Wield::Integrator::Volume(*C1,omega1,*C2,omega2,epsilon,tolerance,false);
 
       sigmas[i] = sqrt(c1c1)*sqrt(c2c2) / c1c2;
-      //std::cout << thetas[i] << " " << c1c1 << " " << c2c2 << " " << c1c2 << " --> " << sqrt(c1c1)*sqrt(c2c2) / c1c2 << std::endl;
-
     }
   WIELD_PROGRESS_COMPLETE("Computing CSL");
 
