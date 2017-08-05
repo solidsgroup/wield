@@ -1,0 +1,58 @@
+#type of simulation to run
+#$Energy2D
+$CSL
+
+#$Pi 3.14159265359
+
+#lattice constant
+$a 1
+
+#thermalization parameter
+#$Sigma1 sqrt(2.0/$Pi)
+$Sigma1 00.1
+$Sigma2 $Sigma1
+
+
+#numerical damping -- (reciprocal width of window function)
+$Epsilon 0.25
+
+#number of terms in Fourier series
+$Order1 32
+$Order2  $Order1
+
+#location of atoms in unit cell
+$AlphaX1 $a
+$AlphaY1 $a
+$AlphaZ1 $a
+$X1 0.    0.     0.     0.     0. $a/2. -$a/2.  $a/2. -$a/2. $a/2.  $a/2. -$a/2. -$a/2.
+$Y1 0. $a/2.  $a/2. -$a/2. -$a/2.    0.     0.     0.     0. $a/2. -$a/2.  $a/2. -$a/2.
+$Z1 0. $a/2. -$a/2.  $a/2. -$a/2. $a/2.  $a/2. -$a/2. -$a/2.    0.     0.     0.     0.
+$AlphaX2 $AlphaX1
+$AlphaY2 $AlphaY1
+$AlphaZ2 $AlphaZ1
+$X2      $X1
+$Y2      $Y1
+$Z2      $Z1
+
+#tolerance for throwing out terms
+$Tolerance 1E-16
+
+#[110] Tilt
+$AxisX1 1 1 0
+$AxisZ1 -1 1 0
+$AxisX2 1 1 0
+$AxisZ2 -1 1 0
+
+
+#theta range
+$ThetaRotX1 0.5
+$ThetaRotX2 -0.5
+#$DR 0.1
+$ThetaMin 0.0
+$ThetaMax 90.0
+$DTheta 1
+
+#Output file
+$OutFile output.ref
+
+
