@@ -67,7 +67,7 @@ make_directories: $(SRC)
 #
 # Unit Tests
 #
-TEST_DIRS = $(shell find tests -mindepth 1 -type d)
+TEST_DIRS = $(shell find tests -mindepth 1 -type d | sort)
 
 test: $(TEST_DIRS:=/output.dat)
 %/output.dat: .FORCE

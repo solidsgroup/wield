@@ -18,7 +18,7 @@ $Sigma2 $Sigma1
 $Epsilon 0.25
 
 #number of terms in Fourier series
-$Order1 8
+$Order1 16
 $Order2  $Order1
 
 #location of atoms in unit cell

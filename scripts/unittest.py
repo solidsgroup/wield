@@ -1,10 +1,15 @@
+import os
 import sys
 import subprocess
 import filecmp
 
-print(sys.argv[1] + "."*(60-len(sys.argv[1])),end='')
+termsize=os.get_terminal_size().columns
+print(sys.argv[1] + "."*(termsize-4-len(sys.argv[1])),end='')
 sys.stdout.flush()
 try:
+    subprocess.call(["rm","-rf",sys.argv[1]+"output.dat"])
+    subprocess.call(["rm","-rf",sys.argv[1]+"run.stdout"])
+    subprocess.call(["rm","-rf",sys.argv[1]+"run.error"])
     with open(sys.argv[1]+"run.stdout","w") as stdoutfile:
         err=subprocess.call(["./bin/wield",sys.argv[1]+"input.in","-DOutFile="+sys.argv[1]+"output.dat"],stdout=stdoutfile);
         if err:
