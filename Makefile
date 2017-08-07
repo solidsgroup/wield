@@ -67,11 +67,16 @@ make_directories: $(SRC)
 #
 # Unit Tests
 #
-TEST_DIRS = $(shell find tests -mindepth 1 -type d | sort)
+test: test-csl test-energy1d
 
-test: $(TEST_DIRS:=/output.dat)
+TEST_DIRS_CSL = $(shell find tests -mindepth 1 -type d -name "csl*"| sort)
+test-csl: $(TEST_DIRS_CSL:=/output.dat)
+
+TEST_DIRS_ENERGY1D = $(shell find tests -mindepth 1 -type d -name "energy1d*"| sort)
+test-energy1d: $(TEST_DIRS_ENERGY1D:=/output.dat)
+
 %/output.dat: .FORCE
-	-@python3 scripts/unittest.py $(@:output.dat=)
+	-@python3 scripts/unit_test.py $(@:output.dat=)
 .FORCE:
 
 
