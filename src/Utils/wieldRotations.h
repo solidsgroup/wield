@@ -114,6 +114,25 @@ Eigen::Matrix3d createMatrixFromBungeEulerAngles(double phi1, double Phi, double
   WIELD_EXCEPTION_CATCH;
 }
 
+Eigen::Matrix3d createMatrixFromAxisAngle(Eigen::Vector3d u, double theta)
+{
+  WIELD_EXCEPTION_TRY;
+
+  Eigen::Matrix3d ux;
+  ux <<
+    0, -u[2], u[1],
+    u[2], 0, -u[0],
+    -u[1], u[0], 0;
+  Eigen::Matrix3d uu = u*u.transpose();
+
+  return
+    (Eigen::Matrix3d::Identity()*cos(theta*pi/180.))
+    + (ux*sin(theta*pi/180.))
+    + (uu*(1.-cos(theta*pi/180.)));
+
+  WIELD_EXCEPTION_CATCH;
+}
+
 
 
 #endif

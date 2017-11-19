@@ -152,9 +152,6 @@ void Energy1D(Reader::Reader &reader)
   WIELD_EXCEPTION_TRY;
   
   double
-    thetaMin = reader.Read<double>("ThetaMin"),
-    thetaMax = reader.Read<double>("ThetaMax"),
-    dTheta = reader.Read<double>("DTheta"),
     epsilon = reader.Read<double>("Epsilon",0.2),
     tolerance = reader.Read<double>("Tolerance",1E-16);
   
@@ -260,30 +257,80 @@ void Energy1D(Reader::Reader &reader)
   // Apply successive rotation
   //
 
-  double
-    thetaRotX1 = reader.Read<double>("ThetaRotX1",0.),
-    thetaRotY1 = reader.Read<double>("ThetaRotY1",0.),
-    thetaRotZ1 = reader.Read<double>("ThetaRotZ1",0.),
-    thetaRotX2 = reader.Read<double>("ThetaRotX2",0.),
-    thetaRotY2 = reader.Read<double>("ThetaRotY2",0.),
-    thetaRotZ2 = reader.Read<double>("ThetaRotZ2",0.);
+  // ALL
+  double thetaMin, thetaMax, dTheta;
+
+  // SLERP only
+  bool useSlerp = false;
+  Eigen::Vector3d slerpN1, slerpN2, slerpRotAxis;
+  double slerpDt;
+
+  // NON-SLERP only
+  double thetaRotX1, thetaRotY1, thetaRotZ1, thetaRotX2, thetaRotY2, thetaRotZ2;
+
+  if (reader.Find("SlerpN1"))
+    {
+      useSlerp=true;
+      std::vector<double> n1 = reader.Read<std::vector<double> >("SlerpN1");
+      slerpN1 << n1[0], n1[1], sqrt(1-n1[0]*n1[0] - n1[1]*n1[1]);
+      slerpN1 /= slerpN1.norm();
+      std::vector<double> n2 = reader.Read<std::vector<double> >("SlerpN2");
+      slerpN2 << n2[0], n2[1], sqrt(1-n2[0]*n2[0] - n2[1]*n2[1]);
+      slerpN2 /= slerpN2.norm();
+      slerpDt = reader.Read<double>("SlerpDt");
+     
+      slerpRotAxis = slerpN1.cross(slerpN2);
+
+      thetaMin = 0;
+      thetaMax = acos(slerpN1.dot(slerpN2))*180/pi;
+      dTheta = (thetaMax-thetaMin)*slerpDt;
+      thetaMax += dTheta;
+
+      std::cout << "Angle between vectors = " << thetaMax << std::endl;
+
+    }
+
+  else
+    {
+      thetaRotX1 = reader.Read<double>("ThetaRotX1",0.);
+      thetaRotY1 = reader.Read<double>("ThetaRotY1",0.);
+      thetaRotZ1 = reader.Read<double>("ThetaRotZ1",0.);
+      thetaRotX2 = reader.Read<double>("ThetaRotX2",0.);
+      thetaRotY2 = reader.Read<double>("ThetaRotY2",0.);
+      thetaRotZ2 = reader.Read<double>("ThetaRotZ2",0.);
+      thetaMin = reader.Read<double>("ThetaMin");
+      thetaMax = reader.Read<double>("ThetaMax");
+      dTheta = reader.Read<double>("DTheta");
+    }
+
   double w = 0;
   std::vector<double> thetas, ws;
+  
   for (double theta = thetaMin; theta <= thetaMax ; theta += dTheta)
     {
-      Eigen::Matrix3d
-	omega1 =
-	//rot1 *
-	createMatrixFromXAngle(thetaRotX1*theta) *
-	createMatrixFromYAngle(thetaRotY1*theta) *
-	createMatrixFromZAngle(thetaRotZ1*theta) *
-	rot1,
-	omega2 =
-	//rot1 *
-	createMatrixFromXAngle(thetaRotX2*theta) *
-	createMatrixFromYAngle(thetaRotY2*theta) *
-	createMatrixFromZAngle(thetaRotZ2*theta) *
-	rot2;      
+
+      Eigen::Matrix3d omega1, omega2;
+
+      if (useSlerp)
+	{
+	  Eigen::AngleAxisd slerpRot = Eigen::AngleAxisd(theta*pi/180, slerpRotAxis);
+	  omega1 = createMatrixFromNormalVector(slerpRot*slerpN1) * rot1;
+	  omega2 = createMatrixFromNormalVector(slerpRot*slerpN1) * rot2;
+	}
+      else
+	{
+	  omega1 =
+	    createMatrixFromXAngle(thetaRotX1*theta) *
+	    createMatrixFromYAngle(thetaRotY1*theta) *
+	    createMatrixFromZAngle(thetaRotZ1*theta) *
+	    rot1,
+	    omega2 =
+	    createMatrixFromXAngle(thetaRotX2*theta) *
+	    createMatrixFromYAngle(thetaRotY2*theta) *
+	    createMatrixFromZAngle(thetaRotZ2*theta) *
+	    rot2;      
+	}
+
       w = Wield::Integrator::Surface(C1,omega1,
 				     C2,omega2,
 				     epsilon, tolerance);
