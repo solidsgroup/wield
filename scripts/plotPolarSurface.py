@@ -1,11 +1,15 @@
 #!python
+import os.path
 import argparse
 from math import atan2
-from numpy import loadtxt, linspace, meshgrid, arctan2, pi, radians,degrees,concatenate,cos,sin,sqrt
+from numpy import loadtxt, linspace, meshgrid, arctan2, pi, radians,degrees,concatenate,cos,arccos,sin,sqrt,dot,inf
+from numpy.linalg import norm
 from scipy.interpolate import griddata, interp2d
+from scipy.optimize import minimize
 from pylab import subplots,contourf,pcolor,figure,draw,ginput,show,colorbar,pcolormesh,savefig,plot,ion,pause,clf,xlim,tight_layout,xticks,yticks,set_cmap,get_cmap,title
 from fractional_polar_axes import *
 import sys
+from tkinter import filedialog
 
 parser = argparse.ArgumentParser(description='Create a polar surface plot');
 parser.add_argument('file', help='Data file for plotting');
@@ -37,6 +41,7 @@ parser.add_argument('-cmap','--cmap', default='jet',help='(jet,gray,binary) See 
 parser.add_argument('-t', '--title', default="", help='Optional plot title');
 args=parser.parse_args();
 
+
 # def format_coord(x, y):
 #     #col = int(x+0.5)
 #     #row = int(y+0.5)
@@ -51,8 +56,8 @@ if (len(args.tick_locs) != len(args.tick_labels)):
 multiplier = float(args.multiplier[0]);
 adder = float(args.adder[0]);
 data = loadtxt(args.file);
-x = data[:,0];
-y = data[:,1];
+x =  data[:,0]*cos(radians(float(args.theta0))) + data[:,1]*sin(radians(float(args.theta0)));
+y = -data[:,0]*sin(radians(float(args.theta0))) + data[:,1]*cos(radians(float(args.theta0)));
 w = multiplier*data[:,3] + adder;
 print("minimum=" + str(min(w)));
 
@@ -69,7 +74,9 @@ rgrid = linspace(0.0,1.0,args.resolution[0])
 print(args.theta0)
 thetagrid = linspace(float(args.theta_limit[0]),float(args.theta_limit[1]),args.resolution[1])
 rgrid, thetagrid = meshgrid(rgrid,thetagrid)
-wgrid   = griddata((x,y),w,(rgrid*cos(radians(thetagrid)),rgrid*sin(radians(thetagrid))),fill_value=0,method=args.method);
+xgrid = rgrid*cos(radians(thetagrid))
+ygrid = rgrid*sin(radians(thetagrid))
+wgrid   = griddata((x,y),w,(xgrid,ygrid),fill_value=0,method=args.method);
 
 
 #if float(args.theta_limit[1])-float(args.theta_limit[0]) > 180:
@@ -78,13 +85,15 @@ fig,ax = subplots(ncols=1,subplot_kw=dict(projection='polar'))
 ax.xaxis.set_ticklabels([])
 ax.yaxis.set_ticklabels([])
 ax.set_xlim(0,1);
-pc = pcolormesh(radians(thetagrid-float(args.theta0)),rgrid,wgrid,shading='gouraud',cmap=get_cmap(args.cmap));
+pc = pcolormesh(radians(thetagrid),rgrid,wgrid,shading='gouraud',cmap=get_cmap(args.cmap));
 if (len(args.tick_locs) > 0):
     cb = colorbar(pc,pad=0.2,shrink=.8);
 else:
     cb = colorbar(pc,pad=0.05,shrink=.9);
 if args.cmin != args.cmax:
     cb.set_clim(args.cmin,args.cmax);
+else:
+    cb.set_clim(min(w),max(w));
 # else:
 #     fig = figure()
 #     ax = fractional_polar_axes(fig,thlim=(float(args.theta_limit[0]),float(args.theta_limit[1])),rlim=(0.0,1))
@@ -263,7 +272,7 @@ elif args.interactive:
 
     while True:
         io = input("Enter a command: ")
-        if (io == 'q'):
+        if (io == 'q' or io == 'x'):
             exit();
         if (io == '1'):
             print(griddata((x,y),w,(0,0),fill_value=0,method=args.method));
@@ -292,6 +301,125 @@ elif args.interactive:
             xlim(0,1);
             show(); pause(1);
             #print(griddata((x,y),w,(cos(pts[0][0])*pts[0][1], sin(pts[0][0])*pts[0][1]),fill_value=0,method=args.method));
+        if (io == 'm'):
+
+            pts = ginput(1,timeout=-1);
+            n1 = np.array([0.,0.,0.])
+            n1[0] = cos(pts[0][0])*pts[0][1]; n1[1] = sin(pts[0][0])*pts[0][1]; n1[2] = sqrt(1 - n1[0]**2 - n1[1]**2);
+
+            print(n1)
+            n1,wmin = optimize(n1)
+            print(n1,wmin)
+                
+
+            #def fn(n):
+            #    return griddata((x,y),w,(n[0], n[1]),fill_value=0,method=args.method)
+            #print("minimizing...")
+            #print(minimize(fn,n1,method="Nelder-Mead"))
+            
+
+        if (io == 'g'):
+            def slerp(p0, p1, t):
+                omega = arccos(dot(p0/norm(p0), p1/norm(p1)))
+                so = sin(omega)
+                return sin((1.0-t)*omega) / so * p0 + sin(t*omega)/so * p1
+
+            def optimize(n):
+                wmin = inf; xmin=n[0];ymin=n[1]
+                threshold = 0.01
+                for xcol,ycol,wcol in zip(xgrid,ygrid,wgrid):
+                    for x, y, w in zip(xcol,ycol,wcol):
+                        if (x-n[0])**2 + (y-n[1])**2 < threshold and x**2 + y**2 < 0.999:
+                            if w<wmin:
+                                wmin=w; xmin=x; ymin=y;
+                return np.array([xmin,ymin,sqrt(1 - xmin**2 - ymin**2)])
+
+            def convexify(thetas,ws):
+                wcs=[]
+                for theta in thetas:
+                    current_max=-inf
+                    for theta1 in thetas:
+                        current_min=inf
+                        for theta2,w2 in zip(thetas,ws):
+                            current= (cos(theta1-theta)/abs(cos(theta1-theta2)))*w2
+                            if current<current_min: current_min = current
+                        if current_min>current_max: current_max = current_min
+                    wcs.append(current_max);
+                return wcs;
+
+            def convexify2(thetas,ws):
+                wcs=[]
+                for i in range(0,len(thetas)):
+                    wcs_min = ws[i];
+                    for j in range(0,i):
+                        for k in range(i+1,len(thetas)):
+                            wcs_this = (ws[j]*sin(thetas[k]-thetas[i]) + ws[k]*sin(thetas[i]-thetas[j]))/sin(thetas[k]-thetas[j])
+                            if wcs_this<wcs_min: wcs_min=wcs_this;
+                    wcs.append(wcs_min)
+                return wcs;
+
+            #theta_pre = 0; theta_post = 0;
+            #io = input("Padding (in degrees) [0, 0] : ") or "0 0"
+            #if len(io.split(" ")) == 2:
+            #    theta_pre = float(io.split(" ")[0])
+            #    theta_post = float(io.split(" ")[1])
+            #else: "Must specify 0 or two numbers. Continuing with [0 0]"
+            #print(theta_pre,theta_post)
+
+            io = input("Number of points [100]: ") or "100"
+            numpoints=float(io)+1;
+
+            io = input("Optimize normal vectors? [y/N]: ")
+            if io=='y' or io=='Y' or io=='yes': optimization=True
+            else: optimization=False
+
+            pts = ginput(2,timeout=-1);
+            n1 = np.array([0.,0.,0.])
+            n2 = np.array([0.,0.,0.])
+
+            n1[0] = cos(pts[0][0])*pts[0][1]; n1[1] = sin(pts[0][0])*pts[0][1];  n1[2] = sqrt(1 - n1[0]**2 - n1[1]**2);
+            n2[0] = cos(pts[1][0])*pts[1][1]; n2[1] = sin(pts[1][0])*pts[1][1];  n2[2] = sqrt(1 - n2[0]**2 - n2[1]**2);
+
+            dtheta = degrees(arccos(dot(n1, n2)))
+
+            if optimization:
+                n1 = optimize(n1)
+                n2 = optimize(n2)
+
+            xx=[]
+            yy=[]
+            ww=[]
+            rr=[]
+            tt=[]
+            print("n1="+str(n1))
+            print("n2="+str(n2))
+            T = linspace(0,1,numpoints)
+            #T = concatenate((
+            #    linspace(-theta_pre/dtheta,0,int(numpoints*theta_pre/dtheta)),
+            #    linspace(0,1,numpoints),
+            #    linspace(1,theta_post/dtheta,int(numpoints*theta_post/dtheta))))
+            for t in T:
+                nt = slerp(n1,n2,t)
+                xx.append(nt[0])
+                yy.append(nt[1])
+                rr.append(sqrt(nt[0]**2 + nt[1]**2))
+                tt.append(atan2(nt[1],nt[0]))
+            ww = griddata((x,y),w,(xx,yy),fill_value=0,method=args.method);
+            wc = convexify2(radians(T*dtheta),ww)
+            plot(tt,rr)
+            fig2 = figure()
+            plot(T*dtheta,ww)
+            plot(T*dtheta,wc)
+            show()
+            
+            filename=filedialog.asksaveasfilename()
+            if (filename):
+                f=open(filename,'w')
+                for theta,energy,energy_convex in zip(T*dtheta,ww,wc):
+                    f.write(str(theta)+'\t'+str(energy)+'\t'+str(energy_convex)+'\n')
+                f.close()
+
+            
     show()
 else:
     show()
