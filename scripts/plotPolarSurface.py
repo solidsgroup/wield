@@ -27,6 +27,7 @@ parser.add_argument('-f8', '--facet8-file', default="", help='Facet8 data input 
 parser.add_argument('-o', '--output-file', default="", help='Image output file');
 parser.add_argument('-a1', '--multiplier', nargs=1, default=[1], help='Multiplicatve constant');
 parser.add_argument('-a2', '--adder', nargs=1, default=[0], help='Additive constant');
+parser.add_argument('-theta0','--theta0',default=0,help='Rotation offset (in degrees)');
 parser.add_argument('--tick-locs',nargs='*',default=[]);
 parser.add_argument('--tick-labels',nargs='*',default=[]);
 parser.add_argument('--center-tick-label',default='');
@@ -65,6 +66,7 @@ if args.ysim:
     w = concatenate([w,w])
 
 rgrid = linspace(0.0,1.0,args.resolution[0])
+print(args.theta0)
 thetagrid = linspace(float(args.theta_limit[0]),float(args.theta_limit[1]),args.resolution[1])
 rgrid, thetagrid = meshgrid(rgrid,thetagrid)
 wgrid   = griddata((x,y),w,(rgrid*cos(radians(thetagrid)),rgrid*sin(radians(thetagrid))),fill_value=0,method=args.method);
@@ -76,7 +78,7 @@ fig,ax = subplots(ncols=1,subplot_kw=dict(projection='polar'))
 ax.xaxis.set_ticklabels([])
 ax.yaxis.set_ticklabels([])
 ax.set_xlim(0,1);
-pc = pcolormesh(radians(thetagrid),rgrid,wgrid,shading='gouraud',cmap=get_cmap(args.cmap));
+pc = pcolormesh(radians(thetagrid-float(args.theta0)),rgrid,wgrid,shading='gouraud',cmap=get_cmap(args.cmap));
 if (len(args.tick_locs) > 0):
     cb = colorbar(pc,pad=0.2,shrink=.8);
 else:
