@@ -9,9 +9,9 @@
 #define eigen_assert(A) if (!(A)){ WIELD_EXCEPTION_NEW("Eigen Exception: the conditional (" << #A << ") failed");}
 //#define eigen_assert(A) if (!(A)){ cout << "Problem here"<< endl;}
 
-#include "Eigen/Core"
-#include "Eigen/Geometry"
-#include "Eigen/LU"
+#include "eigen3/Eigen/Core"
+#include "eigen3/Eigen/Geometry"
+#include "eigen3/Eigen/LU"
 
 #define Success Success_tmp
 #undef  Success_tmp

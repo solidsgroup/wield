@@ -86,6 +86,7 @@ ax.xaxis.set_ticklabels([])
 ax.yaxis.set_ticklabels([])
 ax.set_xlim(0,1);
 pc = pcolormesh(radians(thetagrid),rgrid,wgrid,shading='gouraud',cmap=get_cmap(args.cmap));
+pc.set_rasterized(True)
 if (len(args.tick_locs) > 0):
     cb = colorbar(pc,pad=0.2,shrink=.8);
 else:
@@ -274,6 +275,14 @@ elif args.interactive:
         io = input("Enter a command: ")
         if (io == 'q' or io == 'x'):
             exit();
+        if (io == 's'):
+            filename=filedialog.asksaveasfilename()
+            if filename:
+                savefig(filename,rasterized=True)
+                print("File saved to " + filename)
+            else:
+                print("File not saved")
+
         if (io == '1'):
             print(griddata((x,y),w,(0,0),fill_value=0,method=args.method));
         if (io == '3'):

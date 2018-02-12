@@ -6,7 +6,7 @@
 #include <stdexcept>
 
 
-#include "Reader.h"
+#include "solidsuccs-reader/Reader.h"
 #include "Utils/wieldTypes.h"
 #include "Utils/wieldRotations.h"
 #include "Utils/wieldProgress.h"

@@ -41,7 +41,7 @@
 #include <csignal>
 
 #include "tclap/CmdLine.h"
-#include "Reader.h"
+#include "solidsuccs-reader/Reader.h"
 
 #include "Utils/wieldExceptions.h"
 #include "Utils/wieldColor.h"

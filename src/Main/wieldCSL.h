@@ -9,7 +9,7 @@
 #include <stdexcept>
 #include <omp.h>
 
-#include "Reader.h"
+#include "solidsuccs-reader/Reader.h"
 
 #include "Utils/wieldExceptions.h"
 #include "Utils/wieldNote.h"

@@ -45,7 +45,7 @@
 #include "Integrator/wieldSurface.h"
 #include "IO/wieldReaderMacros.h"
 
-#include "Reader.h"
+#include "solidsuccs-reader/Reader.h"
 
 namespace Wield
 {

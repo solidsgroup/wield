@@ -1,5 +1,5 @@
-#include "Eigen/Core"
-#include "Eigen/Geometry"
+#include "eigen3/Eigen/Core"
+#include "eigen3/Eigen/Geometry"
 
 Eigen::Matrix3d RotX(double theta)
 {

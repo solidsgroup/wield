@@ -58,7 +58,7 @@
 
 #include "tclap/CmdLine.h"
 #include "TCLAP/IgnoreArg.h"
-#include "Reader.h"
+#include "solidsuccs-reader/Reader.h"
 
 #include "Main/wieldEnergy1D.h"
 #include "Main/wieldEnergy2D.h"

@@ -13,7 +13,7 @@
 #include "Series/wieldFourierSeries.h"
 //#include "Series/wieldCosSeries.h"
 
-#include "Reader.h"
+#include "solidsuccs-reader/Reader.h"
 
 #ifdef WIELD_USE_VTK
 #include <vtkVersion.h>
