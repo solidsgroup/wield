@@ -67,17 +67,29 @@
 /// Orientation parameters
 /// ----------------------
 /// 
-/// All rotations are given in degrees.
+/// All rotations must be specified in degrees.
+/// There are several ways of specifying lattice orientation.
 ///
-/// \param $phi1_1/2 The first Bunge Euler angle for lattice 1/2 (default 0)
-/// \param $Phi_1/2 The second Bunge Euler angle for lattice 1/2 (default 0)
-/// \param $phi2_1/2 The third Bunge Euler angle for lattice 1/2 (default 0)
-/// \param $Axis(X/Y/Z)(1/2) Generate a rotation matrix based on miller indices.  (default: none)
-///        E.g. to generate a rotation such that the for lattice 1 X axis corresponds to the [111] direction and the Z axis corresponds to [10-1], set $AxisX1 to 1 1 1 and $AxisZ1 to 1 0 -1.
-///        \b Note: for each lattice, specify only two of the three possible axes -- the third will be automatically computed.
-///        \b Note: the right hand rule must be obeyed, but the vectors do not have to be orthonormal.
-/// \param $RotAxes1/2 An arbitrarily long list of axes about which to rotate the lattice. \b Note: using $RotAxes1/2 and $Rots1/2 is the preferred way to configure lattices.
-/// \param $Rots1/2 The angles by which to rotate each of the above axes. \b Note: number of rotation angles must correspond to the number of axes in $RotAxes1/2.
+/// 1. Specifying crystallographic axes
+///
+///    * `$Axis(X/Y/Z)(1/2)`: Generate a rotation matrix based on miller indices.  (default: none)
+///           E.g. to generate a rotation such that the for lattice 1 X axis corresponds to the [111] direction and the Z axis corresponds to [10-1], set $AxisX1 to 1 1 1 and $AxisZ1 to 1 0 -1.
+///           - \b Note: for each lattice, specify only two of the three possible axes -- the third will be automatically computed.
+///           - \b Note: the right hand rule must be obeyed, but the vectors do not have to be orthonormal.
+///
+/// 2. Specifying arbitrary successive axis/angle pairs
+///
+///    * `$RotAxes1/2`:  An arbitrarily long list of axes about which to rotate the lattice. \b Note: using $RotAxes1/2 and $Rots1/2 is the preferred way to configure lattices.
+///    * `$Rots1/2`:  The angles by which to rotate each of the above axes. \b Note: number of rotation angles must correspond to the number of axes in $RotAxes1/2.
+///
+/// 3. Specify Bunge Euler angles. 
+///    * `$BungeEuler1/2`: A set of three angles corresponding to Bunge Euler angles \f$\phi_1,\Phi,\phi_2\f$, as measured from EBSD.
+///    * `$TraceAngle`: The trace angle of the interface as measured from the x axis.
+///    
+///    This should be used with `ThetaRotX1/2=1`, to compute the energy of the boundary as a function of out-of-plane angle.
+///    Note that \f$\theta=0\f$ corresponds to the plane's normal coinciding with the z axis - in other words, the plane is parallel to the observation plane.
+///
+/// These orientations are not designed to be used together. Using them together can result in unpredictable behavior.
 ///
 /// 1D range of rotations
 /// ---------------------
@@ -149,223 +161,243 @@ namespace Main
 {
 void Energy1D(Reader::Reader &reader)
 {
-  WIELD_EXCEPTION_TRY;
+	WIELD_EXCEPTION_TRY;
   
-  double
-    epsilon = reader.Read<double>("Epsilon",0.2),
-    tolerance = reader.Read<double>("Tolerance",1E-16);
+	double
+		epsilon = reader.Read<double>("Epsilon",0.2),
+		tolerance = reader.Read<double>("Tolerance",1E-16);
   
-  bool 
-    convexify     = reader.Find("Convexify"),
-    fullConvexify = reader.Find("FullConvexify");
+	bool 
+		convexify     = reader.Find("Convexify"),
+		fullConvexify = reader.Find("FullConvexify");
 
-  Wield::Series::FourierSeries<Wield::Series::GaussDirac>
-    C1(reader.Read<int>("Order1"),
-       reader.Read<double>("AlphaX1"),
-       reader.Read<double>("AlphaY1"),
-       reader.Read<double>("AlphaZ1"),
-       Wield::Series::GaussDirac(reader.Read<double>("Sigma1")),
-       //reader.Read<double>("Sigma1"),
-       reader.Read<std::vector<double> >("X1"),
-       reader.Read<std::vector<double> >("Y1"),
-       reader.Read<std::vector<double> >("Z1"));
+	Wield::Series::FourierSeries<Wield::Series::GaussDirac>
+		C1(reader.Read<int>("Order1"),
+		   reader.Read<double>("AlphaX1"),
+		   reader.Read<double>("AlphaY1"),
+		   reader.Read<double>("AlphaZ1"),
+		   Wield::Series::GaussDirac(reader.Read<double>("Sigma1")),
+		   //reader.Read<double>("Sigma1"),
+		   reader.Read<std::vector<double> >("X1"),
+		   reader.Read<std::vector<double> >("Y1"),
+		   reader.Read<std::vector<double> >("Z1"));
   
-  Wield::Series::FourierSeries<Wield::Series::GaussDirac>
-    C2(reader.Read<int>("Order2"),
-       reader.Read<double>("AlphaX2"),
-       reader.Read<double>("AlphaY2"),
-       reader.Read<double>("AlphaZ2"),
-       Wield::Series::GaussDirac(reader.Read<double>("Sigma2")),
-       //reader.Read<double>("Sigma2"),
-       reader.Read<std::vector<double> >("X2"),
-       reader.Read<std::vector<double> >("Y2"),
-       reader.Read<std::vector<double> >("Z2"));
+	Wield::Series::FourierSeries<Wield::Series::GaussDirac>
+		C2(reader.Read<int>("Order2"),
+		   reader.Read<double>("AlphaX2"),
+		   reader.Read<double>("AlphaY2"),
+		   reader.Read<double>("AlphaZ2"),
+		   Wield::Series::GaussDirac(reader.Read<double>("Sigma2")),
+		   //reader.Read<double>("Sigma2"),
+		   reader.Read<std::vector<double> >("X2"),
+		   reader.Read<std::vector<double> >("Y2"),
+		   reader.Read<std::vector<double> >("Z2"));
 
-  bool normalize = false;
-  double ground  = 0.;
-  if (reader.Find("GroundZ1"))
-    {
-      normalize = true;
+	bool normalize = false;
+	double ground  = 0.;
+	if (reader.Find("GroundZ1"))
+	{
+		normalize = true;
 
-      Eigen::Matrix3d groundRot1 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("GroundZ1"),
-					       reader.Read<Eigen::Vector3d>("GroundX1")).transpose();
-      Eigen::Matrix3d groundRot2 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("GroundZ2"),
-					       reader.Read<Eigen::Vector3d>("GroundX2")).transpose();
-      double g1 = Wield::Integrator::Surface(C1,groundRot1,C1,groundRot1,epsilon,tolerance);
-      double g2 = Wield::Integrator::Surface(C2,groundRot2,C2,groundRot2,epsilon,tolerance);
-      ground = sqrt(g1*g2);
+		Eigen::Matrix3d groundRot1 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("GroundZ1"),
+								reader.Read<Eigen::Vector3d>("GroundX1")).transpose();
+		Eigen::Matrix3d groundRot2 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("GroundZ2"),
+								reader.Read<Eigen::Vector3d>("GroundX2")).transpose();
+		double g1 = Wield::Integrator::Surface(C1,groundRot1,C1,groundRot1,epsilon,tolerance);
+		double g2 = Wield::Integrator::Surface(C2,groundRot2,C2,groundRot2,epsilon,tolerance);
+		ground = sqrt(g1*g2);
 
-      if (ground != ground) 
-	WIELD_EXCEPTION_NEW("Computed ground state energy invalid: g1=" << g1 << ", g2=" << g2);
+		if (ground != ground) 
+			WIELD_EXCEPTION_NEW("Computed ground state energy invalid: g1=" << g1 << ", g2=" << g2);
 
-      if (fabs(ground) < 1E-32)
-	WIELD_WARNING("Ground very small (" << ground << "). Maybe increase tolerance?")
+		if (fabs(ground) < 1E-32)
+			WIELD_WARNING("Ground very small (" << ground << "). Maybe increase tolerance?")
 
-      ground *= (1 + tolerance);
-    }
-  if (reader.Find("Ground"))
-    {
-      if (normalize) WIELD_WARNING("Ground value being overwritten!");
+				ground *= (1 + tolerance);
+	}
+	if (reader.Find("Ground"))
+	{
+		if (normalize) WIELD_WARNING("Ground value being overwritten!");
       
-      normalize = true;
+		normalize = true;
 
-      ground = reader.Read<double>("Ground");
-    }
+		ground = reader.Read<double>("Ground");
+	}
 
-  std::ofstream out(reader.Read<std::string>("OutFile").c_str());
+	std::ofstream out(reader.Read<std::string>("OutFile").c_str());
 
-  //
-  // Rotation matrix 1
-  //
-  Eigen::Matrix3d rot1 = Eigen::Matrix3d::Identity();
-  if (reader.Find("AxisY1") && reader.Find("AxisZ1"))
-    rot1 = createMatrixFromYZ(reader.Read<Eigen::Vector3d>("AxisY1"),reader.Read<Eigen::Vector3d>("AxisZ1")) * rot1;
-  else if (reader.Find("AxisZ1") && reader.Find("AxisX1"))
-    rot1 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("AxisZ1"),reader.Read<Eigen::Vector3d>("AxisX1")) * rot1;
-  else if (reader.Find("AxisX1") && reader.Find("AxisY1"))
-    rot1 = createMatrixFromXY(reader.Read<Eigen::Vector3d>("AxisX1"),reader.Read<Eigen::Vector3d>("AxisY1")) * rot1;
-  else if (reader.Find("RotAxes1"))
-    {
-      std::vector<char> rotAxes1 = reader.Read<std::vector<char> >("RotAxes1");
-      std::vector<double>  rots1 = reader.Read<std::vector<double> >("Rots1");
-      for (int i=0; i<rotAxes1.size(); i++) rot1 = createMatrixFromAngle(rots1[i],rotAxes1[i]) * rot1;
-    }
-  // {
-  //   //      1     2     3
-  //   double phi1, Phi, phi2;
-  //   Phi  = acos(rot1(2,2));
-  //   phi1 = atan2(rot1(2,0), rot1(2,1));
-  //   phi2 = atan2(rot1(0,2),-rot1(1,2));
-  // }
+	//
+	// Rotation matrix 1
+	//
+	Eigen::Matrix3d rot1 = Eigen::Matrix3d::Identity();
+	if (reader.Find("AxisY1") && reader.Find("AxisZ1"))
+		rot1 = createMatrixFromYZ(reader.Read<Eigen::Vector3d>("AxisY1"),reader.Read<Eigen::Vector3d>("AxisZ1")) * rot1;
+	else if (reader.Find("AxisZ1") && reader.Find("AxisX1"))
+		rot1 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("AxisZ1"),reader.Read<Eigen::Vector3d>("AxisX1")) * rot1;
+	else if (reader.Find("AxisX1") && reader.Find("AxisY1"))
+		rot1 = createMatrixFromXY(reader.Read<Eigen::Vector3d>("AxisX1"),reader.Read<Eigen::Vector3d>("AxisY1")) * rot1;
+	else if (reader.Find("RotAxes1"))
+	{
+		std::vector<char> rotAxes1 = reader.Read<std::vector<char> >("RotAxes1");
+		std::vector<double>  rots1 = reader.Read<std::vector<double> >("Rots1");
+		for (int i=0; i<rotAxes1.size(); i++) rot1 = createMatrixFromAngle(rots1[i],rotAxes1[i]) * rot1;
+	}
+	else if (reader.Find("BungeEuler1"))
+	{
+		std::vector<double> bungeEuler = reader.Read<std::vector<double> >("BungeEuler1");
+		if (bungeEuler.size() != 3) WIELD_EXCEPTION_NEW("You must specify THREE bunge euler angles");
+		double traceAngle = reader.Read<double>("TraceAngle",0.0);
+		rot1 =  createMatrixFromXAngle(90.0) *
+			createMatrixFromZAngle(traceAngle) *
+			createMatrixFromZAngle(bungeEuler[2]) *
+			createMatrixFromXAngle(bungeEuler[1]) *
+			createMatrixFromZAngle(bungeEuler[0]) *
+			rot1;
+		if (reader.Find("ThetaRotY1") || reader.Find("ThetaRotZ1"))
+			WIELD_WARNING("ThetaRotY1 or ThetaRotZ1 specified. You should only use ThetaRotX with Bunge Euler angles.")
+	}
 
-  //
-  // Rotation matrix 2
-  //
+	//
+	// Rotation matrix 2
+	//
 
-  Eigen::Matrix3d rot2 = Eigen::Matrix3d::Identity();
-  if (reader.Find("AxisY2") && reader.Find("AxisZ2"))      rot2 = createMatrixFromYZ(reader.Read<Eigen::Vector3d>("AxisY2"),reader.Read<Eigen::Vector3d>("AxisZ2")) * rot2;
-  else if (reader.Find("AxisZ2") && reader.Find("AxisX2")) rot2 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("AxisZ2"),reader.Read<Eigen::Vector3d>("AxisX2")) * rot2;
-  else if (reader.Find("AxisX2") && reader.Find("AxisY2")) rot2 = createMatrixFromXY(reader.Read<Eigen::Vector3d>("AxisX2"),reader.Read<Eigen::Vector3d>("AxisY2")) * rot2;
-  if (reader.Find("RotAxes2"))
-    {
-      std::vector<char> rotAxes2 = reader.Read<std::vector<char> >("RotAxes2");
-      std::vector<double>  rots2 = reader.Read<std::vector<double> >("Rots2");
-      for (int i=0; i<rotAxes2.size(); i++) rot2 = createMatrixFromAngle(rots2[i],rotAxes2[i]) * rot2;
-    }
+	Eigen::Matrix3d rot2 = Eigen::Matrix3d::Identity();
+	if (reader.Find("AxisY2") && reader.Find("AxisZ2"))      rot2 = createMatrixFromYZ(reader.Read<Eigen::Vector3d>("AxisY2"),reader.Read<Eigen::Vector3d>("AxisZ2")) * rot2;
+	else if (reader.Find("AxisZ2") && reader.Find("AxisX2")) rot2 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("AxisZ2"),reader.Read<Eigen::Vector3d>("AxisX2")) * rot2;
+	else if (reader.Find("AxisX2") && reader.Find("AxisY2")) rot2 = createMatrixFromXY(reader.Read<Eigen::Vector3d>("AxisX2"),reader.Read<Eigen::Vector3d>("AxisY2")) * rot2;
+	else if (reader.Find("RotAxes2"))
+	{
+		std::vector<char> rotAxes2 = reader.Read<std::vector<char> >("RotAxes2");
+		std::vector<double>  rots2 = reader.Read<std::vector<double> >("Rots2");
+		for (int i=0; i<rotAxes2.size(); i++) rot2 = createMatrixFromAngle(rots2[i],rotAxes2[i]) * rot2;
+	}
+	else if (reader.Find("BungeEuler2"))
+	{
+		std::vector<double> bungeEuler = reader.Read<std::vector<double> >("BungeEuler2");
+		if (bungeEuler.size() != 3) WIELD_EXCEPTION_NEW("You must specify THREE bunge euler angles");
+		double traceAngle = reader.Read<double>("TraceAngle",0.0);
+		rot2 =  createMatrixFromZAngle(traceAngle) *
+			createMatrixFromZAngle(bungeEuler[0]) *
+			createMatrixFromXAngle(bungeEuler[1]) *
+			createMatrixFromZAngle(bungeEuler[2]) *
+			rot2;
+		if (reader.Find("ThetaRotY2") || reader.Find("ThetaRotZ2"))
+			WIELD_WARNING("ThetaRotY2 or ThetaRotZ2 specified. You should only use ThetaRotX with Bunge Euler angles.")
+	}
 
-  //
-  // Apply successive rotation
-  //
+	//
+	// Apply successive rotation
+	//
 
-  // ALL
-  double thetaMin, thetaMax, dTheta;
+	// ALL
+	double thetaMin, thetaMax, dTheta;
 
-  // SLERP only
-  bool useSlerp = false;
-  Eigen::Vector3d slerpN1, slerpN2, slerpRotAxis;
-  double slerpDt;
+	// SLERP only
+	bool useSlerp = false;
+	Eigen::Vector3d slerpN1, slerpN2, slerpRotAxis;
+	double slerpDt;
 
-  // NON-SLERP only
-  double thetaRotX1, thetaRotY1, thetaRotZ1, thetaRotX2, thetaRotY2, thetaRotZ2;
+	// NON-SLERP only
+	double thetaRotX1, thetaRotY1, thetaRotZ1, thetaRotX2, thetaRotY2, thetaRotZ2;
 
-  if (reader.Find("SlerpN1"))
-    {
-      useSlerp=true;
-      std::vector<double> n1 = reader.Read<std::vector<double> >("SlerpN1");
-      slerpN1 << n1[0], n1[1], sqrt(1-n1[0]*n1[0] - n1[1]*n1[1]);
-      slerpN1 /= slerpN1.norm();
-      std::vector<double> n2 = reader.Read<std::vector<double> >("SlerpN2");
-      slerpN2 << n2[0], n2[1], sqrt(1-n2[0]*n2[0] - n2[1]*n2[1]);
-      slerpN2 /= slerpN2.norm();
-      slerpDt = reader.Read<double>("SlerpDt");
+	if (reader.Find("SlerpN1"))
+	{
+		useSlerp=true;
+		std::vector<double> n1 = reader.Read<std::vector<double> >("SlerpN1");
+		slerpN1 << n1[0], n1[1], sqrt(1-n1[0]*n1[0] - n1[1]*n1[1]);
+		slerpN1 /= slerpN1.norm();
+		std::vector<double> n2 = reader.Read<std::vector<double> >("SlerpN2");
+		slerpN2 << n2[0], n2[1], sqrt(1-n2[0]*n2[0] - n2[1]*n2[1]);
+		slerpN2 /= slerpN2.norm();
+		slerpDt = reader.Read<double>("SlerpDt");
      
-      slerpRotAxis = slerpN1.cross(slerpN2);
+		slerpRotAxis = slerpN1.cross(slerpN2);
 
-      thetaMin = 0;
-      thetaMax = acos(slerpN1.dot(slerpN2))*180/pi;
-      dTheta = (thetaMax-thetaMin)*slerpDt;
-      thetaMax += dTheta;
+		thetaMin = 0;
+		thetaMax = acos(slerpN1.dot(slerpN2))*180/pi;
+		dTheta = (thetaMax-thetaMin)*slerpDt;
+		thetaMax += dTheta;
 
-      std::cout << "Angle between vectors = " << thetaMax << std::endl;
+		std::cout << "Angle between vectors = " << thetaMax << std::endl;
 
-    }
+	}
 
-  else
-    {
-      thetaRotX1 = reader.Read<double>("ThetaRotX1",0.);
-      thetaRotY1 = reader.Read<double>("ThetaRotY1",0.);
-      thetaRotZ1 = reader.Read<double>("ThetaRotZ1",0.);
-      thetaRotX2 = reader.Read<double>("ThetaRotX2",0.);
-      thetaRotY2 = reader.Read<double>("ThetaRotY2",0.);
-      thetaRotZ2 = reader.Read<double>("ThetaRotZ2",0.);
-      thetaMin = reader.Read<double>("ThetaMin");
-      thetaMax = reader.Read<double>("ThetaMax");
-      dTheta = reader.Read<double>("DTheta");
-    }
+	else
+	{
+		thetaRotX1 = reader.Read<double>("ThetaRotX1",0.);
+		thetaRotY1 = reader.Read<double>("ThetaRotY1",0.);
+		thetaRotZ1 = reader.Read<double>("ThetaRotZ1",0.);
+		thetaRotX2 = reader.Read<double>("ThetaRotX2",0.);
+		thetaRotY2 = reader.Read<double>("ThetaRotY2",0.);
+		thetaRotZ2 = reader.Read<double>("ThetaRotZ2",0.);
+		thetaMin = reader.Read<double>("ThetaMin");
+		thetaMax = reader.Read<double>("ThetaMax");
+		dTheta = reader.Read<double>("DTheta");
+	}
 
-  double w = 0;
-  std::vector<double> thetas, ws;
+	double w = 0;
+	std::vector<double> thetas, ws;
   
-  for (double theta = thetaMin; theta <= thetaMax ; theta += dTheta)
-    {
-
-      Eigen::Matrix3d omega1, omega2;
-
-      if (useSlerp)
+	for (double theta = thetaMin; theta <= thetaMax ; theta += dTheta)
 	{
-	  Eigen::AngleAxisd slerpRot = Eigen::AngleAxisd(theta*pi/180, slerpRotAxis);
-	  omega1 = createMatrixFromNormalVector(slerpRot*slerpN1) * rot1;
-	  omega2 = createMatrixFromNormalVector(slerpRot*slerpN1) * rot2;
-	}
-      else
+
+		Eigen::Matrix3d omega1, omega2;
+
+		if (useSlerp)
+		{
+			Eigen::AngleAxisd slerpRot = Eigen::AngleAxisd(theta*pi/180, slerpRotAxis);
+			omega1 = createMatrixFromNormalVector(slerpRot*slerpN1) * rot1;
+			omega2 = createMatrixFromNormalVector(slerpRot*slerpN1) * rot2;
+		}
+		else
+		{
+			omega1 =
+				createMatrixFromXAngle(thetaRotX1*theta) *
+				createMatrixFromYAngle(thetaRotY1*theta) *
+				createMatrixFromZAngle(thetaRotZ1*theta) *
+				rot1,
+				omega2 =
+				createMatrixFromXAngle(thetaRotX2*theta) *
+				createMatrixFromYAngle(thetaRotY2*theta) *
+				createMatrixFromZAngle(thetaRotZ2*theta) *
+				rot2;      
+		}
+
+		w = Wield::Integrator::Surface(C1,omega1,
+					       C2,omega2,
+					       epsilon, tolerance);
+		if (normalize)
+			w = 1-(w/ground);
+		else
+			w = -w;
+
+		thetas.push_back(theta);
+		ws.push_back(w);
+		WIELD_PROGRESS("Computing energy", theta-thetaMin, thetaMax-thetaMin, dTheta)
+			}
+	std::cout << std::endl;
+
+	//
+	// Convexification
+	//
+
+
+	if (convexify || fullConvexify)
 	{
-	  omega1 =
-	    createMatrixFromXAngle(thetaRotX1*theta) *
-	    createMatrixFromYAngle(thetaRotY1*theta) *
-	    createMatrixFromZAngle(thetaRotZ1*theta) *
-	    rot1,
-	    omega2 =
-	    createMatrixFromXAngle(thetaRotX2*theta) *
-	    createMatrixFromYAngle(thetaRotY2*theta) *
-	    createMatrixFromZAngle(thetaRotZ2*theta) *
-	    rot2;      
+		std::vector<double> wulff;
+		std::vector<double> wcs = Wield::Optimization::Convexify1DAngles(thetas,ws,wulff,fullConvexify);
+		for (int i=0; i<thetas.size(); i++)
+			out << thetas[i] << " " << ws[i] << " " << wcs[i] << " " << wulff[i] << std::endl;
 	}
-
-      w = Wield::Integrator::Surface(C1,omega1,
-				     C2,omega2,
-				     epsilon, tolerance);
-      if (normalize)
-	w = 1-(w/ground);
-      else
-	w = -w;
-
-      thetas.push_back(theta);
-      ws.push_back(w);
-      WIELD_PROGRESS("Computing energy", theta-thetaMin, thetaMax-thetaMin, dTheta)
-    }
-  std::cout << std::endl;
-
-  //
-  // Convexification
-  //
+	else
+		for (int i=0; i<thetas.size(); i++)
+			out << thetas[i] << " " << ws[i] << std::endl;
 
 
-  if (convexify || fullConvexify)
-    {
-      std::vector<double> wulff;
-      std::vector<double> wcs = Wield::Optimization::Convexify1DAngles(thetas,ws,wulff,fullConvexify);
-      for (int i=0; i<thetas.size(); i++)
-	out << thetas[i] << " " << ws[i] << " " << wcs[i] << " " << wulff[i] << std::endl;
-    }
-  else
-    for (int i=0; i<thetas.size(); i++)
-      out << thetas[i] << " " << ws[i] << std::endl;
+	out.close();
 
 
-  out.close();
-
-
-  WIELD_EXCEPTION_CATCH;
+	WIELD_EXCEPTION_CATCH;
 }
 }
 }
