@@ -1,0 +1,21 @@
+=== Please note that the line number reported by addr2line may not be accurate.
+    If necessary, one can use 'readelf -wl my_exefile | grep my_line_address'
+    to find out the offset for that line.
+ 0: /home/mgokuli/visit2_13_3.linux-x86_64/2.13.3/linux-x86_64/plugins/databases/libEBoxlib2DDatabase_ser.so(_ZN11BLBackTrace20print_backtrace_infoEP8_IO_FILE+0x3d) [0x7f24297477cd]
+
+ 1: /home/mgokuli/visit2_13_3.linux-x86_64/2.13.3/linux-x86_64/plugins/databases/libEBoxlib2DDatabase_ser.so(_ZN11BLBackTrace7handlerEi+0x3fc) [0x7f242974824c]
+
+ 2: /lib/x86_64-linux-gnu/libc.so.6(+0x3ef20) [0x7f2438f71f20]
+
+ 3: /lib/x86_64-linux-gnu/libc.so.6(__select+0x5f) [0x7f243904a03f]
+
+ 4: /home/mgokuli/visit2_13_3.linux-x86_64/2.13.3/linux-x86_64/lib/libvisitcommon.so(_ZNK16SocketConnection9NeedsReadEb+0xe3) [0x7f24397f4d83]
+
+ 5: /home/mgokuli/visit2_13_3.linux-x86_64/2.13.3/linux-x86_64/lib/libengine_ser.so(_ZN6Engine9EventLoopEv+0x66) [0x7f243a0d5a66]
+
+ 6: /home/mgokuli/visit2_13_3.linux-x86_64/2.13.3/linux-x86_64/bin/engine_ser(+0x1291) [0x55cce2b8a291]
+
+ 7: /lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0xe7) [0x7f2438f54b97]
+
+ 8: /home/mgokuli/visit2_13_3.linux-x86_64/2.13.3/linux-x86_64/bin/engine_ser(+0x107a) [0x55cce2b8a07a]
+

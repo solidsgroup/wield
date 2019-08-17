@@ -8,6 +8,7 @@ FG_RED             = '\033[31m'
 FG_GREEN           = '\033[32m'
 FG_YELLOW          = '\033[33m'
 FG_BLUE            = '\033[34m'
+READER_LOCATION = /home/mgokuli/wield/reader
 
 CC                    = g++	
 CPP_COMPILER_OPTIONS += -c -g3 -ggdb -fopenmp -Wno-deprecated -Wunused-variable -DMUPARSER 

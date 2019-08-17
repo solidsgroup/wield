@@ -60,10 +60,10 @@ $ThetaRotX1 0.5
 $ThetaRotX2 -0.5
 #$DR 0.1
 $ThetaMin 0.0
-$ThetaMax 120.0
+$ThetaMax 360.0
 $DTheta 1.0
 
 #Output file
-$OutFile output.out
+$OutFile Cu_csl_112.txt
 
 

@@ -1,5 +1,5 @@
 $Energy1D
-$a 3.615
+$a 3.597
 $Sigma1 $a*0.175
 $Sigma2 $Sigma1
 $Epsilon 0.5
@@ -11,7 +11,7 @@ $Tolerance 1E-8
 $AlphaX1 $a
 $AlphaY1 $a
 $AlphaZ1 $a
-$Order1 8
+$Order1 18
 $X1 0.    0.     0.     0.     0. $a/2. -$a/2.  $a/2. -$a/2. $a/2.  $a/2. -$a/2. -$a/2.
 $Y1 0. $a/2.  $a/2. -$a/2. -$a/2.    0.     0.     0.     0. $a/2. -$a/2.  $a/2. -$a/2.
 $Z1 0. $a/2. -$a/2.  $a/2. -$a/2. $a/2.  $a/2. -$a/2. -$a/2.    0.     0.     0.     0.
@@ -22,13 +22,13 @@ $Order2  $Order1
 $X2      $X1
 $Y2      $Y1
 $Z2      $Z1
-$AxisX1 1 0 0
-$AxisZ1 0 0 1
-$AxisX2 1 0 0
-$AxisZ2 0 0 1
-$ThetaRotX1 0.5
-$ThetaRotX2 -0.5
+$AxisX1 1 1 0
+$AxisZ1 1 -1 0
+$AxisX2 $AxisX1
+$AxisZ2 -1 1 0
+$ThetaRotX1 1
+$ThetaRotX2 $ThetaRotX1
 $ThetaMin 0
-$ThetaMax 360
-$DTheta 1.0
-$OutFile Cu_stgb_001.txt
+$ThetaMax 90
+$DTheta 1
+$OutFile recreate_outputs/try_Cu_111-110atgb_lores.txt
