@@ -15,7 +15,7 @@
 #include <stdexcept>
 #include <pthread.h>
 
-#include "solidsuccs-reader/Reader.h"
+#include "Reader/Reader.h"
 #include "Utils/wieldColor.h"
 #include "Utils/wieldTypes.h"
 #include "Utils/wieldRotations.h"

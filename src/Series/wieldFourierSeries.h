@@ -7,7 +7,7 @@
 #include <fstream>
 #include <stdexcept>
 
-#include "solidsuccs-reader/Reader.h"
+#include "Reader/Reader.h"
 #include "Utils/wieldTypes.h"
 #include "Utils/wieldRotations.h"
 #include "Utils/wieldExceptions.h"

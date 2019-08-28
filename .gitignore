@@ -23,3 +23,5 @@ archive
 results
 run.stdout
 run.error
+.vscode
+wield.code-workspace

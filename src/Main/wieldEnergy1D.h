@@ -146,7 +146,7 @@
 #include <stdexcept>
 
 
-#include "solidsuccs-reader/Reader.h"
+#include "Reader/Reader.h"
 
 #include "Utils/wieldExceptions.h"
 #include "Series/wieldFourierSeries.h"

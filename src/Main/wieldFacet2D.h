@@ -30,7 +30,7 @@
 #include <cstdlib>
 #include <pthread.h>
 
-#include "solidsuccs-reader/Reader.h"
+#include "Reader/Reader.h"
 
 #include "Utils/wieldExceptions.h"
 #include "Utils/wieldColor.h"
