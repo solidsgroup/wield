@@ -31,6 +31,10 @@ public:
   // {
   //   return exp(-sigma*sigma*(x*x + y*y + z*z)/4.) / sqrt(8*pi*pi*pi);
   // }
+  FourierSeries(Mollifier _mollifier)
+  {
+    std::cout << "Initiated!" << std::endl;
+  }
 
   FourierSeries(const FourierSeries<Mollifier> &copy):
     order(copy.order),
@@ -50,6 +54,7 @@ public:
 		std::vector<double> X, 
 		std::vector<double> Y, 
 		std::vector<double> Z,
+    int numThreads=1,
 		int verbose=false):
     order(_order),
     alphaX(_alphaX),
@@ -68,6 +73,7 @@ public:
     for (int l=-order+1; l<order; l++)
       {
 	if(verbose) WIELD_PROGRESS("Computing CSL", l+order, 2*order, 1);
+  #pragma omp parallel for num_threads(numThreads)
 	for (int m=-order+1; m<order; m++)
 	  for (int n=-order+1; n<order; n++)
 	    {
@@ -122,6 +128,7 @@ public:
   double alphaY;  ///< \brief Y Lattice coefficient
   double alphaZ;  ///< \brief Z Lattice coefficient
   double sigma;
+  int numThreads = 1;
 private:
   std::vector<std::complex<double> > C;          ///< Matrix of complex Fourier coefficients
   Mollifier phiHat;

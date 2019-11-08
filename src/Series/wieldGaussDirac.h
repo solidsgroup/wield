@@ -12,6 +12,7 @@ namespace Series
 class GaussDirac
 {
 public:
+  GaussDirac()  {} 
   GaussDirac(double _sigma): sigma(_sigma) {} 
   std::complex<double> operator () (Eigen::Covector3d k)
   {

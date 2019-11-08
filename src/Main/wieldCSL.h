@@ -98,7 +98,22 @@ void CSL(Reader::Reader &reader, ///< [in] Reader object to parse input commands
      reader.Read<std::vector<double> >("X1"),
      reader.Read<std::vector<double> >("Y1"),
      reader.Read<std::vector<double> >("Z1"),
+     numThreads,
      verbose);
+  
+//  std::cout << "Start writing file" << std::endl;
+//  std::ofstream myfile;
+//  myfile.open("field.dat");
+//  for (double x = -4*0.5*sqrt(3.); x < 4*0.5*sqrt(3.); x+=0.1)
+//    for (double y = -4*1.5; y < 4*1.5; y+=0.1)
+//    {
+//      std::cout << "x = " << x << " y = " << y << " C = " << (*C1)(x,y,0.0).real() << std::endl;
+//      myfile << x << " " << y << " " << (*C1)(x,y,0.0).real() << std::endl;
+//    }
+//  myfile.close();
+//  std::cout << "Done writing file" << std::endl;
+
+
   
   if (reader.Find("Order2") 
       && reader.Find("AlphaX2") && reader.Find("AlphaY2") && reader.Find("AlphaZ2") 
@@ -114,6 +129,7 @@ void CSL(Reader::Reader &reader, ///< [in] Reader object to parse input commands
 									     reader.Read<std::vector<double> >("X2"),
 									     reader.Read<std::vector<double> >("Y2"),
 									     reader.Read<std::vector<double> >("Z2"),
+                       numThreads,
 									     verbose);
     }
   else

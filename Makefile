@@ -2,6 +2,9 @@
 # Brandon Runnels
 # Last Edited: November 5, 2013
 
+PYTHON_INCLUDE = -I/usr/include/python3.6/ -I./src/ -I./inc/
+PYTHON_LIB     = -lboost_python-py36
+
 RESET              = '\033[0m'
 B_ON               = '\033[1m'
 FG_RED             = '\033[31m'
@@ -10,7 +13,7 @@ FG_YELLOW          = '\033[33m'
 FG_BLUE            = '\033[34m'
 
 CC                    = g++	
-CPP_COMPILER_OPTIONS += -c -g3 -ggdb -fopenmp -Wno-deprecated -Wunused-variable -DMUPARSER 
+CPP_COMPILER_OPTIONS += -c -g3 -ggdb -fopenmp -Wno-deprecated -Wunused-variable -DMUPARSER -fPIC
 CPP_LINKER_OPTIONS   += -g3 -ggdb -fopenmp  
 
 ifdef EMACS
@@ -63,6 +66,11 @@ make_directories: $(SRC)
 %.cc: $(HDR)
 
 %.h :
+
+python: $(OBJ)
+	@printf "PYTHON: compiling library\n"
+	@$(CC) -x c++ -c src/wield.cpy -fPIC -o src/wield.cpy.o ${INCLUDE} ${PYTHON_INCLUDE} ${CXX_COMPILE_FLAGS} 
+	@$(CC) -shared -Wl,-soname,wield.so -o wield.so src/wield.cpy.o ${OBJ} ${LIB} ${MPI_LIB} $(PYTHON_LIB) 
 
 #
 # Unit Tests
