@@ -159,7 +159,7 @@ namespace Wield
 {
 namespace Main
 {
-void Energy1D(Reader::Reader &reader)
+void Energy1D(Reader::Reader &reader, int numThreads=1)
 {
 	WIELD_EXCEPTION_TRY;
   
@@ -236,13 +236,13 @@ void Energy1D(Reader::Reader &reader)
 		rot1 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("AxisZ1"),reader.Read<Eigen::Vector3d>("AxisX1")).transpose() * rot1;
 	else if (reader.Find("AxisX1") && reader.Find("AxisY1"))
 		rot1 = createMatrixFromXY(reader.Read<Eigen::Vector3d>("AxisX1"),reader.Read<Eigen::Vector3d>("AxisY1")).transpose() * rot1;
-	else if (reader.Find("RotAxes1"))
+	if (reader.Find("RotAxes1"))
 	{
 		std::vector<char> rotAxes1 = reader.Read<std::vector<char> >("RotAxes1");
 		std::vector<double>  rots1 = reader.Read<std::vector<double> >("Rots1");
 		for (int i=0; i<rotAxes1.size(); i++) rot1 = createMatrixFromAngle(rots1[i],rotAxes1[i]) * rot1;
 	}
-	else if (reader.Find("BungeEuler1"))
+	if (reader.Find("BungeEuler1"))
 	{
 		std::vector<double> bungeEuler = reader.Read<std::vector<double> >("BungeEuler1");
 		if (bungeEuler.size() != 3) WIELD_EXCEPTION_NEW("You must specify THREE bunge euler angles");
@@ -265,13 +265,13 @@ void Energy1D(Reader::Reader &reader)
 	if (reader.Find("AxisY2") && reader.Find("AxisZ2"))      rot2 = createMatrixFromYZ(reader.Read<Eigen::Vector3d>("AxisY2"),reader.Read<Eigen::Vector3d>("AxisZ2")).transpose() * rot2;
 	else if (reader.Find("AxisZ2") && reader.Find("AxisX2")) rot2 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("AxisZ2"),reader.Read<Eigen::Vector3d>("AxisX2")).transpose() * rot2;
 	else if (reader.Find("AxisX2") && reader.Find("AxisY2")) rot2 = createMatrixFromXY(reader.Read<Eigen::Vector3d>("AxisX2"),reader.Read<Eigen::Vector3d>("AxisY2")).transpose() * rot2;
-	else if (reader.Find("RotAxes2"))
+	if (reader.Find("RotAxes2"))
 	{
 		std::vector<char> rotAxes2 = reader.Read<std::vector<char> >("RotAxes2");
 		std::vector<double>  rots2 = reader.Read<std::vector<double> >("Rots2");
 		for (int i=0; i<rotAxes2.size(); i++) rot2 = createMatrixFromAngle(rots2[i],rotAxes2[i]) * rot2;
 	}
-	else if (reader.Find("BungeEuler2"))
+	if (reader.Find("BungeEuler2"))
 	{
 		std::vector<double> bungeEuler = reader.Read<std::vector<double> >("BungeEuler2");
 		if (bungeEuler.size() != 3) WIELD_EXCEPTION_NEW("You must specify THREE bunge euler angles");
@@ -338,28 +338,35 @@ void Energy1D(Reader::Reader &reader)
 	double w = 0;
 	std::vector<double> thetas, ws;
   
-	for (double theta = thetaMin; theta <= thetaMax ; theta += dTheta)
+	int niter = niter = (thetaMax - thetaMin)/dTheta;;
+	thetas.resize(niter+1);
+	ws.resize(niter+1);
+
+	for (int i = 0; i <= niter; i++) thetas[i] = thetaMin + dTheta*((float)i);
+		
+#pragma omp parallel for num_threads(numThreads)
+	for (int i = 0; i <= niter; i++)
 	{
 
 		Eigen::Matrix3d omega1, omega2;
 
 		if (useSlerp)
 		{
-			Eigen::AngleAxisd slerpRot = Eigen::AngleAxisd(theta*pi/180, slerpRotAxis);
+			Eigen::AngleAxisd slerpRot = Eigen::AngleAxisd(thetas[i]*pi/180, slerpRotAxis);
 			omega1 = createMatrixFromNormalVector(slerpRot*slerpN1) * rot1;
 			omega2 = createMatrixFromNormalVector(slerpRot*slerpN1) * rot2;
 		}
 		else
 		{
 			omega1 =
-				createMatrixFromXAngle(thetaRotX1*theta) *
-				createMatrixFromYAngle(thetaRotY1*theta) *
-				createMatrixFromZAngle(thetaRotZ1*theta) *
+				createMatrixFromXAngle(thetaRotX1*thetas[i]) *
+				createMatrixFromYAngle(thetaRotY1*thetas[i]) *
+				createMatrixFromZAngle(thetaRotZ1*thetas[i]) *
 				rot1,
 				omega2 =
-				createMatrixFromXAngle(thetaRotX2*theta) *
-				createMatrixFromYAngle(thetaRotY2*theta) *
-				createMatrixFromZAngle(thetaRotZ2*theta) *
+				createMatrixFromXAngle(thetaRotX2*thetas[i]) *
+				createMatrixFromYAngle(thetaRotY2*thetas[i]) *
+				createMatrixFromZAngle(thetaRotZ2*thetas[i]) *
 				rot2;      
 		}
 
@@ -371,9 +378,9 @@ void Energy1D(Reader::Reader &reader)
 		else
 			w = -w;
 
-		thetas.push_back(theta);
-		ws.push_back(w);
-		WIELD_PROGRESS("Computing energy", theta-thetaMin, thetaMax-thetaMin, dTheta)
+		ws[i]     = w;
+		if (omp_get_thread_num()==0) WIELD_PROGRESS("Computing energy", i, niter/numThreads, 1)
+
 			}
 	std::cout << std::endl;
 

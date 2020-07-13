@@ -121,13 +121,13 @@ int main(int argc,     ///< Number of arguments
     rabbit = new Reader::Reader(fileName, argc, argv, "$", "#", "...");
   
   if (rabbit->Find("Energy1D"))
-    Wield::Main::Energy1D(*rabbit);
+    Wield::Main::Energy1D(*rabbit,numThreads);
   if (rabbit->Find("Energy2D"))
     Wield::Main::Energy2D(*rabbit,numThreads);
   if (rabbit->Find("CSL"))
     Wield::Main::CSL(*rabbit,numThreads,verbose);
   if (rabbit->Find("EnergyOffset"))
-    Wield::Main::EnergyOffset(*rabbit);
+	  Wield::Main::EnergyOffset(*rabbit);
   // if (rabbit->Find("BlenderVoxelData"))
   //   Wield::Main::BlenderVoxelData(*rabbit);
   // if (rabbit->Find("VisualizeOR"))
