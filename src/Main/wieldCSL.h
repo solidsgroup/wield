@@ -130,52 +130,61 @@ void CSL(Reader::Reader &reader, ///< [in] Reader object to parse input commands
 	//
 	// Rotation matrix 1
 	//
-	if (verbose)
-		WIELD_NOTE("Computing rotation matrices")
-
 	Eigen::Matrix3d rot1 = Eigen::Matrix3d::Identity();
 	if (reader.Find("AxisY1") && reader.Find("AxisZ1"))
-		rot1 = createMatrixFromYZ(reader.Read<Eigen::Vector3d>("AxisY1"), reader.Read<Eigen::Vector3d>("AxisZ1")).transpose() * rot1;
+		rot1 = createMatrixFromYZ(reader.Read<Eigen::Vector3d>("AxisY1"),reader.Read<Eigen::Vector3d>("AxisZ1")).transpose() * rot1;
 	else if (reader.Find("AxisZ1") && reader.Find("AxisX1"))
-		rot1 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("AxisZ1"), reader.Read<Eigen::Vector3d>("AxisX1")).transpose() * rot1; // added transpose
+		rot1 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("AxisZ1"),reader.Read<Eigen::Vector3d>("AxisX1")).transpose() * rot1; // added transpose
 	else if (reader.Find("AxisX1") && reader.Find("AxisY1"))
-		rot1 = createMatrixFromXY(reader.Read<Eigen::Vector3d>("AxisX1"), reader.Read<Eigen::Vector3d>("AxisY1")).transpose() * rot1; // added transpose
-	else if (reader.Find("RotAxes1"))
+		rot1 = createMatrixFromXY(reader.Read<Eigen::Vector3d>("AxisX1"),reader.Read<Eigen::Vector3d>("AxisY1")).transpose() * rot1; // added transpose
+	if (reader.Find("RotAxes1"))
 	{
-		std::vector<char> rotAxes1 = reader.Read<std::vector<char>>("RotAxes1");
-		std::vector<double> rots1 = reader.Read<std::vector<double>>("Rots1");
-		for (int i = 0; i < rotAxes1.size(); i++)
-			rot1 = createMatrixFromAngle(rots1[i], rotAxes1[i]) * rot1;
+		std::vector<char> rotAxes1 = reader.Read<std::vector<char> >("RotAxes1");
+		std::vector<double>  rots1 = reader.Read<std::vector<double> >("Rots1");
+		for (int i=0; i<rotAxes1.size(); i++) rot1 = createMatrixFromAngle(rots1[i],rotAxes1[i]) * rot1;
 	}
-	if (verbose)
-		WIELD_NOTE("Rot1 components: " << std::endl
-									   << rot1);
-	if (verbose)
-		WIELD_NOTE("Rot1 Euler angles: " << rot1.eulerAngles(2, 0, 2).transpose() * 180. / pi);
+	if (reader.Find("BungeEuler1"))
+	{
+		std::vector<double> bungeEuler = reader.Read<std::vector<double> >("BungeEuler1");
+		if (bungeEuler.size() != 3) WIELD_EXCEPTION_NEW("You must specify THREE bunge euler angles");
+		double traceAngle = reader.Read<double>("TraceAngle",0.0);
+		rot1 =  createMatrixFromXAngle(90.0) *
+			createMatrixFromZAngle(traceAngle) *
+			createMatrixFromZAngle(bungeEuler[2]) *
+			createMatrixFromXAngle(bungeEuler[1]) *
+			createMatrixFromZAngle(bungeEuler[0]) *
+			rot1;
+		if (reader.Find("ThetaRotY1") || reader.Find("ThetaRotZ1"))
+			WIELD_WARNING("ThetaRotY1 or ThetaRotZ1 specified. You should only use ThetaRotX with Bunge Euler angles.")
+	}
 
 	//
 	// Rotation matrix 2
 	//
 
 	Eigen::Matrix3d rot2 = Eigen::Matrix3d::Identity();
-	if (reader.Find("AxisY2") && reader.Find("AxisZ2"))
-		rot2 = createMatrixFromYZ(reader.Read<Eigen::Vector3d>("AxisY2"), reader.Read<Eigen::Vector3d>("AxisZ2")).transpose() * rot2; // added transpose
-	else if (reader.Find("AxisZ2") && reader.Find("AxisX2"))
-		rot2 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("AxisZ2"), reader.Read<Eigen::Vector3d>("AxisX2")).transpose() * rot2; // added transpose
-	else if (reader.Find("AxisX2") && reader.Find("AxisY2"))
-		rot2 = createMatrixFromXY(reader.Read<Eigen::Vector3d>("AxisX2"), reader.Read<Eigen::Vector3d>("AxisY2")).transpose() * rot2; // added transpose
-	else if (reader.Find("RotAxes2"))
+	if (reader.Find("AxisY2") && reader.Find("AxisZ2"))      rot2 = createMatrixFromYZ(reader.Read<Eigen::Vector3d>("AxisY2"),reader.Read<Eigen::Vector3d>("AxisZ2")).transpose() * rot2; // added transpose
+	else if (reader.Find("AxisZ2") && reader.Find("AxisX2")) rot2 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("AxisZ2"),reader.Read<Eigen::Vector3d>("AxisX2")).transpose() * rot2; // added transpose
+	else if (reader.Find("AxisX2") && reader.Find("AxisY2")) rot2 = createMatrixFromXY(reader.Read<Eigen::Vector3d>("AxisX2"),reader.Read<Eigen::Vector3d>("AxisY2")).transpose() * rot2; // added transpose
+	if (reader.Find("RotAxes2"))
 	{
-		std::vector<char> rotAxes2 = reader.Read<std::vector<char>>("RotAxes2");
-		std::vector<double> rots2 = reader.Read<std::vector<double>>("Rots2");
-		for (int i = 0; i < rotAxes2.size(); i++)
-			rot2 = createMatrixFromAngle(rots2[i], rotAxes2[i]) * rot2;
+		std::vector<char> rotAxes2 = reader.Read<std::vector<char> >("RotAxes2");
+		std::vector<double>  rots2 = reader.Read<std::vector<double> >("Rots2");
+		for (int i=0; i<rotAxes2.size(); i++) rot2 = createMatrixFromAngle(rots2[i],rotAxes2[i]) * rot2;
 	}
-	if (verbose)
-		WIELD_NOTE("Rot2 components: " << std::endl
-									   << rot2);
-	if (verbose)
-		WIELD_NOTE("Rot2 Euler angles: " << rot2.eulerAngles(2, 0, 2).transpose() * 180. / pi);
+	if (reader.Find("BungeEuler2"))
+	{
+		std::vector<double> bungeEuler = reader.Read<std::vector<double> >("BungeEuler2");
+		if (bungeEuler.size() != 3) WIELD_EXCEPTION_NEW("You must specify THREE bunge euler angles");
+		double traceAngle = reader.Read<double>("TraceAngle",0.0);
+		rot2 =  createMatrixFromZAngle(traceAngle) *
+			createMatrixFromZAngle(bungeEuler[0]) *
+			createMatrixFromXAngle(bungeEuler[1]) *
+			createMatrixFromZAngle(bungeEuler[2]) *
+			rot2;
+		if (reader.Find("ThetaRotY2") || reader.Find("ThetaRotZ2"))
+			WIELD_WARNING("ThetaRotY2 or ThetaRotZ2 specified. You should only use ThetaRotX with Bunge Euler angles.")
+	}
 
 	std::vector<Eigen::Matrix3d> omega1s, omega2s;
 	std::vector<double> thetas;
