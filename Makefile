@@ -1,6 +1,5 @@
 # Generic Makefile
 # Brandon Runnels
-# Last Edited: November 5, 2013
 
 RESET              = '\033[0m'
 B_ON               = '\033[1m'
@@ -13,9 +12,9 @@ CC                    = g++
 CPP_COMPILER_OPTIONS += -c -g3 -ggdb -fopenmp -Wno-deprecated -Wunused-variable -DMUPARSER 
 CPP_LINKER_OPTIONS   += -g3 -ggdb -fopenmp  
 
-INC_PYTHON            = $(shell python3.8-config --cflags)
-LIB_PYTHON            = $(shell python3.8-config --ldflags)
-PYTHON_NAME           = py/wield$(shell python3.8-config --extension-suffix)
+INC_PYTHON            = $(shell python3-config --cflags)
+LIB_PYTHON            = $(shell python3-config --ldflags)
+PYTHON_NAME           = py/wield$(shell python3-config --extension-suffix)
 
 ifdef EMACS
 PREFIX                = $(shell pwd)/
@@ -30,7 +29,7 @@ OBJ_MAIN              = $(subst ./src/,./obj/, $(SRC_MAIN:.cc=.o))
 INC 		      = -O3 -I./src \
 		        -I./inc \
 			-I./extern/eigen/
-LIB		      = $(LIB_EXT) -lmuparser $(LIB_PYTHON) -lpython3.8
+LIB		      = $(LIB_EXT) -lmuparser $(LIB_PYTHON) -lpython3
 
 
 .SECONDARY: $(OBJ) $(OBJ_MAIN)
