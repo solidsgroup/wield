@@ -15,7 +15,7 @@ CPP_LINKER_OPTIONS   += -g3 -ggdb -fopenmp
 
 INC_PYTHON            = $(shell python3.8-config --cflags)
 LIB_PYTHON            = $(shell python3.8-config --ldflags)
-PYTHON_NAME           = bin/wield$(shell python3.8-config --extension-suffix)
+PYTHON_NAME           = py/wield$(shell python3.8-config --extension-suffix)
 
 ifdef EMACS
 PREFIX                = $(shell pwd)/
@@ -35,16 +35,23 @@ LIB		      = $(LIB_EXT) -lmuparser $(LIB_PYTHON) -lpython3.8
 
 .SECONDARY: $(OBJ) $(OBJ_MAIN)
 
-all: make_directories $(EXE) $(PYTHON_NAME)
+default: make_directories $(EXE)
+
+all: make_directories $(EXE) python
 	@echo $(B_ON)$(FG_GREEN)"###"
 	@echo "### DONE" 
 	@echo "###"$(RESET)	
 
-$(PYTHON_NAME): ./src/python.cpp $(OBJ) $(SRC) $(HDR)
+python: $(PYTHON_NAME)
+	@echo $(B_ON)$(FG_GREEN)"###"
+	@echo "### DONE" 
+	@echo "###"$(RESET)	
+
+$(PYTHON_NAME): ./py/python.cpp $(OBJ) $(SRC) $(HDR)
 	@echo $(B_ON)$(FG_BLUE)"###"
 	@echo "### LINKING $@" 
 	@echo "###"$(RESET)
-	$(CC) $(INC) -I./extern/pybind11/include/ -O3 -Wall -shared -std=c++11 -fPIC $(INC_PYTHON) src/python.cpp -o $@
+	$(CC) $(INC) -I./extern/pybind11/include/ -O3 -Wall -shared -std=c++11 -fPIC $(INC_PYTHON) py/python.cpp -o $@
 
 bin/wield: ./obj/wield.o $(OBJ) 
 	@echo $(B_ON)$(FG_BLUE)"###"
@@ -99,6 +106,6 @@ clean:
 	@echo $(B_ON)$(FG_RED)"###"
 	@echo "### Cleaning out ./obj, ./bin, *~, *#" 
 	@echo "###"$(RESET)	
-	rm -rf ${OBJ} ${OBJ_MAIN} ${EXE} ./bin/* *~ *\#
+	rm -rf ${OBJ} ${OBJ_MAIN} ${EXE} ./bin/* *~ *\# $(PYTHON_NAME)
 tidy:
 	rm -rf *~ *\# src/*~ src/*\# dat/*~ dat/*\# inc/*~ inc/*\# 
