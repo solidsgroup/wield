@@ -40,7 +40,7 @@ all: make_directories $(EXE) $(PYTHON_NAME)
 	@echo "### DONE" 
 	@echo "###"$(RESET)	
 
-$(PYTHON_NAME): ./src/python.cpp $(OBJ)
+$(PYTHON_NAME): ./src/python.cpp $(OBJ) $(SRC) $(HDR)
 	@echo $(B_ON)$(FG_BLUE)"###"
 	@echo "### LINKING $@" 
 	@echo "###"$(RESET)

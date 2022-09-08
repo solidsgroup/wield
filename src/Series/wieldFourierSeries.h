@@ -65,7 +65,7 @@ public:
 		for (int l = -order + 1; l < order; l++)
 		{
 			if (verbose)
-				WIELD_PROGRESS("Computing CSL", l + order, 2 * order, 1);
+				WIELD_PROGRESS("Computing Fourier coefficients", l + order, 2 * order, 1);
 #pragma omp parallel for num_threads(numThreads)
 			for (int m = -order + 1; m < order; m++)
 				for (int n = -order + 1; n < order; n++)
@@ -97,7 +97,7 @@ public:
 				}
 		}
 		if (verbose)
-			WIELD_PROGRESS_COMPLETE("Computing CSL");
+			WIELD_PROGRESS_COMPLETE("Computing Fourier coefficients");
 	}
 
 	FourierSeries(int _order,

@@ -29,7 +29,7 @@ double Surface(Wield::Series::FourierSeries<Mollifier> C1,
 	       Wield::Series::FourierSeries<Mollifier> C2,
 	       Eigen::Matrix3d R2,
 	       double epsilon,
-	       double tolerance=0)
+	       double tolerance=1E-16)
 {
   std::complex<double> w12 = 0;
   double mod_tolerance = (epsilon * log(1.0/tolerance));
@@ -81,20 +81,6 @@ double Surface(Wield::Series::FourierSeries<Mollifier> C1,
 	}
   return real(w12);
 }
-
-//double SurfaceGaussDirac(//Wield::Series::FourierSeries<Wield::Series::GaussDirac> C1,
-//						 //Eigen::Matrix3d R1,
-//						 //Wield::Series::FourierSeries<Wield::Series::GaussDirac> C2,
-//						 //Eigen::Matrix3d R2,
-//						 double epsilon,
-//						 double tolerance
-//	)
-//{
-//	std::cout << "made it inside..." << std::endl;
-//	return 0.0;
-//	//Surface(C1,R1,C2,R2,epsilon,tolerance);
-//}
-
 
 template<class Mollifier>
 double Surface(Wield::Series::FourierSeries<Mollifier> C1,
