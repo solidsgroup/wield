@@ -42,7 +42,7 @@ all: make_directories $(EXE) python
 	@echo "### DONE" 
 	@echo "###"$(RESET)	
 
-python: $(PYTHON_NAME)
+python: make_directories $(PYTHON_NAME)
 	@echo $(B_ON)$(FG_GREEN)"###"
 	@echo "### DONE" 
 	@echo "###"$(RESET)	
