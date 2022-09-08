@@ -200,9 +200,9 @@ void Energy1D(Reader::Reader &reader, int numThreads=1)
 		normalize = true;
 
 		Eigen::Matrix3d groundRot1 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("GroundZ1"),
-								reader.Read<Eigen::Vector3d>("GroundX1")).transpose();
+								reader.Read<Eigen::Vector3d>("GroundX1"));
 		Eigen::Matrix3d groundRot2 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("GroundZ2"),
-								reader.Read<Eigen::Vector3d>("GroundX2")).transpose();
+								reader.Read<Eigen::Vector3d>("GroundX2"));
 		double g1 = Wield::Integrator::Surface(C1,groundRot1,C1,groundRot1,epsilon,tolerance);
 		double g2 = Wield::Integrator::Surface(C2,groundRot2,C2,groundRot2,epsilon,tolerance);
 		ground = sqrt(g1*g2);
@@ -231,16 +231,16 @@ void Energy1D(Reader::Reader &reader, int numThreads=1)
 	//
 	Eigen::Matrix3d rot1 = Eigen::Matrix3d::Identity();
 	if (reader.Find("AxisY1") && reader.Find("AxisZ1"))
-		rot1 = createMatrixFromYZ(reader.Read<Eigen::Vector3d>("AxisY1"),reader.Read<Eigen::Vector3d>("AxisZ1")).transpose() * rot1;
+		rot1 = createMatrixFromYZ(reader.Read<Eigen::Vector3d>("AxisY1"),reader.Read<Eigen::Vector3d>("AxisZ1")) * rot1;
 	else if (reader.Find("AxisZ1") && reader.Find("AxisX1"))
-		rot1 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("AxisZ1"),reader.Read<Eigen::Vector3d>("AxisX1")).transpose() * rot1;
+		rot1 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("AxisZ1"),reader.Read<Eigen::Vector3d>("AxisX1")) * rot1;
 	else if (reader.Find("AxisX1") && reader.Find("AxisY1"))
-		rot1 = createMatrixFromXY(reader.Read<Eigen::Vector3d>("AxisX1"),reader.Read<Eigen::Vector3d>("AxisY1")).transpose() * rot1;
+		rot1 = createMatrixFromXY(reader.Read<Eigen::Vector3d>("AxisX1"),reader.Read<Eigen::Vector3d>("AxisY1")) * rot1;
 	if (reader.Find("RotAxes1"))
 	{
 		std::vector<char> rotAxes1 = reader.Read<std::vector<char> >("RotAxes1");
 		std::vector<double>  rots1 = reader.Read<std::vector<double> >("Rots1");
-		for (int i=0; i<rotAxes1.size(); i++) rot1 = createMatrixFromAngle(rots1[i],rotAxes1[i]) * rot1;
+		for (int i=0; i<rotAxes1.size(); i++) rot1 = createMatrixFromAngle(rots1[i],rotAxes1[i]).transpose() * rot1;
 	}
 	if (reader.Find("BungeEuler1"))
 	{
@@ -262,9 +262,9 @@ void Energy1D(Reader::Reader &reader, int numThreads=1)
 	//
 
 	Eigen::Matrix3d rot2 = Eigen::Matrix3d::Identity();
-	if (reader.Find("AxisY2") && reader.Find("AxisZ2"))      rot2 = createMatrixFromYZ(reader.Read<Eigen::Vector3d>("AxisY2"),reader.Read<Eigen::Vector3d>("AxisZ2")).transpose() * rot2;
-	else if (reader.Find("AxisZ2") && reader.Find("AxisX2")) rot2 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("AxisZ2"),reader.Read<Eigen::Vector3d>("AxisX2")).transpose() * rot2;
-	else if (reader.Find("AxisX2") && reader.Find("AxisY2")) rot2 = createMatrixFromXY(reader.Read<Eigen::Vector3d>("AxisX2"),reader.Read<Eigen::Vector3d>("AxisY2")).transpose() * rot2;
+	if (reader.Find("AxisY2") && reader.Find("AxisZ2"))      rot2 = createMatrixFromYZ(reader.Read<Eigen::Vector3d>("AxisY2"),reader.Read<Eigen::Vector3d>("AxisZ2")) * rot2;
+	else if (reader.Find("AxisZ2") && reader.Find("AxisX2")) rot2 = createMatrixFromZX(reader.Read<Eigen::Vector3d>("AxisZ2"),reader.Read<Eigen::Vector3d>("AxisX2")) * rot2;
+	else if (reader.Find("AxisX2") && reader.Find("AxisY2")) rot2 = createMatrixFromXY(reader.Read<Eigen::Vector3d>("AxisX2"),reader.Read<Eigen::Vector3d>("AxisY2")) * rot2;
 	if (reader.Find("RotAxes2"))
 	{
 		std::vector<char> rotAxes2 = reader.Read<std::vector<char> >("RotAxes2");

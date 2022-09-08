@@ -51,7 +51,7 @@ Eigen::Matrix3d createMatrixFromXY(Eigen::Vector3d ex, Eigen::Vector3d ey)
   Omega.col(0) = ex / ex.norm();
   Omega.col(1) = ey / ey.norm();
   Omega.col(2) = ez / ez.norm();
-  return Omega;
+  return Omega.transpose();
   WIELD_EXCEPTION_CATCH;
 }
 
@@ -67,7 +67,7 @@ Eigen::Matrix3d createMatrixFromYZ(Eigen::Vector3d ey, Eigen::Vector3d ez)
   Omega.col(0) = ex / ex.norm();
   Omega.col(1) = ey / ey.norm();
   Omega.col(2) = ez / ez.norm();
-  return Omega;
+  return Omega.transpose();
   WIELD_EXCEPTION_CATCH;
 }
 
@@ -83,7 +83,7 @@ Eigen::Matrix3d createMatrixFromZX(Eigen::Vector3d ez, Eigen::Vector3d ex)
   Omega.col(0) = ex / ex.norm();
   Omega.col(1) = ey / ey.norm();
   Omega.col(2) = ez / ez.norm();
-  return Omega;
+  return Omega.transpose();
   WIELD_EXCEPTION_CATCH;
 }
 

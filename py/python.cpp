@@ -23,9 +23,11 @@
 // 
 
 #include "Reader/Reader.h"
+#include "Series/wieldSqrtGaussDirac.h"
 #include "Series/wieldGaussDirac.h"
 #include "Series/wieldFourierSeries.h"
 #include "Integrator/wieldSurface.h"
+#include "Integrator/wieldVolume.h"
 
 #include "pybind11/pybind11.h"
 #include "pybind11/stl.h"
@@ -36,7 +38,7 @@ double add(double i, double j) {
 }
 
 
-double SurfaceGaussDirac(Wield::Series::FourierSeries<Wield::Series::GaussDirac> C1,
+double SurfaceGD(Wield::Series::FourierSeries<Wield::Series::GaussDirac> C1,
 						 Eigen::Matrix3d R1,
 						 Wield::Series::FourierSeries<Wield::Series::GaussDirac> C2,
 						 Eigen::Matrix3d R2,
@@ -44,6 +46,16 @@ double SurfaceGaussDirac(Wield::Series::FourierSeries<Wield::Series::GaussDirac>
 						 double tolerance)
 {
 	return Wield::Integrator::Surface(C1,R1,C2,R2,epsilon,tolerance);
+}
+
+double VolumeSQGD(Wield::Series::FourierSeries<Wield::Series::SqrtGaussDirac> C1,
+						 Eigen::Matrix3d R1,
+						 Wield::Series::FourierSeries<Wield::Series::SqrtGaussDirac> C2,
+						 Eigen::Matrix3d R2,
+						 double epsilon,
+						 double tolerance)
+{
+	return Wield::Integrator::Volume(C1,R1,C2,R2,epsilon,tolerance);
 }
 
 //PYBIND11_MODULE(wield, m) {
@@ -61,14 +73,21 @@ double SurfaceGaussDirac(Wield::Series::FourierSeries<Wield::Series::GaussDirac>
 
 PYBIND11_MODULE(wield,m) {
 
-	pybind11::class_<Wield::Series::FourierSeries<Wield::Series::GaussDirac>>(m,"Crystal")
+	pybind11::class_<Wield::Series::FourierSeries<Wield::Series::GaussDirac>>(m,"CrystalGD")
 		.def(pybind11::init<
 			 const int, const double, const double, const double,
 			 const double, std::vector<double>, std::vector<double>,std::vector<double>,
 			 int, int >());
 
-	m.def("Surface",&SurfaceGaussDirac,"Surface integrate");
-	//m.def("Surface",&add,"Surface integrate");
+	pybind11::class_<Wield::Series::FourierSeries<Wield::Series::SqrtGaussDirac>>(m,"CrystalSQGD")
+		.def(pybind11::init<
+			 const int, const double, const double, const double,
+			 const double, std::vector<double>, std::vector<double>,std::vector<double>,
+			 int, int >());
+
+	m.def("SurfaceGD",&SurfaceGD,"Surface integrate (energy)");
+	m.def("VolumeSQGD",&VolumeSQGD,"Volume integrage (CSL)");
+
 	m.def("createMatrixFromAngle",&createMatrixFromAngle,"Surface integrate");
 	m.def("createMatrixFromXAngle",&createMatrixFromXAngle,"Generate rotation matrix about x axis");
 	m.def("createMatrixFromYAngle",&createMatrixFromYAngle,"Generate rotation matrix about y axis");
