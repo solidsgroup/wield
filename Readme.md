@@ -23,7 +23,9 @@ Clone the repository:
 
 Install using pip:
 
-    pip3 install wield/py
+    pip3 install --user -e wield/py
+
+(The `--user` and `-e` options are not required, but are recommended as this is not a production code)
 
 Now you can import wield and use wield functions in python, e.g.
 
