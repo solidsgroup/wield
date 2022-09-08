@@ -2,39 +2,38 @@
 
 This is a small research program to compute the energy of a bicrystal interface. 
 
+Dependencies
+============
+
+The following external packages are required for Wield.
+
+1. MuParser: available in the Ubuntu repository as `libmuparser-dev`
+
+2. TCLAP: available in the Ubuntu repository as `libtclap-dev`
+
+3. Python developer tools: available in the Ubuntu repository as `python3-dev`
+
+
+Installation - Python
+=====================
+
+Clone the repository:
+
+    git clone https://github.com/solidsgroup/wield.git
+
+Install using pip:
+
+    pip3 install wield/py
+
+Now you can import wield and use wield functions in python, e.g.
+
+    import wield
+    wield.createMatrixFromXAngle(0.0)
+
+
 Installation
 ============
 
-Dependencies
-------------
-
-The following packages are required for Wield.
-
-1. Reader: this is a small header file library containing an input file parser.
-   It can be downloaded from https://github.com/bsrunnels/reader
-   For Wield to find Reader, set the environment variable READER_LOCATION
-
-       export READER_LOCATION = /path/to/reader/directory
-
-   **or** modify the Makefile to include the line
-
-       READER_LOCATION = /path/to/reader/directory
-
-   **or** update `CPLUS_INCLUDE_DIR` to include the READER_LOCATION
-   (Note: the path should _not_ include the `solidsuccs-reader` subdirectory)
-
-   Alternatively, Reader can be installed for some versions of Ubuntu using aptitude. 
-
-       sudo add-apt-repository ppa:solidsuccs/codes
-       sudo apt update
-       sudo apt install solidsuccs-reader
-
-   If installed in this way, Wield will find Reader automatically.
-
-
-2. MuParser: available in the Ubuntu repository as 'libmuparser-dev`
-
-3. TCLAP: available in the Ubuntu repository as `libtclap-dev`
 
 Compilation
 -----------

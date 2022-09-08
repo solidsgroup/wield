@@ -30,7 +30,6 @@ public:
 	// {
 	//   return exp(-sigma*sigma*(x*x + y*y + z*z)/4.) / sqrt(8*pi*pi*pi);
 	// }
-
 	FourierSeries(const FourierSeries<Mollifier> &copy) : order(copy.order),
 														  alphaX(copy.alphaX),
 														  alphaY(copy.alphaY),
@@ -66,7 +65,7 @@ public:
 		for (int l = -order + 1; l < order; l++)
 		{
 			if (verbose)
-				WIELD_PROGRESS("Computing CSL", l + order, 2 * order, 1);
+				WIELD_PROGRESS("Computing Fourier coefficients", l + order, 2 * order, 1);
 #pragma omp parallel for num_threads(numThreads)
 			for (int m = -order + 1; m < order; m++)
 				for (int n = -order + 1; n < order; n++)
@@ -98,9 +97,27 @@ public:
 				}
 		}
 		if (verbose)
-			WIELD_PROGRESS_COMPLETE("Computing CSL");
+			WIELD_PROGRESS_COMPLETE("Computing Fourier coefficients");
 	}
 
+	FourierSeries(int _order,
+				  double _alphaX,
+				  double _alphaY,
+				  double _alphaZ,
+				  double _sigma,
+				  std::vector<double> X,
+				  std::vector<double> Y,
+				  std::vector<double> Z,
+				  int numThreads = 1,
+				  int verbose = false
+		) :FourierSeries(_order,_alphaX,_alphaY,_alphaZ,Mollifier(_sigma),X,Y,Z,numThreads,verbose)
+	{}
+
+	FourierSeries() : phiHat(0)
+	{
+	}
+
+	
 	std::complex<double> &operator()(signed int i, signed int j, signed int k)
 	{
 		return C[(2 * order - 1) * (2 * order - 1) * (order + i - 1) + (2 * order - 1) * (order + j - 1) + (order + k - 1)];

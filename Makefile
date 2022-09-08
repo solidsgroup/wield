@@ -1,6 +1,5 @@
 # Generic Makefile
 # Brandon Runnels
-# Last Edited: November 5, 2013
 
 RESET              = '\033[0m'
 B_ON               = '\033[1m'
@@ -13,29 +12,47 @@ CC                    = g++
 CPP_COMPILER_OPTIONS += -c -g3 -ggdb -fopenmp -Wno-deprecated -Wunused-variable -DMUPARSER 
 CPP_LINKER_OPTIONS   += -g3 -ggdb -fopenmp  
 
+INC_PYTHON            = $(shell python3-config --cflags)
+LIB_PYTHON            = $(shell python3-config --ldflags)
+PYTHON_NAME           = py/wield$(shell python3-config --extension-suffix)
+
 ifdef EMACS
 PREFIX                = $(shell pwd)/
 endif
 EXCLUDE               = $(PREFIX)/src/MainOld.cpp
 SRC_MAIN              = $(filter-out $(EXCLUDE), $(shell find ./src/ -name '*.cc'))
-EXE 		      = $(subst ./src/,./bin/, $(SRC_MAIN:.cc=))
-SRC		      = $(filter-out $(EXCLUDE), $(shell find ./src/ -name '*.cpp'))
+EXE 		      = bin/wield
+SRC		      = $(filter-out $(EXCLUDE), $(shell find ./src/ -mindepth 2 -name  '*.cpp'))
 HDR		      = $(filter-out $(EXCLUDE), $(shell find ./inc/ ./src/ -name '*.h'))
 OBJ 		      = $(subst ./src/,./obj/, $(SRC:.cpp=.o)) 
 OBJ_MAIN              = $(subst ./src/,./obj/, $(SRC_MAIN:.cc=.o))
-INC 		      = -I./src \
+INC 		      = -O3 -I./src \
 		        -I./inc \
-		        $(INC_EXT)
-LIB		      = $(LIB_EXT) -lmuparser
+			-I./extern/eigen/
+LIB		      = $(LIB_EXT) -lmuparser $(LIB_PYTHON) -lpython3
+
 
 .SECONDARY: $(OBJ) $(OBJ_MAIN)
 
-all: make_directories $(EXE)
+default: make_directories $(EXE)
+
+all: make_directories $(EXE) python
 	@echo $(B_ON)$(FG_GREEN)"###"
 	@echo "### DONE" 
 	@echo "###"$(RESET)	
 
-$(PREFIX)bin/%: ./obj/%.o $(OBJ) 
+python: make_directories $(PYTHON_NAME)
+	@echo $(B_ON)$(FG_GREEN)"###"
+	@echo "### DONE" 
+	@echo "###"$(RESET)	
+
+$(PYTHON_NAME): ./py/python.cpp $(OBJ) $(SRC) $(HDR)
+	@echo $(B_ON)$(FG_BLUE)"###"
+	@echo "### LINKING $@" 
+	@echo "###"$(RESET)
+	$(CC) $(INC) -I./extern/pybind11/include/ -O3 -Wall -shared -std=c++11 -fPIC $(INC_PYTHON) py/python.cpp -o $@
+
+bin/wield: ./obj/wield.o $(OBJ) 
 	@echo $(B_ON)$(FG_BLUE)"###"
 	@echo "### LINKING $@" 
 	@echo "###"$(RESET)
@@ -56,6 +73,7 @@ $(PREFIX)bin/%: ./obj/%.o $(OBJ)
 	$(CC) $(CPP_COMPILER_OPTIONS) $(INC) -o $@ $(PREFIX)$<
 
 make_directories: $(SRC)
+	git submodule update --init --recursive
 	mkdir -p $(dir $(OBJ)) $(dir $(OBJ_MAIN)) bin
 
 %.cpp: $(HDR)
@@ -88,6 +106,6 @@ clean:
 	@echo $(B_ON)$(FG_RED)"###"
 	@echo "### Cleaning out ./obj, ./bin, *~, *#" 
 	@echo "###"$(RESET)	
-	rm -rf ${OBJ} ${OBJ_MAIN} ${EXE} ./bin/* *~ *\#
+	rm -rf ${OBJ} ${OBJ_MAIN} ${EXE} ./bin/* *~ *\# $(PYTHON_NAME)
 tidy:
 	rm -rf *~ *\# src/*~ src/*\# dat/*~ dat/*\# inc/*~ inc/*\# 

@@ -29,7 +29,7 @@ double Surface(Wield::Series::FourierSeries<Mollifier> C1,
 	       Wield::Series::FourierSeries<Mollifier> C2,
 	       Eigen::Matrix3d R2,
 	       double epsilon,
-	       double tolerance=0)
+	       double tolerance=1E-16)
 {
   std::complex<double> w12 = 0;
   double mod_tolerance = (epsilon * log(1.0/tolerance));

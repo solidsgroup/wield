@@ -119,7 +119,7 @@ double Volume(Wield::Series::FourierSeries<Mollifier> &C1, ///< [in] Structure f
 	}
     }
   if (verbose) WIELD_PROGRESS_COMPLETE("Computing CSL");
-  if (verbose) WIELD_NOTE("Highest order term used: "<< order_max << std::endl);
+  //if (verbose) WIELD_NOTE("Highest order term used: "<< order_max << std::endl);
   return real(w12);
   WIELD_EXCEPTION_CATCH;
 }
