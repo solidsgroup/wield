@@ -7,9 +7,11 @@ Dependencies
 
 The following external packages are required for Wield.
 
-1. MuParser: available in the Ubuntu repository as 'libmuparser-dev`
+1. MuParser: available in the Ubuntu repository as `libmuparser-dev`
 
 2. TCLAP: available in the Ubuntu repository as `libtclap-dev`
+
+3. Python developer tools: available in the Ubuntu repository as `python3-dev`
 
 
 Installation - Python
