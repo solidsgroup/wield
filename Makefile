@@ -74,6 +74,7 @@ bin/wield: ./obj/wield.o $(OBJ)
 	$(CC) $(CPP_COMPILER_OPTIONS) $(INC) -o $@ $(PREFIX)$<
 
 make_directories: $(SRC)
+	git submodule update --init --recursive
 	mkdir -p $(dir $(OBJ)) $(dir $(OBJ_MAIN)) bin
 
 %.cpp: $(HDR)
