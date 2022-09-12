@@ -46,7 +46,7 @@ python: make_directories $(PYTHON_NAME)
 	@echo "### DONE" 
 	@echo "###"$(RESET)	
 
-$(PYTHON_NAME): ./py/python.cpp $(OBJ) $(SRC) $(HDR)
+$(PYTHON_NAME): ./py/python.cpp $(SRC) $(HDR)
 	@echo $(B_ON)$(FG_BLUE)"###"
 	@echo "### LINKING $@" 
 	@echo "###"$(RESET)
