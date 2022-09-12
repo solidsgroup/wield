@@ -28,6 +28,7 @@
 #include "Series/wieldFourierSeries.h"
 #include "Integrator/wieldSurface.h"
 #include "Integrator/wieldVolume.h"
+#include "Optimization/wieldConvexify2D.h"
 
 #include "pybind11/pybind11.h"
 #include "pybind11/stl.h"
@@ -58,18 +59,76 @@ double VolumeSQGD(Wield::Series::FourierSeries<Wield::Series::SqrtGaussDirac> C1
 	return Wield::Integrator::Volume(C1,R1,C2,R2,epsilon,tolerance);
 }
 
-//PYBIND11_MODULE(wield, m) {
-//    m.doc() = "pybind11 example plugin"; // optional module docstring
-//
-//    m.def("add", &add, "A function that adds two numbers");
-//}
+std::pair<double,std::vector<Eigen::Vector3d>> Convexify2D(std::vector<std::vector<double>> &x,
+				 std::vector<std::vector<double>> &y,
+				 std::vector<std::vector<double>> &z,
+				 std::vector<std::vector<double>> &r,
+				 std::vector<std::vector<double>> &theta,
+				 std::vector<std::vector<double>> &w
+				 //double &wMin,
+				 //Eigen::Vector3d &lambdaMin,
+				 //Eigen::Vector3d &n1Min,
+				 //Eigen::Vector3d &n2Min,
+				 //Eigen::Vector3d &n3Min,
+				 //int coarsen,
+				 //double searchRadius,
+				 //int refining,
+				 //bool symmetricY
+	)
+{
+	/// Try 2D faceting first
 
-//Wield::Integrator::Surface<Wield::Series::GaussDirac>;
-//int null()
-//{
-//	&createMatrixFromAngle;
-//	Wield::Integrator::Surface<Wield::Series::GaussDirac>;
-//}
+	int sizet = x.size();
+	int sizer = x[0].size();
+
+	double wMin = w[0][0];
+	Eigen::Vector3d e(0,0,1);
+	Eigen::Vector3d n1Min = e, n2Min = e, n3Min = e;
+	for (int i1 = 0; i1 < sizet/2; i1++)
+	{
+		// Positive r: (i,j)
+		// Negative r: (i+sizet/2, j)
+		int i2 = i1 + sizet/2;
+
+		if (std::abs(std::fmod(theta[i2][0],180.) - std::fmod(theta[i1][0],180.)) > 1E-8)
+			WIELD_EXCEPTION_NEW("Thetas do not match: " << theta[i2][0] << ", " << theta[i1][0]);
+
+		for (int j1 = 1; j1 < sizer; j1++) 
+		{
+			Eigen::Vector3d n1(x[i1][j1], y[i1][j1], z[i1][j1]);
+			for (int j2 = 1; j2 < sizer; j2++)
+			{
+				Eigen::Vector3d n2(x[i2][j2], y[i2][j2], z[i2][j2]);
+				Eigen::Vector2d lambda = Wield::Optimization::ConvexCoefficients(n1,n2,e);
+				double wCurr = lambda(0)*w[i1][j1] + lambda(1)*w[i2][j2];
+				if (wCurr < wMin)
+				{
+					std::cout << "====MINIMIZER====" << std::endl;
+					wMin = wCurr;
+					n1Min = n1;
+					n2Min = n2;
+					std::cout << "N1 = " << n1.transpose() << std::endl;
+					std::cout << "w1 = " << w[i1][j1] << std::endl;
+					std::cout << "N2 = " << n2.transpose() << std::endl;
+					std::cout << "w2 = " << w[i2][j2] << std::endl;
+					std::cout << wMin << std::endl;
+					std::cout << lambda.transpose() << std::endl << std::endl;;
+				}
+			}
+		}
+		
+	}
+
+	std::vector<Eigen::Vector3d> ret;
+	ret.push_back(n1Min);
+	ret.push_back(n2Min);
+	ret.push_back(n3Min);
+
+	std::pair<double,std::vector<Eigen::Vector3d>> pair;
+	pair.first = wMin;
+	pair.second = ret;
+	return pair;
+}
 
 PYBIND11_MODULE(wield,m) {
 
@@ -99,6 +158,7 @@ PYBIND11_MODULE(wield,m) {
 	m.def("createMatrixFromNormalVector",&createMatrixFromNormalVector,"Generate rotation matrix from normal vector");
 	m.def("createMatrixFromBungeEulerAngles",&createMatrixFromBungeEulerAngles,"Generate rotation matrix from Bunge Euler Angles");
 	m.def("createMatrixFromAxisAngle",&createMatrixFromAxisAngle,"Generate rotation matrix from axis-angle pair");
+	m.def("Convexify2D",&Convexify2D,"Convexify 2D");
 	
 }
 

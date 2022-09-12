@@ -106,7 +106,7 @@ Eigen::Vector2d ConvexCoefficients(Eigen::Vector3d n1, Eigen::Vector3d n2, Eigen
   Eigen::Vector2d lambda(0,0);
   double theta1 = asin(sqrt(n1(0)*n1(0) + n1(1)*n1(1))); double theta2 = -asin(sqrt(n2(0)*n2(0) + n2(1)*n2(1)));
   double det = sin(theta1-theta2);
-  if (fabs(det)<1E-5) {lambda[0]=0; lambda[1]=0; return lambda;}
+  if (fabs(det)<1E-5) {lambda[0]=std::numeric_limits<double>::infinity(); lambda[1]=std::numeric_limits<double>::infinity(); return lambda;}
   lambda(0) = -sin(theta2)/det;
   lambda(1) = sin(theta1)/det;
   return lambda;
@@ -149,31 +149,27 @@ Eigen::Vector3d ConvexCoefficients(Eigen::Vector3d n1, Eigen::Vector3d n2, Eigen
 
 
 
-template<>
-void *Convexify2D<3>(void *args) 
+
+void Convexify2D(int index,
+				 int numThreads,
+				 int maxFacetOrder,
+				 std::vector<double> &x,
+				 std::vector<double> &y,
+				 std::vector<double> &z,
+				 std::vector<double> &r,
+				 std::vector<double> &theta,
+				 std::vector<double> &w,
+				 double &wMin,
+				 Eigen::Vector3d &lambdaMin,
+				 Eigen::Vector3d &n1Min,
+				 Eigen::Vector3d &n2Min,
+				 Eigen::Vector3d &n3Min,
+				 int coarsen,
+				 double searchRadius,
+				 int refining,
+				 bool symmetricY) 
 {
   WIELD_EXCEPTION_TRY;
-
-
-  int index                  =   ((ConvexifyData2D<3> *)(args))->index;
-  int numThreads             =   ((ConvexifyData2D<3> *)(args))->numThreads;
-  int maxFacetOrder          =   ((ConvexifyData2D<3> *)(args))->maxFacetOrder;
-  std::vector<double> &x          = *(((ConvexifyData2D<3> *)(args))->x);
-  std::vector<double> &y          = *(((ConvexifyData2D<3> *)(args))->y);
-  std::vector<double> &z          = *(((ConvexifyData2D<3> *)(args))->z);
-  std::vector<double> &r          = *(((ConvexifyData2D<3> *)(args))->r);
-  std::vector<double> &theta      = *(((ConvexifyData2D<3> *)(args))->theta);
-  std::vector<double> &w          = *(((ConvexifyData2D<3> *)(args))->w);
-  double &wMin               =   ((ConvexifyData2D<3> *)(args))->wMin;
-  Eigen::Vector3d &lambdaMin =   ((ConvexifyData2D<3> *)(args))->lambdaMin;
-  Eigen::Vector3d &n1Min     =   ((ConvexifyData2D<3> *)(args))->n1Min;
-  Eigen::Vector3d &n2Min     =   ((ConvexifyData2D<3> *)(args))->n2Min;
-  Eigen::Vector3d &n3Min     =   ((ConvexifyData2D<3> *)(args))->n3Min;
-  int coarsen                =   ((ConvexifyData2D<3> *)(args))->coarsen;
-  double searchRadius        =   ((ConvexifyData2D<3> *)(args))->searchRadius;
-  int refining               =   ((ConvexifyData2D<3> *)(args))->refining;
-  bool symmetricY            =   ((ConvexifyData2D<3> *)(args))->symmetricY;
-  
 
   Eigen::Vector3d n1MinOld=n1Min, n2MinOld=n2Min, n3MinOld=n3Min;
 
@@ -301,10 +297,64 @@ void *Convexify2D<3>(void *args)
       if (index == 0) WIELD_PROGRESS("Faceting", i, x.size(), 1);
     }
   if (index == 0) {WIELD_PROGRESS("Faceting", x.size(), x.size(), 1); std::cout << std::endl;}
-  pthread_exit(args);
-  return NULL;
   WIELD_EXCEPTION_CATCH;
 }
+
+template<>
+void *Convexify2D<3>(void *args) 
+{
+  WIELD_EXCEPTION_TRY;
+  int index                  =   ((ConvexifyData2D<3> *)(args))->index;
+  int numThreads             =   ((ConvexifyData2D<3> *)(args))->numThreads;
+  int maxFacetOrder          =   ((ConvexifyData2D<3> *)(args))->maxFacetOrder;
+  std::vector<double> &x          = *(((ConvexifyData2D<3> *)(args))->x);
+  std::vector<double> &y          = *(((ConvexifyData2D<3> *)(args))->y);
+  std::vector<double> &z          = *(((ConvexifyData2D<3> *)(args))->z);
+  std::vector<double> &r          = *(((ConvexifyData2D<3> *)(args))->r);
+  std::vector<double> &theta      = *(((ConvexifyData2D<3> *)(args))->theta);
+  std::vector<double> &w          = *(((ConvexifyData2D<3> *)(args))->w);
+  double &wMin               =   ((ConvexifyData2D<3> *)(args))->wMin;
+  Eigen::Vector3d &lambdaMin =   ((ConvexifyData2D<3> *)(args))->lambdaMin;
+  Eigen::Vector3d &n1Min     =   ((ConvexifyData2D<3> *)(args))->n1Min;
+  Eigen::Vector3d &n2Min     =   ((ConvexifyData2D<3> *)(args))->n2Min;
+  Eigen::Vector3d &n3Min     =   ((ConvexifyData2D<3> *)(args))->n3Min;
+  int coarsen                =   ((ConvexifyData2D<3> *)(args))->coarsen;
+  double searchRadius        =   ((ConvexifyData2D<3> *)(args))->searchRadius;
+  int refining               =   ((ConvexifyData2D<3> *)(args))->refining;
+  bool symmetricY            =   ((ConvexifyData2D<3> *)(args))->symmetricY;
+
+  Convexify2D(index,numThreads,maxFacetOrder,x,y,z,r,theta,w,wMin,lambdaMin,
+			  n1Min,n2Min,n3Min,coarsen,searchRadius,refining,symmetricY);
+  pthread_exit(args);
+  WIELD_EXCEPTION_CATCH;
+}
+
+
+//void Convexify2D(int index,
+//				 int numThreads,
+//				 int maxFacetOrder,
+//				 std::vector<double> &x,
+//				 std::vector<double> &y,
+//				 std::vector<double> &z,
+//				 std::vector<double> &r,
+//				 std::vector<double> &theta,
+//				 std::vector<double> &w,
+//				 double &wMin,
+//				 Eigen::Vector3d &lambdaMin,
+//				 Eigen::Vector3d &n1Min,
+//				 Eigen::Vector3d &n2Min,
+//				 Eigen::Vector3d &n3Min,
+//				 int coarsen,
+//				 double searchRadius,
+//				 int refining,
+//				 bool symmetricY) 
+//{
+//  WIELD_EXCEPTION_TRY;
+//  WIELD_EXCEPTION_CATCH;
+//}
+
+
+
 }
 }
 

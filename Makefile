@@ -29,7 +29,7 @@ OBJ_MAIN              = $(subst ./src/,./obj/, $(SRC_MAIN:.cc=.o))
 INC 		      = -O3 -I./src \
 		        -I./inc \
 			-I./extern/eigen/
-LIB		      = $(LIB_EXT) -lmuparser $(LIB_PYTHON) -lpython3
+LIB		      = $(LIB_EXT) -lmuparser 
 
 
 .SECONDARY: $(OBJ) $(OBJ_MAIN)
@@ -50,7 +50,7 @@ $(PYTHON_NAME): ./py/python.cpp $(OBJ) $(SRC) $(HDR)
 	@echo $(B_ON)$(FG_BLUE)"###"
 	@echo "### LINKING $@" 
 	@echo "###"$(RESET)
-	$(CC) $(INC) -I./extern/pybind11/include/ -O3 -Wall -shared -std=c++11 -fPIC $(INC_PYTHON) py/python.cpp -o $@
+	$(CC) -DWIELD_PYTHON $(INC) -I./extern/pybind11/include/ -O3 -Wall -shared -std=c++11 -fPIC $(INC_PYTHON) py/python.cpp -o $@
 
 bin/wield: ./obj/wield.o $(OBJ) 
 	@echo $(B_ON)$(FG_BLUE)"###"
