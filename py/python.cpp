@@ -59,12 +59,15 @@ double VolumeSQGD(Wield::Series::FourierSeries<Wield::Series::SqrtGaussDirac> C1
 	return Wield::Integrator::Volume(C1,R1,C2,R2,epsilon,tolerance);
 }
 
-std::pair<double,std::vector<Eigen::Vector3d>> Convexify2D(std::vector<std::vector<double>> &x,
-				 std::vector<std::vector<double>> &y,
-				 std::vector<std::vector<double>> &z,
-				 std::vector<std::vector<double>> &r,
-				 std::vector<std::vector<double>> &theta,
-				 std::vector<std::vector<double>> &w
+std::pair<double,std::vector<Eigen::Vector3d>> Convexify2D(
+	std::vector<std::vector<double>> &x,
+	std::vector<std::vector<double>> &y,
+	std::vector<std::vector<double>> &z,
+	std::vector<std::vector<double>> &r,
+	std::vector<std::vector<double>> &theta,
+	std::vector<std::vector<double>> &w,
+	bool threefacet = false
+														   
 				 //double &wMin,
 				 //Eigen::Vector3d &lambdaMin,
 				 //Eigen::Vector3d &n1Min,
@@ -88,6 +91,7 @@ std::pair<double,std::vector<Eigen::Vector3d>> Convexify2D(std::vector<std::vect
 	{
 		// Positive r: (i,j)
 		// Negative r: (i+sizet/2, j)
+		//std::cout << "theta = " << theta[i1][0] << std::endl;
 		int i2 = i1 + sizet/2;
 
 		if (std::abs(std::fmod(theta[i2][0],180.) - std::fmod(theta[i1][0],180.)) > 1E-8)
@@ -101,23 +105,92 @@ std::pair<double,std::vector<Eigen::Vector3d>> Convexify2D(std::vector<std::vect
 				Eigen::Vector3d n2(x[i2][j2], y[i2][j2], z[i2][j2]);
 				Eigen::Vector2d lambda = Wield::Optimization::ConvexCoefficients(n1,n2,e);
 				double wCurr = lambda(0)*w[i1][j1] + lambda(1)*w[i2][j2];
+				//std::cout << lambda.transpose() << std::endl << std::endl;;
+
+				
+
 				if (wCurr < wMin)
 				{
-					std::cout << "====MINIMIZER====" << std::endl;
+					//std::cout << "====MINIMIZER====" << std::endl;
+					//std::cout << "theta1 = " << theta[i1][j1] << std::endl;
+					//std::cout << "theta2 = " << theta[i2][j2] << std::endl;
+					//std::cout << "wMin = " << wMin << std::endl;
+					//std::cout << "wCur = " << wCurr << std::endl;
 					wMin = wCurr;
 					n1Min = n1;
 					n2Min = n2;
-					std::cout << "N1 = " << n1.transpose() << std::endl;
-					std::cout << "w1 = " << w[i1][j1] << std::endl;
-					std::cout << "N2 = " << n2.transpose() << std::endl;
-					std::cout << "w2 = " << w[i2][j2] << std::endl;
-					std::cout << wMin << std::endl;
-					std::cout << lambda.transpose() << std::endl << std::endl;;
+					//std::cout << "N1 = " << n1.transpose() << std::endl;
+					//std::cout << "w1 = " << w[i1][j1] << std::endl;
+					//std::cout << "N2 = " << n2.transpose() << std::endl;
+					//std::cout << "w2 = " << w[i2][j2] << std::endl;
+					//std::cout << wMin << std::endl;
+					//std::cout << lambda.transpose() << std::endl << std::endl;;
 				}
 			}
 		}
 		
 	}
+
+
+	if (threefacet)
+	{
+		for (int t1 = 0; t1 < sizet; t1++)
+		{
+			if (theta[t1][0] > 180) break;
+			std::cout << theta[t1][0] << std::endl;
+			for (int t2 = 0; t2 < sizet; t2++)
+			{
+				if (theta[t2][0] < theta[t1][0]) continue;
+				if (theta[t2][0] > theta[t1][0] + 180.) break;
+				for (int t3 = 0; t3 < sizet; t3++)
+				{
+					if (theta[t3][0] < theta[t1][0]+180.) continue;
+					if (theta[t3][0] > theta[t2][0]+180.) break;
+
+					for (int j1 = 1; j1 < sizer; j1++)
+					{
+						Eigen::Vector3d n1(x[t1][j1], y[t1][j1], z[t1][j1]);
+						for (int j2 = 1; j2 < sizer; j2++)
+						{
+							Eigen::Vector3d n2(x[t2][j2], y[t2][j2], z[t2][j2]);
+							for (int j3 = 1; j3 < sizer; j3++)
+							{
+								if (w[t1][j1] > w[0][0] && w[t2][j2] > w[0][0] && w[t3][j3] > w[0][0]) continue;
+								Eigen::Vector3d n3(x[t3][j3], y[t3][j3], z[t3][j3]);
+								Eigen::Vector3d lambda = Wield::Optimization::ConvexCoefficients(n1,n2,n3,e);
+								double wCurr = lambda(0)*w[t1][j1] + lambda(1)*w[t2][j2] + lambda(2)*w[t3][j3];
+								if (wCurr < 0) continue;
+								if (wCurr < wMin)
+								{
+									//std::cout << "====MINIMIZER====" << std::endl;
+									wMin = wCurr;
+									n1Min = n1;
+									n2Min = n2;
+									n3Min = n3;
+									//std::cout << "N1 = " << n1.transpose() << std::endl;
+									//std::cout << "w1 = " << w[t1][j1] << std::endl;
+									//std::cout << "N2 = " << n2.transpose() << std::endl;
+									//std::cout << "w2 = " << w[t2][j2] << std::endl;
+									//std::cout << "N3 = " << n3.transpose() << std::endl;
+									//std::cout << "w3 = " << w[t3][j3] << std::endl;
+									//std::cout << "lamb = " << lambda.transpose() << std::endl;
+									//std::cout << wMin << std::endl;
+									//std::cout << lambda.transpose() << std::endl << std::endl;;
+								}
+								
+							}
+						}
+					}
+				}
+			}
+		}
+
+
+
+
+	}
+
+
 
 	std::vector<Eigen::Vector3d> ret;
 	ret.push_back(n1Min);

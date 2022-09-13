@@ -103,48 +103,59 @@ void *Convexify2D(void *args);
 static inline
 Eigen::Vector2d ConvexCoefficients(Eigen::Vector3d n1, Eigen::Vector3d n2, Eigen::Vector3d e)
 {
-  Eigen::Vector2d lambda(0,0);
-  double theta1 = asin(sqrt(n1(0)*n1(0) + n1(1)*n1(1))); double theta2 = -asin(sqrt(n2(0)*n2(0) + n2(1)*n2(1)));
-  double det = sin(theta1-theta2);
-  if (fabs(det)<1E-5) {lambda[0]=std::numeric_limits<double>::infinity(); lambda[1]=std::numeric_limits<double>::infinity(); return lambda;}
-  lambda(0) = -sin(theta2)/det;
-  lambda(1) = sin(theta1)/det;
-  return lambda;
+	double inf = std::numeric_limits<double>::infinity();
+	Eigen::Vector2d lambda(inf,inf);
+
+	//double det = n1[0]*n2[1] - n2[0]*n1[1];
+	//if (fabs(det) < 1E-8) return lambda;
+
+	//lambda(0) = ( n2(1)*e(0) - n2(0)*e(1)) / det;
+	//lambda(1) = (-n1(1)*e(0) + n1(0)*e(1)) / det;
+	
+	double theta1 = asin(sqrt(n1(0)*n1(0) + n1(1)*n1(1)));
+	double theta2 = -asin(sqrt(n2(0)*n2(0) + n2(1)*n2(1)));
+	double det = sin(theta1-theta2);
+	if (fabs(det)<1E-5) return lambda;
+	lambda(0) = -sin(theta2)/det;
+	lambda(1) = sin(theta1)/det;
+	return lambda;
 }
 static inline
 Eigen::Vector3d ConvexCoefficients(Eigen::Vector3d n1, Eigen::Vector3d n2, Eigen::Vector3d n3, Eigen::Vector3d e)
 {
-  Eigen::Vector3d lambda(0,0,0);
-  double det = 
-    + n1[0]*n2[1]*n3[2] 
-    + n1[1]*n2[2]*n3[0]
-    + n1[2]*n2[0]*n3[1]
-    - n1[0]*n2[2]*n3[1]
-    - n1[1]*n2[0]*n3[2]
-    - n1[2]*n2[1]*n3[0];
-  if (fabs(det) < 1E-8) return lambda;
-  lambda(0) = 
-    (+  e[0]*n2[1]*n3[2] 
-     + n2[0]*n3[1]* e[2]
-     + n3[0]* e[1]*n2[2]
-     -  e[0]*n3[1]*n2[2]
-     - n2[0]* e[1]*n3[2]
-     - n3[0]*n2[1]* e[2] )/det;
-  lambda(1) = 
-    (+ n1[0]* e[1]*n3[2]
-     +  e[0]*n3[1]*n1[2]
-     + n3[0]*n1[1]* e[2]
-     - n1[0]*n3[1]* e[2]
-     -  e[0]*n1[1]*n3[2]
-     - n3[0]* e[1]*n1[2] )/det;
-  lambda(2) = 
-    (+ n1[0]*n2[1]* e[2]
-     + n2[0]* e[1]*n1[2]
-     +  e[0]*n1[1]*n2[2]
-     - n1[0]* e[1]*n2[2]
-     - n2[0]*n1[1]* e[2]
-     -  e[0]*n2[1]*n1[2])/det;
-  return lambda;
+	double inf = std::numeric_limits<double>::infinity();
+	Eigen::Vector3d lambda(inf,inf,inf);
+	double det = 
+		+ n1[0]*n2[1]*n3[2] 
+		+ n1[1]*n2[2]*n3[0]
+		+ n1[2]*n2[0]*n3[1]
+		- n1[0]*n2[2]*n3[1]
+		- n1[1]*n2[0]*n3[2]
+		- n1[2]*n2[1]*n3[0];
+	if (fabs(det) < 1E-8) return lambda;
+	lambda(0) = 
+		(+  e[0]*n2[1]*n3[2] 
+		 + n2[0]*n3[1]* e[2]
+		 + n3[0]* e[1]*n2[2]
+		 -  e[0]*n3[1]*n2[2]
+		 - n2[0]* e[1]*n3[2]
+		 - n3[0]*n2[1]* e[2] )/det;
+	lambda(1) = 
+		(+ n1[0]* e[1]*n3[2]
+		 +  e[0]*n3[1]*n1[2]
+		 + n3[0]*n1[1]* e[2]
+		 - n1[0]*n3[1]* e[2]
+		 -  e[0]*n1[1]*n3[2]
+		 - n3[0]* e[1]*n1[2] )/det;
+	lambda(2) = 
+		(+ n1[0]*n2[1]* e[2]
+		 + n2[0]* e[1]*n1[2]
+		 +  e[0]*n1[1]*n2[2]
+		 - n1[0]* e[1]*n2[2]
+		 - n2[0]*n1[1]* e[2]
+		 -  e[0]*n2[1]*n1[2])/det;
+	if (lambda(0) < 0 || lambda(1) < 0 || lambda(2) < 0) lambda = Eigen::Vector3d(inf,inf,inf);
+	return lambda;
 }
 
 
