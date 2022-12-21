@@ -1,0 +1,8 @@
+@software{wield,
+  author = {Runnels, Brandon},
+  doi = {10.1016/j.jmps.2016.01.008},
+  month = {12},
+  title = {{(W)eak approximation of (I)nterface (E)nergy for (L)attice boun(D)aries (WIELD)}},
+  url = {https://github.com/solidsgroup/wield},
+  year = {2015}
+}
