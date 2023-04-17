@@ -67,16 +67,6 @@ std::pair<double,std::vector<Eigen::Vector3d>> Convexify2D(
 	std::vector<std::vector<double>> &theta,
 	std::vector<std::vector<double>> &w,
 	bool threefacet = false
-														   
-				 //double &wMin,
-				 //Eigen::Vector3d &lambdaMin,
-				 //Eigen::Vector3d &n1Min,
-				 //Eigen::Vector3d &n2Min,
-				 //Eigen::Vector3d &n3Min,
-				 //int coarsen,
-				 //double searchRadius,
-				 //int refining,
-				 //bool symmetricY
 	)
 {
 	/// Try 2D faceting first
@@ -105,33 +95,16 @@ std::pair<double,std::vector<Eigen::Vector3d>> Convexify2D(
 				Eigen::Vector3d n2(x[i2][j2], y[i2][j2], z[i2][j2]);
 				Eigen::Vector2d lambda = Wield::Optimization::ConvexCoefficients(n1,n2,e);
 				double wCurr = lambda(0)*w[i1][j1] + lambda(1)*w[i2][j2];
-				//std::cout << lambda.transpose() << std::endl << std::endl;;
-
-				
-
 				if (wCurr < wMin)
 				{
-					//std::cout << "====MINIMIZER====" << std::endl;
-					//std::cout << "theta1 = " << theta[i1][j1] << std::endl;
-					//std::cout << "theta2 = " << theta[i2][j2] << std::endl;
-					//std::cout << "wMin = " << wMin << std::endl;
-					//std::cout << "wCur = " << wCurr << std::endl;
 					wMin = wCurr;
 					n1Min = n1;
 					n2Min = n2;
-					//std::cout << "N1 = " << n1.transpose() << std::endl;
-					//std::cout << "w1 = " << w[i1][j1] << std::endl;
-					//std::cout << "N2 = " << n2.transpose() << std::endl;
-					//std::cout << "w2 = " << w[i2][j2] << std::endl;
-					//std::cout << wMin << std::endl;
-					//std::cout << lambda.transpose() << std::endl << std::endl;;
 				}
 			}
 		}
 		
 	}
-
-
 	if (threefacet)
 	{
 		for (int t1 = 0; t1 < sizet; t1++)
@@ -162,36 +135,18 @@ std::pair<double,std::vector<Eigen::Vector3d>> Convexify2D(
 								if (wCurr < 0) continue;
 								if (wCurr < wMin)
 								{
-									//std::cout << "====MINIMIZER====" << std::endl;
 									wMin = wCurr;
 									n1Min = n1;
 									n2Min = n2;
 									n3Min = n3;
-									//std::cout << "N1 = " << n1.transpose() << std::endl;
-									//std::cout << "w1 = " << w[t1][j1] << std::endl;
-									//std::cout << "N2 = " << n2.transpose() << std::endl;
-									//std::cout << "w2 = " << w[t2][j2] << std::endl;
-									//std::cout << "N3 = " << n3.transpose() << std::endl;
-									//std::cout << "w3 = " << w[t3][j3] << std::endl;
-									//std::cout << "lamb = " << lambda.transpose() << std::endl;
-									//std::cout << wMin << std::endl;
-									//std::cout << lambda.transpose() << std::endl << std::endl;;
 								}
-								
 							}
 						}
 					}
 				}
 			}
 		}
-
-
-
-
 	}
-
-
-
 	std::vector<Eigen::Vector3d> ret;
 	ret.push_back(n1Min);
 	ret.push_back(n2Min);
@@ -202,6 +157,11 @@ std::pair<double,std::vector<Eigen::Vector3d>> Convexify2D(
 	pair.second = ret;
 	return pair;
 }
+
+Eigen::Vector2d ConvexCoefficients2(Eigen::Vector3d n1, Eigen::Vector3d n2, Eigen::Vector3d e)
+{ return Wield::Optimization::ConvexCoefficients(n1,n2,e); }
+Eigen::Vector3d ConvexCoefficients3(Eigen::Vector3d n1, Eigen::Vector3d n2, Eigen::Vector3d n3, Eigen::Vector3d e)
+{ return Wield::Optimization::ConvexCoefficients(n1,n2,n3,e); }
 
 PYBIND11_MODULE(wield,m) {
 
@@ -232,7 +192,8 @@ PYBIND11_MODULE(wield,m) {
 	m.def("createMatrixFromBungeEulerAngles",&createMatrixFromBungeEulerAngles,"Generate rotation matrix from Bunge Euler Angles");
 	m.def("createMatrixFromAxisAngle",&createMatrixFromAxisAngle,"Generate rotation matrix from axis-angle pair");
 	m.def("Convexify2D",&Convexify2D,"Convexify 2D");
-	
+	m.def("ConvexCoefficients2",&ConvexCoefficients2,"Convex coefficents for second order facets");
+	m.def("ConvexCoefficients3",&ConvexCoefficients3,"Convex coefficents for third order facets");
 }
 
 						 
