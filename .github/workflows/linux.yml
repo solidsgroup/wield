@@ -14,3 +14,20 @@ jobs:
       run: make python
     - name: python install
       run: pip3 install -e ./py/
+  redhat-ubi8:
+    name: Redhat UBI 8
+    runs-on: ubuntu-latest
+    container:
+      image: redhat/ubi8
+    steps:
+      - name: install git and sudo
+        run: yum install -y sudo git
+      - name: configure git safe directories
+        run: git config --global --add safe.directory '*'
+      - uses: actions/checkout@v2
+      - name: installing preliminaries
+        run: bash .github/workflows/dependencies-yum.sh
+      - name: make python
+        run: make python
+      - name: python install
+        run: pip3 install -e ./py/
