@@ -14,7 +14,8 @@ jobs:
       run: make python
     - name: python install
       run: pip3 install -e ./py/
-  container-test-job:
+  redhat-ubi8:
+    name: Redhat UBI 8
     runs-on: ubuntu-latest
     container:
       image: redhat/ubi8
