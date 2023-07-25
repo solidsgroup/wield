@@ -1,6 +1,6 @@
 set -eu -o pipefail
 
-sudo yum install -y g++ make
+sudo yum install -y gcc gcc-c++ make
 
 # Requirements for regression test scripts
 #pip3 install yt matplotlib numpy pandas
