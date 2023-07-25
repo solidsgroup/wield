@@ -30,7 +30,7 @@ jobs:
       - name: install sudo
         run: yum install -y sudo
       - name: installing preliminaries
-        run: bash .github/workflows/dependencies-apt.sh
+        run: bash .github/workflows/dependencies-yum.sh
       - name: make python
         run: make python
       - name: python install
