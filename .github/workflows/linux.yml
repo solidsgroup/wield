@@ -19,13 +19,6 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: redhat/ubi8
-      env:
-        NODE_ENV: development
-      ports:
-        - 80
-      volumes:
-        - my_docker_volume:/volume_mount
-      options: --cpus 1
     steps:
       - name: install git and sudo
         run: yum install -y sudo git
