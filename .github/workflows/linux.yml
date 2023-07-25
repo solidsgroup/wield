@@ -27,6 +27,8 @@ jobs:
       options: --cpus 1
     steps:
       - uses: actions/checkout@v2
+      - name: install sudo
+        run: yum install sudo
       - name: installing preliminaries
         run: bash .github/workflows/dependencies-apt.sh
       - name: make python
