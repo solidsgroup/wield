@@ -26,5 +26,10 @@ jobs:
         - my_docker_volume:/volume_mount
       options: --cpus 1
     steps:
-      - name: Check for dockerenv file
-        run: (ls /.dockerenv && echo Found dockerenv) || (echo No dockerenv)
+      - uses: actions/checkout@v2
+      - name: installing preliminaries
+        run: bash .github/workflows/dependencies-apt.sh
+      - name: make python
+        run: make python
+      - name: python install
+        run: pip3 install -e ./py/
