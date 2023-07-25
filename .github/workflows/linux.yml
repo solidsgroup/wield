@@ -28,7 +28,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: install sudo
-        run: yum install sudo
+        run: yum install -y sudo
       - name: installing preliminaries
         run: bash .github/workflows/dependencies-apt.sh
       - name: make python
