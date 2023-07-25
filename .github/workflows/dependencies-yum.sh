@@ -1,6 +1,6 @@
 set -eu -o pipefail
 
-sudo yum install -y gcc gcc-c++ make python3-devel
+sudo yum install -y gcc gcc-c++ make python3-devel git
 
 # Requirements for regression test scripts
 #pip3 install yt matplotlib numpy pandas
