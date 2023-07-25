@@ -28,6 +28,8 @@ jobs:
     steps:
       - name: install git and sudo
         run: yum install -y sudo git
+      - name: configure git safe directories
+        git config --global --add safe.directory '*'
       - uses: actions/checkout@v2
       - name: installing preliminaries
         run: bash .github/workflows/dependencies-yum.sh
