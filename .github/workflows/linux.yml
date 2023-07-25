@@ -1,0 +1,16 @@
+name: Linux
+
+on: [push, pull_request]
+
+jobs:
+  ubuntu-22-04:
+    name: Ubuntu 22.04
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: installing preliminaries
+      run: bash .github/workflows/dependencies-apt.sh
+    - name: make python
+      run: make python
+    - name: python install
+      run: pip3 install -e ./py/
