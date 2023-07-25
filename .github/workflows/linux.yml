@@ -26,9 +26,9 @@ jobs:
         - my_docker_volume:/volume_mount
       options: --cpus 1
     steps:
+      - name: install git and sudo
+        run: yum install -y sudo git
       - uses: actions/checkout@v2
-      - name: install sudo
-        run: yum install -y sudo
       - name: installing preliminaries
         run: bash .github/workflows/dependencies-yum.sh
       - name: make python
