@@ -185,9 +185,9 @@ PYBIND11_MODULE(wield,m) {
 	m.def("createMatrixFromYAngle",&createMatrixFromYAngle,"Generate rotation matrix about y axis");
 	m.def("createMatrixFromZAngle",&createMatrixFromZAngle,"Generate rotation matrix about z axis");
 	m.def("createMatrixFromAngle",&createMatrixFromAngle,"Generate rotation matrix about x, y, or z axis");
-	m.def("createMatrixFromXY",&createMatrixFromXY,"Generate rotation matrix from x axis and y axis");
-	m.def("createMatrixFromYZ",&createMatrixFromYZ,"Generate rotation matrix from y axis and z axis");
-	m.def("createMatrixFromZX",&createMatrixFromZX,"Generate rotation matrix from z axis and x axis");
+	m.def("createMatrixFromXY",&createMatrixFromXY,"Generate rotation matrix from x axis and y axis",pybind11::arg("ex"),pybind11::arg("ey"),pybind11::arg("tolerance")=1E-8);
+	m.def("createMatrixFromYZ",&createMatrixFromYZ,"Generate rotation matrix from y axis and z axis",pybind11::arg("ey"),pybind11::arg("ez"),pybind11::arg("tolerance")=1E-8);
+	m.def("createMatrixFromZX",&createMatrixFromZX,"Generate rotation matrix from z axis and x axis",pybind11::arg("ez"),pybind11::arg("ex"),pybind11::arg("tolerance")=1E-8);
 	m.def("createMatrixFromNormalVector",&createMatrixFromNormalVector,"Generate rotation matrix from normal vector");
 	m.def("createMatrixFromBungeEulerAngles",&createMatrixFromBungeEulerAngles,"Generate rotation matrix from Bunge Euler Angles");
 	m.def("createMatrixFromAxisAngle",&createMatrixFromAxisAngle,"Generate rotation matrix from axis-angle pair");

@@ -39,13 +39,13 @@ Eigen::Matrix3d createMatrixFromAngle(double theta, char axis)
   if (axis=='z' || axis=='Z') return createMatrixFromZAngle(theta);
   else return Eigen::Matrix3d::Identity();
 }
-Eigen::Matrix3d createMatrixFromXY(Eigen::Vector3d ex, Eigen::Vector3d ey)
+Eigen::Matrix3d createMatrixFromXY(Eigen::Vector3d ex, Eigen::Vector3d ey, double tolerance=1E-8)
 {
   WIELD_EXCEPTION_TRY;
-  if (fabs(ex.dot(ey)) > 1E-8)
+  if (fabs(ex.dot(ey)) > tolerance)
     WIELD_EXCEPTION_NEW("ex not orthogonal to ey: ex=[" << ex.transpose() << "]; ey=[" << ey.transpose()<<"]");
-  if (ex.norm() < 1E-8) WIELD_EXCEPTION_NEW("ex is a zero vector");
-  if (ey.norm() < 1E-8) WIELD_EXCEPTION_NEW("ey is a zero vector");
+  if (ex.norm() < tolerance) WIELD_EXCEPTION_NEW("ex is a zero vector");
+  if (ey.norm() < tolerance) WIELD_EXCEPTION_NEW("ey is a zero vector");
   Eigen::Vector3d ez = ex.cross(ey);
   Eigen::Matrix3d Omega;
   Omega.col(0) = ex / ex.norm();
@@ -55,13 +55,13 @@ Eigen::Matrix3d createMatrixFromXY(Eigen::Vector3d ex, Eigen::Vector3d ey)
   WIELD_EXCEPTION_CATCH;
 }
 
-Eigen::Matrix3d createMatrixFromYZ(Eigen::Vector3d ey, Eigen::Vector3d ez)
+Eigen::Matrix3d createMatrixFromYZ(Eigen::Vector3d ey, Eigen::Vector3d ez, double tolerance=1E-8)
 {
   WIELD_EXCEPTION_TRY;
-  if (fabs(ey.dot(ez)) > 1E-8)
+  if (fabs(ey.dot(ez)) > tolerance)
     WIELD_EXCEPTION_NEW("ey not orthogonal to ez: ey=[" << ey.transpose() << "]; ez=[" << ez.transpose()<<"]");
-  if (ey.norm() < 1E-8) WIELD_EXCEPTION_NEW("ey is a zero vector");
-  if (ez.norm() < 1E-8) WIELD_EXCEPTION_NEW("ez is a zero vector");
+  if (ey.norm() < tolerance) WIELD_EXCEPTION_NEW("ey is a zero vector");
+  if (ez.norm() < tolerance) WIELD_EXCEPTION_NEW("ez is a zero vector");
   Eigen::Vector3d ex = ey.cross(ez);
   Eigen::Matrix3d Omega;
   Omega.col(0) = ex / ex.norm();
@@ -71,13 +71,13 @@ Eigen::Matrix3d createMatrixFromYZ(Eigen::Vector3d ey, Eigen::Vector3d ez)
   WIELD_EXCEPTION_CATCH;
 }
 
-Eigen::Matrix3d createMatrixFromZX(Eigen::Vector3d ez, Eigen::Vector3d ex)
+Eigen::Matrix3d createMatrixFromZX(Eigen::Vector3d ez, Eigen::Vector3d ex, double tolerance=1E-8)
 {
   WIELD_EXCEPTION_TRY;
-  if (fabs(ez.dot(ex)) > 1E-8)
+  if (fabs(ez.dot(ex)) > tolerance)
     WIELD_EXCEPTION_NEW("ez not orthogonal to ex: ez=[" << ez.transpose() << "]; ex=[" << ex.transpose()<<"]");
-  if (ez.norm() < 1E-8) WIELD_EXCEPTION_NEW("ez is a zero vector");
-  if (ex.norm() < 1E-8) WIELD_EXCEPTION_NEW("ex is a zero vector");
+  if (ez.norm() < tolerance) WIELD_EXCEPTION_NEW("ez is a zero vector");
+  if (ex.norm() < tolerance) WIELD_EXCEPTION_NEW("ex is a zero vector");
   Eigen::Vector3d ey = ez.cross(ex);
   Eigen::Matrix3d Omega;
   Omega.col(0) = ex / ex.norm();

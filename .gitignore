@@ -25,3 +25,4 @@ run.stdout
 run.error
 .vscode
 wield.code-workspace
+doc
