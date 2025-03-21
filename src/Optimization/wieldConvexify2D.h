@@ -103,7 +103,7 @@ void *Convexify2D(void *args);
 static inline
 Eigen::Vector2d ConvexCoefficients(Eigen::Vector3d n1, Eigen::Vector3d n2, Eigen::Vector3d e)
 {
-	double inf = std::numeric_limits<double>::infinity();
+	double inf = abs(std::numeric_limits<double>::infinity());
 	Eigen::Vector2d lambda(inf,inf);
 
 	//double det = n1[0]*n2[1] - n2[0]*n1[1];
@@ -123,7 +123,7 @@ Eigen::Vector2d ConvexCoefficients(Eigen::Vector3d n1, Eigen::Vector3d n2, Eigen
 static inline
 Eigen::Vector3d ConvexCoefficients(Eigen::Vector3d n1, Eigen::Vector3d n2, Eigen::Vector3d n3, Eigen::Vector3d e)
 {
-	double inf = std::numeric_limits<double>::infinity();
+	double inf = abs(std::numeric_limits<double>::infinity());
 	Eigen::Vector3d lambda(inf,inf,inf);
 	double det = 
 		+ n1[0]*n2[1]*n3[2] 
