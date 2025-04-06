@@ -13,7 +13,11 @@ jobs:
     - name: make 
       run: make 
     - name: python install
-      run: pip3 install -e ./py/
+      run: pip install ./py/
+    - name: run test script
+      working-directory: ./tests/energy1d_fcc_stgb_001/
+      run: python input.py
+
   redhat-ubi8:
     name: Redhat UBI 8
     runs-on: ubuntu-latest
