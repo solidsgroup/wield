@@ -1,0 +1,7 @@
+-fopenmp
+-Wno-deprecated
+-Wunused-variable
+-DMUPARSER
+-I./src
+-I./inc
+-I/usr/include/eigen3

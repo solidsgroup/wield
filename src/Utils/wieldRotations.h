@@ -39,9 +39,10 @@ Eigen::Matrix3d createMatrixFromAngle(double theta, char axis)
   if (axis=='z' || axis=='Z') return createMatrixFromZAngle(theta);
   else return Eigen::Matrix3d::Identity();
 }
-Eigen::Matrix3d createMatrixFromXY(Eigen::Vector3d ex, Eigen::Vector3d ey, double tolerance=1E-8)
+Eigen::Matrix3d createMatrixFromXY(Eigen::Vector3d ex, Eigen::Vector3d ey)//, double tolerance=1E-8)
 {
   WIELD_EXCEPTION_TRY;
+  double tolerance = 1E-8;
   if (fabs(ex.dot(ey)) > tolerance)
     WIELD_EXCEPTION_NEW("ex not orthogonal to ey: ex=[" << ex.transpose() << "]; ey=[" << ey.transpose()<<"]");
   if (ex.norm() < tolerance) WIELD_EXCEPTION_NEW("ex is a zero vector");
@@ -55,9 +56,11 @@ Eigen::Matrix3d createMatrixFromXY(Eigen::Vector3d ex, Eigen::Vector3d ey, doubl
   WIELD_EXCEPTION_CATCH;
 }
 
-Eigen::Matrix3d createMatrixFromYZ(Eigen::Vector3d ey, Eigen::Vector3d ez, double tolerance=1E-8)
+
+Eigen::Matrix3d createMatrixFromYZ(Eigen::Vector3d ey, Eigen::Vector3d ez)//, double tolerance=1E-8)
 {
   WIELD_EXCEPTION_TRY;
+  double tolerance = 1E-8;
   if (fabs(ey.dot(ez)) > tolerance)
     WIELD_EXCEPTION_NEW("ey not orthogonal to ez: ey=[" << ey.transpose() << "]; ez=[" << ez.transpose()<<"]");
   if (ey.norm() < tolerance) WIELD_EXCEPTION_NEW("ey is a zero vector");
@@ -71,9 +74,11 @@ Eigen::Matrix3d createMatrixFromYZ(Eigen::Vector3d ey, Eigen::Vector3d ez, doubl
   WIELD_EXCEPTION_CATCH;
 }
 
-Eigen::Matrix3d createMatrixFromZX(Eigen::Vector3d ez, Eigen::Vector3d ex, double tolerance=1E-8)
+
+Eigen::Matrix3d createMatrixFromZX(Eigen::Vector3d ez, Eigen::Vector3d ex) //, double tolerance=1E-8)
 {
   WIELD_EXCEPTION_TRY;
+  double tolerance = 1E-8;
   if (fabs(ez.dot(ex)) > tolerance)
     WIELD_EXCEPTION_NEW("ez not orthogonal to ex: ez=[" << ez.transpose() << "]; ex=[" << ex.transpose()<<"]");
   if (ez.norm() < tolerance) WIELD_EXCEPTION_NEW("ez is a zero vector");

@@ -26,3 +26,5 @@ run.error
 .vscode
 wield.code-workspace
 doc
+py/build
+venv

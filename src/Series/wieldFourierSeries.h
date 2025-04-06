@@ -6,6 +6,7 @@
 #include <vector>
 #include <fstream>
 #include <stdexcept>
+#include <complex>
 
 #include "Reader/Reader.h"
 #include "Utils/wieldTypes.h"
@@ -71,7 +72,7 @@ public:
 				for (int n = -order + 1; n < order; n++)
 				{
 					(*this)(l, m, n) = 0;
-					for (unsigned int i = 0; i < size; i++)
+					for (int i = 0; i < size; i++)
 					{
 						if (fabs(X[i]) > 0.5 * alphaX)
 							WIELD_WARNING("X[i] = " << X[i] << " > 0.5*alphaX= " << 0.5 * alphaX);
@@ -142,11 +143,12 @@ public:
 	double alphaX; ///< \brief X Lattice coefficient
 	double alphaY; ///< \brief Y Lattice coefficient
 	double alphaZ; ///< \brief Z Lattice coefficient
+private:
+	Mollifier phiHat;
+public:
 	double sigma;
-
 private:
 	std::vector<std::complex<double>> C; ///< Matrix of complex Fourier coefficients
-	Mollifier phiHat;
 };
 
 } // namespace Series

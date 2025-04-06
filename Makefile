@@ -1,6 +1,9 @@
 # Generic Makefile
 # Brandon Runnels
 
+# you can override this if your eigen lives somewhere else
+EIGEN_INCLUDE_DIR ?= /usr/include/eigen3
+
 RESET              = '\033[0m'
 B_ON               = '\033[1m'
 FG_RED             = '\033[31m'
@@ -28,7 +31,8 @@ OBJ 		      = $(subst ./src/,./obj/, $(SRC:.cpp=.o))
 OBJ_MAIN              = $(subst ./src/,./obj/, $(SRC_MAIN:.cc=.o))
 INC 		      = -O3 -I./src \
 		        -I./inc \
-			-I./extern/eigen/
+                  -I${EIGEN_INCLUDE_DIR}
+
 LIB		      = $(LIB_EXT) -lmuparser 
 
 
@@ -50,7 +54,7 @@ $(PYTHON_NAME): ./py/python.cpp $(SRC) $(HDR)
 	@echo $(B_ON)$(FG_BLUE)"###"
 	@echo "### LINKING $@" 
 	@echo "###"$(RESET)
-	$(CC) -DWIELD_PYTHON $(INC) -I./extern/pybind11/include/ -O3 -Wall -shared -std=c++11 -fPIC $(INC_PYTHON) py/python.cpp -o $@
+	$(CC) -DWIELD_PYTHON $(INC) -O3 -Wall -shared -std=c++17 -fPIC $(INC_PYTHON) py/python.cpp -o $@
 
 bin/wield: ./obj/wield.o $(OBJ) 
 	@echo $(B_ON)$(FG_BLUE)"###"
@@ -70,7 +74,7 @@ bin/wield: ./obj/wield.o $(OBJ)
 	@echo $(B_ON)$(FG_YELLOW)"###"
 	@echo "### COMPILING $<" 
 	@echo "###"$(RESET)
-	$(CC) $(CPP_COMPILER_OPTIONS) $(INC) -o $@ $(PREFIX)$<
+	$(CC) -ggdb $(CPP_COMPILER_OPTIONS) $(INC) -o $@ $(PREFIX)$<
 
 make_directories: $(SRC)
 	git submodule update --init --recursive
