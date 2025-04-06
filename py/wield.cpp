@@ -233,7 +233,7 @@ PYBIND11_MODULE(wield, m)
      m.def("createMatrixFromYAngle",&createMatrixFromYAngle,"Generate rotation matrix about y axis");
      m.def("createMatrixFromZAngle",&createMatrixFromZAngle,"Generate rotation matrix about z axis");
      m.def("createMatrixFromAngle",&createMatrixFromAngle,"Generate rotation matrix about x, y, or z axis");
-     m.def("createMatrixFromXY", &createMatrixFromXY_array, "Generate rotation matrix from x axis and y axis");
+     m.def("createMatrixFromXY", &createMatrixFromXY, "Generate rotation matrix from x axis and y axis");
      //,pybind11::arg("ex"),pybind11::arg("ey"),pybind11::arg("tolerance")=1E-8);
      m.def("createMatrixFromYZ", &createMatrixFromYZ, "Generate rotation matrix from y axis and z axis");
      //,pybind11::arg("ey"),pybind11::arg("ez"),pybind11::arg("tolerance")=1E-8);
