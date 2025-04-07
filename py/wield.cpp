@@ -41,6 +41,7 @@
 #include "../src/Series/wieldGaussDirac.h"
 #include "../src/Series/wieldSqrtGaussDirac.h"
 #include "../src/Utils/wieldRotations.h"
+#include "../src/Optimization/wieldConvexify1D.h"
 #include "../src/Optimization/wieldConvexify2D.h"
 
 // namespace py = pybind11;
@@ -205,7 +206,22 @@ Convexify2D(
 Eigen::Vector2d ConvexCoefficients2(Eigen::Vector3d n1, Eigen::Vector3d n2, Eigen::Vector3d e)
 { return Wield::Optimization::ConvexCoefficients(n1,n2,e); }
 Eigen::Vector3d ConvexCoefficients3(Eigen::Vector3d n1, Eigen::Vector3d n2, Eigen::Vector3d n3, Eigen::Vector3d e)
-{ return Wield::Optimization::ConvexCoefficients(n1,n2,n3,e); }
+{
+    return Wield::Optimization::ConvexCoefficients(n1, n2, n3, e);
+}
+
+
+std::pair<std::vector<double>, std::vector<double> >
+Convexify1D(
+    std::vector<double> &phis,
+    std::vector<double> &energies,
+    bool full = false)
+{
+     std::vector<double> wulff;
+     std::vector<double> relaxed_energies;
+     relaxed_energies = Wield::Optimization::Convexify1DAngles(phis, energies, wulff, full);
+     return {relaxed_energies,wulff};
+}
 
 PYBIND11_MODULE(wield, m)
 {
@@ -242,6 +258,7 @@ PYBIND11_MODULE(wield, m)
      m.def("createMatrixFromNormalVector",&createMatrixFromNormalVector,"Generate rotation matrix from normal vector");
      m.def("createMatrixFromBungeEulerAngles",&createMatrixFromBungeEulerAngles,"Generate rotation matrix from Bunge Euler Angles");
      m.def("createMatrixFromAxisAngle",&createMatrixFromAxisAngle,"Generate rotation matrix from axis-angle pair");
+     m.def("Convexify1D",&Convexify1D,"Convexify 1D");
      m.def("Convexify2D",&Convexify2D,"Convexify 2D");
      m.def("ConvexCoefficients2",&ConvexCoefficients2,"Convex coefficents for second order facets");
      m.def("ConvexCoefficients3",&ConvexCoefficients3,"Convex coefficents for third order facets");

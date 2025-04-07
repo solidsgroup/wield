@@ -14,7 +14,7 @@ ext_modules = [
             "../src/"
         ],
         language="c++",
-        extra_compile_args=["-std=c++17"],
+        extra_compile_args=["-std=c++17", "-O3"],
     )
 ]
 
